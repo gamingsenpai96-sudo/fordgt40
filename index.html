@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ford GT40 — Go Like Hell</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=Oswald:wght@200;300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/js/three.module.js",
+        "three/addons/": "./assets/js/"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="preloader-content">
+        <div class="preloader-ring"></div>
+        <p class="preloader-text">LOADING ASSETS</p>
+        <p class="preloader-percent" id="preloader-percent">0%</p>
+      </div>
+    </div>
+
+    <!-- Audio unlock banner / floating button -->
+    <button id="sound-btn" class="sound-banner" aria-label="Toggle Sound">
+      <span class="sound-icon-wrap">
+        <svg id="sound-svg-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+        <svg id="sound-svg-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </span>
+      <span id="sound-btn-text">CLICK FOR SOUND</span>
+    </button>
+
+    <!-- Precision Telemetry Custom Cursor -->
+    <div id="custom-cursor" class="custom-cursor">
+      <div class="cursor-dot"></div>
+      <div class="cursor-ring"></div>
+      <div id="cursor-label" class="cursor-label"></div>
+    </div>
+
+    <!-- Atmospheric Track Embers & Aerodynamic Wind Streamlines -->
+    <div id="tsparticles" class="particles-bg-wrap"></div>
+
+    <!-- Audio indicator notification with live graphic equalizer when engine triggers -->
+    <div id="engine-indicator" class="engine-indicator">
+      <span class="engine-indicator-pulse"></span>
+      <span class="engine-indicator-text">FORD 7.0L V8 &bull; IGNITION</span>
+      <div id="audio-eq-bars" class="audio-eq-bars" title="Live Engine Acoustic Spectrum">
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+      </div>
+    </div>
+
+    <!-- Cinematic Hero Video Wrapper -->
+    <div id="hero-video-wrap" class="hero-video-wrap">
+      <video
+        id="hero-car-video"
+        class="hero-car-video"
+        playsinline
+        webkit-playsinline
+        preload="auto"
+        poster="assets/videos/frame_3.5.jpg"
+      >
+        <source src="assets/videos/1966_Ford_GT40_h264.mp4" type="video/mp4" />
+        <source src="assets/videos/1966_Ford_GT40.mp4" type="video/mp4" />
+      </video>
+      <div class="video-atmosphere-overlay"></div>
+    </div>
+
+    <!-- Scroll Start Cue (Appears when site is opened for the first time) -->
+    <div id="scroll-start-cue" class="scroll-start-cue" role="button" tabindex="0" aria-label="Scroll to begin">
+      <div class="cue-pill">
+        <span class="cue-pulse-ring"></span>
+        <span class="cue-text">SCROLL TO BEGIN</span>
+      </div>
+      <div class="cue-subtext">OR CLICK TO START</div>
+      <div class="cue-arrow-wrap">
+        <svg class="cue-arrow-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Scroll spacer to allow smooth downward transition to story -->
+    <div id="scroll-spacer"></div>
+
+    <!-- Progress bar along the right edge -->
+    <div id="scroll-progress" class="scroll-progress">
+      <div class="scroll-progress-fill" id="scroll-progress-fill"></div>
+    </div>
+
+    <!-- UI Overlay — pins to viewport, fades in as car sequence completes -->
+    <div id="overlay" class="overlay hidden">
+      <!-- Top bar -->
+      <header class="top-bar">
+        <button class="menu-btn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="logo-glow"></div>
+        <button class="search-btn" aria-label="Search">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Hero text -->
+      <div class="hero">
+        <p class="hero-sub animate-in" data-delay="0">FORD GT40 MK II &bull; LE MANS 1966</p>
+        <h1 class="hero-title animate-in" data-delay="150">GO LIKE HELL</h1>
+        <p class="hero-tagline animate-in" data-delay="300">
+          THE 24-HOUR BATTLE FOR MOTORSPORT SUPREMACY
+        </p>
+      </div>
+
+      <!-- Specs panel with 3D Tilt and Rolling Odometer Values -->
+      <aside class="specs animate-in" data-delay="450" data-tilt data-tilt-max="10" data-tilt-glare data-tilt-max-glare="0.2">
+        <div class="specs-header">
+          <span class="specs-line"></span>
+          <span class="specs-label">SPECIFICATIONS</span>
+        </div>
+        <dl class="specs-list">
+          <div class="spec-row">
+            <dt>ENGINE</dt>
+            <dd><span class="spec-num" data-target="7.0" data-decimals="1">0.0</span>L FE V8</dd>
+          </div>
+          <div class="spec-row">
+            <dt>POWER</dt>
+            <dd><span class="spec-num" data-target="485" data-decimals="0">0</span> BHP</dd>
+          </div>
+          <div class="spec-row">
+            <dt>WEIGHT</dt>
+            <dd><span class="spec-num" data-target="1080" data-decimals="0" data-comma="true">0</span> KG</dd>
+          </div>
+          <div class="spec-row">
+            <dt>TOP SPEED</dt>
+            <dd><span class="spec-num" data-target="330" data-decimals="0">0</span> KM/H</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <!-- Bottom navigation with 3D Card Tilt & Precision Cursor Interaction -->
+      <nav class="bottom-nav animate-in" data-delay="600">
+        <a href="#slide-2-showroom" class="nav-card highlight-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="SHOWROOM"
+          ><span>SHOWROOM<br />SPLIT 2D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#game-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="RACE 3D"
+          ><span>LE MANS<br />DRIVE 3D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#exploded-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="ANATOMY 3D"
+          ><span>ANATOMY<br />EXPLODED 3D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#story" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="THE STORY"
+          ><span>ENTER<br />THE STORY</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#ford-vs-ferrari" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="RIVALRY"
+          ><span>FORD VS<br />FERRARI</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#cars" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="THE CARS"
+          ><span>THE CARS</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#circuit" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="CIRCUIT"
+          ><span>THE CIRCUIT</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#24hours" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="24 HOURS"
+          ><span>24 HOURS</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#people" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="LEGENDS"
+          ><span>THE PEOPLE</span><span class="arrow">&rarr;</span></a
+        >
+      </nav>
+
+      <!-- Landing page continue hint -->
+      <div id="landing-continue-hint" class="landing-continue-hint" role="button" tabindex="0">
+        <span>SCROLL DOWN FOR MORE</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 10l5 5 5-5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ====== Content sections wrapper (unlocked on second deliberate scroll) ====== -->
+    <div id="story-container">
+      <!-- ====== SLIDE 2: FORD GT40 VS FERRARI 330 P3 SPLIT SHOWROOM ====== -->
+      <section id="slide-2-showroom" class="showroom-split-section">
+        <div class="showroom-split-container" id="showroom-split-container">
+          <!-- Left Half: Ford GT40 -->
+          <div
+            class="split-half split-half-ford"
+            id="showroom-half-ford"
+            role="button"
+            tabindex="0"
+            aria-label="Ford GT40"
+            data-cursor="INSPECT GT40"
+          >
+            <!-- Background Layer -->
+            <div class="showroom-bg-wrap">
+              <img
+                src="assets/images/showroom/ford-bg.jpg"
+                alt="Ford Showroom Background"
+                class="showroom-bg-img"
+                loading="eager"
+              />
+              <div class="showroom-glow ford-glow"></div>
+            </div>
+            <!-- Car Cutout Layer (Only car hovers) -->
+            <div class="showroom-car-wrap">
+              <img
+                src="assets/images/showroom/ford-car.png"
+                alt="Ford GT40 Mk II"
+                class="showroom-car-cutout"
+                loading="eager"
+              />
+            </div>
+          </div>
+
+          <!-- Right Half: Ferrari 330 P3 -->
+          <div
+            class="split-half split-half-ferrari"
+            id="showroom-half-ferrari"
+            role="button"
+            tabindex="0"
+            aria-label="Ferrari 330 P3"
+            data-cursor="INSPECT 330 P3"
+          >
+            <!-- Background Layer -->
+            <div class="showroom-bg-wrap">
+              <img
+                src="assets/images/showroom/ferrari-bg.jpg"
+                alt="Ferrari Showroom Background"
+                class="showroom-bg-img"
+                loading="eager"
+              />
+              <div class="showroom-glow ferrari-glow"></div>
+            </div>
+            <!-- Car Cutout Layer (Only car hovers) -->
+            <div class="showroom-car-wrap">
+              <img
+                src="assets/images/showroom/ferrari-car.png"
+                alt="Ferrari 330 P3"
+                class="showroom-car-cutout"
+                loading="eager"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 3: 3D INTERACTIVE LE MANS GAME ====== -->
+      <section id="game-section" class="game-section content-section">
+        <div class="game-wrapper">
+          <div class="game-header">
+            <span class="section-tag">02</span>
+            <h2 class="section-title">Circuit de la Sarthe</h2>
+            <p class="section-body">
+              Take the wheel of the legendary 7.0L V8 Ford GT40 Mk II on the iconic Le Mans circuit.
+              Scroll to this section, click to enter the cockpit, and pilot the 485 bhp monster in full 3D third-person POV.
+            </p>
+          </div>
+
+          <!-- 3D Game Viewport -->
+          <div id="game-container" class="game-container">
+            <canvas id="game-canvas"></canvas>
+
+            <!-- Pre-play Click-to-Play Overlay -->
+            <div id="game-overlay" class="game-overlay">
+              <div class="game-overlay-content">
+                <div class="game-badge">
+                  <span class="live-dot"></span>
+                  <span>LE MANS 1966 &bull; 3D SIMULATION</span>
+                </div>
+                <h3 class="game-prompt-title">TAKE THE WHEEL</h3>
+                <p class="game-prompt-sub">CIRCUIT DE LA SARTHE &bull; THIRD PERSON CHASE POV</p>
+
+                <button id="game-start-btn" class="game-start-btn" aria-label="Start Driving">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>CLICK TO PLAY & DRIVE</span>
+                </button>
+
+                <!-- Controls Guide -->
+                <div class="game-keys-legend">
+                  <div class="key-item"><kbd>W</kbd> <span>THROTTLE</span></div>
+                  <div class="key-item"><kbd>S</kbd> <span>BRAKE / REV</span></div>
+                  <div class="key-item"><kbd>A</kbd><kbd>D</kbd> <span>STEER</span></div>
+                  <div class="key-item"><kbd>SPACE</kbd> <span>HANDBRAKE</span></div>
+                  <div class="key-item"><kbd>ESC</kbd> <span>EXIT DRIVE</span></div>
+                </div>
+
+                <!-- Model loading bar -->
+                <div id="game-loader-bar" class="game-loader-bar">
+                  <div id="game-loader-fill" class="game-loader-fill"></div>
+                  <span id="game-loader-text" class="game-loader-text">CIRCUIT TELEMETRY INITIALIZING...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Driving HUD -->
+            <div id="game-hud" class="game-hud">
+              <div class="hud-top">
+                <div class="hud-tag">
+                  <span class="hud-dot"></span>
+                  <span>FORD GT40 MK II &bull; LE MANS 1966</span>
+                </div>
+                <button id="game-exit-btn" class="game-exit-btn" type="button">
+                  <span>EXIT DRIVE [ESC]</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Telemetry Cluster -->
+              <div class="hud-cluster">
+                <div class="hud-gauge">
+                  <div class="hud-speed-row">
+                    <span class="hud-speed-val" id="hud-speed">0</span>
+                    <span class="hud-speed-unit">KM/H</span>
+                  </div>
+                  <div class="hud-rpm-bar-wrap">
+                    <div class="hud-rpm-bar" id="hud-rpm-bar"></div>
+                  </div>
+                  <div class="hud-rpm-labels">
+                    <span>0</span><span>2</span><span>4</span><span>6</span><span class="redline">7K</span>
+                  </div>
+                </div>
+                <div class="hud-gear-wrap">
+                  <span class="hud-gear-label">GEAR</span>
+                  <span class="hud-gear-val" id="hud-gear">N</span>
+                </div>
+              </div>
+
+              <div class="hud-controls-pill">
+                <span>[W] GAS &bull; [S] BRAKE &bull; [A][D] STEER &bull; [SPACE] DRIFT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SECTION: 3D EXPLODED TECHNICAL BREAKDOWN ====== -->
+      <section id="exploded-section" class="exploded-section content-section">
+        <div class="exploded-wrapper">
+          <!-- Section Header -->
+          <div class="exploded-header">
+            <div class="exploded-header-top">
+              <span class="section-tag">03 &bull; TECHNICAL BREAKDOWN</span>
+              <span class="exploded-badge">
+                <span class="live-dot"></span>
+                SHELBY AMERICAN &bull; CHASSIS P/1046
+              </span>
+            </div>
+            <h2 class="section-title">Anatomy of a Legend</h2>
+            <p class="section-body">
+              Deconstruct the 1966 24 Hours of Le Mans champion down to its bare mechanical bone. Explore the 7.0-litre FE V8, Kar Kraft T-44 transaxle, quick-change racing calipers, and aerodynamic monocoque in full 3D interactive exploded space.
+            </p>
+          </div>
+
+          <!-- System Navigation Pills -->
+          <div class="exploded-nav-bar">
+            <button class="exploded-system-btn active" data-system="all" data-cursor="EXPLODE ALL">
+              <span class="btn-icon">⬡</span>
+              <span class="btn-name">FULL EXPLODED</span>
+            </button>
+            <button class="exploded-system-btn" data-system="engine" data-cursor="7.0L V8">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-name">7.0L V8 ENGINE</span>
+            </button>
+            <button class="exploded-system-btn" data-system="transmission" data-cursor="T-44">
+              <span class="btn-icon">⚙️</span>
+              <span class="btn-name">T-44 TRANSAXLE</span>
+            </button>
+            <button class="exploded-system-btn" data-system="cockpit" data-cursor="COCKPIT">
+              <span class="btn-icon">💺</span>
+              <span class="btn-name">COCKPIT & INTERIOR</span>
+            </button>
+            <button class="exploded-system-btn" data-system="suspension" data-cursor="BRAKES">
+              <span class="btn-icon">🛞</span>
+              <span class="btn-name">SUSPENSION & BRAKES</span>
+            </button>
+            <button class="exploded-system-btn" data-system="chassis" data-cursor="MONOCOQUE">
+              <span class="btn-icon">🏎️</span>
+              <span class="btn-name">CHASSIS & AERO</span>
+            </button>
+          </div>
+
+          <!-- 3D Interactive Stage -->
+          <div class="exploded-stage-container" id="exploded-container">
+            <canvas id="exploded-canvas"></canvas>
+
+            <!-- Paddock Viewport Telemetry Badge -->
+            <div class="exploded-viewport-badge">
+              <div class="cad-indicator"><span class="pulse-dot"></span> LE MANS PADDOCK &bull; ENGINEERING BAY</div>
+              <div class="cad-coords" id="exploded-camera-coords">ROT: 45° • FOV: 40° • ACTIVE: FULL EXPLODED</div>
+            </div>
+
+            <!-- Floating 3D Hotspots (Screen Projected) -->
+            <div id="exploded-hotspots" class="exploded-hotspots-container">
+              <button class="hotspot-pin" data-target="engine" style="--accent: #ff4757" title="Inspect 427 FE V8">
+                <span class="pin-ring"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-label"><span>01</span> 427 FE V8</span>
+              </button>
+              <button class="hotspot-pin" data-target="transmission" style="--accent: #ffa502" title="Inspect T-44 Transaxle">
+                <span class="pin-ring"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-label"><span>02</span> T-44 TRANSAXLE</span>
+              </button>
+              <button class="hotspot-pin" data-target="cockpit" style="--accent: #2ed573" title="Inspect Cockpit & Gurney Bubble">
+                <span class="pin-ring"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-label"><span>03</span> RACE COCKPIT</span>
+              </button>
+              <button class="hotspot-pin" data-target="suspension" style="--accent: #1e90ff" title="Inspect Brakes & Suspension">
+                <span class="pin-ring"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-label"><span>04</span> QUICK-CHANGE BRAKES</span>
+              </button>
+              <button class="hotspot-pin" data-target="chassis" style="--accent: #a55eea" title="Inspect 40-inch Monocoque">
+                <span class="pin-ring"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-label"><span>05</span> 40" MONOCOQUE</span>
+              </button>
+            </div>
+
+            <!-- Floating Engineering Telemetry Card (Right Side Overlay) -->
+            <div class="exploded-telemetry-card" id="telemetry-card">
+              <div class="telemetry-card-inner">
+                <div class="telemetry-card-header">
+                  <div class="telemetry-badge-row">
+                    <span class="telemetry-subsystem-tag" id="tel-subsystem">HOLISTIC ASSEMBLY // CHASSIS P/1046</span>
+                    <span class="telemetry-status-tag">ACTIVE TELEMETRY</span>
+                  </div>
+                  <h3 class="telemetry-title" id="tel-title">FULL SYSTEM ARCHITECTURE</h3>
+                  <p class="telemetry-desc" id="tel-desc">
+                    The complete 1966 Le Mans 24 Hours winner. Designed to conquer 24 hours at 200+ mph on the Mulsanne Straight. Standing just 40 inches tall with a mid-mounted 7.0-litre V8, semi-monocoque steel tub, and quick-change running gear.
+                  </p>
+                </div>
+
+                <!-- Dynamic Specs Grid -->
+                <div class="telemetry-specs-grid" id="tel-specs-grid"></div>
+
+                <!-- Interactive Rev Engine & Equalizer Row -->
+                <div class="telemetry-audio-row">
+                  <button class="rev-engine-btn" id="btn-rev-engine" data-cursor="ROAR V8">
+                    <span class="rev-icon">🔊</span>
+                    <span class="rev-label">REV 7.0L V8</span>
+                  </button>
+                  <div class="rev-viz" id="rev-viz">
+                    <span class="rev-bar"></span>
+                    <span class="rev-bar"></span>
+                    <span class="rev-bar"></span>
+                    <span class="rev-bar"></span>
+                    <span class="rev-bar"></span>
+                    <span class="rev-bar"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Interactive Action Bar (Bottom Floating HUD) -->
+            <div class="exploded-quick-hud">
+              <div class="hud-slider-group">
+                <span class="hud-slider-label">ASSEMBLY DEPTH</span>
+                <button class="slider-btn" id="btn-explode-0">0%</button>
+                <div class="slider-track-wrap">
+                  <input type="range" id="explode-slider" min="0" max="100" value="65" class="exploded-range-input" />
+                  <div class="slider-fill-track" id="explode-slider-fill" style="width: 65%"></div>
+                </div>
+                <button class="slider-btn" id="btn-explode-50">50%</button>
+                <button class="slider-btn" id="btn-explode-100">100%</button>
+                <span class="hud-slider-val" id="explode-val-display">65%</span>
+              </div>
+
+              <div class="hud-actions-group">
+                <button class="hud-tool-btn" id="xray-toggle" title="Toggle Body Translucency" data-cursor="X-RAY">
+                  <span class="icon">👁️</span>
+                  <span class="btn-text">X-RAY BODY: <strong id="xray-state">OFF</strong></span>
+                </button>
+                <button class="hud-tool-btn active" id="autorotate-toggle" title="Toggle Auto-Orbit" data-cursor="ORBIT">
+                  <span class="icon">🔄</span>
+                  <span class="btn-text">ORBIT: <strong id="rotate-state">ON</strong></span>
+                </button>
+                <button class="hud-tool-btn" id="reset-cam-btn" title="Reset Camera View" data-cursor="RESET">
+                  <span class="icon">🎯</span>
+                  <span class="btn-text">RESET VIEW</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="exploded-loader" class="exploded-loader-overlay">
+              <div class="exploded-loader-spinner"></div>
+              <div class="exploded-loader-title">STREAMING LE MANS WORKSHOP GEOMETRY...</div>
+              <div class="exploded-loader-bar">
+                <div id="exploded-loader-fill" class="exploded-loader-fill"></div>
+              </div>
+              <div id="exploded-loader-sub" class="exploded-loader-sub">Loading GT40 Mk II Meshes & Materials (0%)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 04: The Story -->
+      <section id="story" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">04</span>
+          <h2 class="section-title">The Story</h2>
+          <p class="section-body">
+            In 1963, Henry Ford II set out to buy Ferrari. When Enzo Ferrari
+            walked away from the deal, Ford launched a revenge campaign that would
+            become one of the greatest underdog stories in motorsport history —
+            building a car from scratch to dethrone Ferrari at their own race.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 05: Ford vs Ferrari -->
+      <section id="ford-vs-ferrari" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">05</span>
+          <h2 class="section-title">Ford vs Ferrari</h2>
+          <p class="section-body">
+            Carroll Shelby and Ken Miles led the charge. Against corporate
+            politics, impossible deadlines, and the might of Maranello, they
+            engineered the GT40 into a Le Mans weapon — proving that American grit
+            could conquer European racing royalty.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 06: The Cars -->
+      <section id="cars" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">06</span>
+          <h2 class="section-title">The Cars</h2>
+          <p class="section-body">
+            The GT40 Mark II packed a thundering 7.0-litre V8 producing 485 bhp.
+            Standing just 40 inches tall — hence the name — it sliced through the
+            air at over 220 km/h on the Mulsanne Straight, a marvel of aerodynamic
+            engineering for its era.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 07: The Circuit -->
+      <section id="circuit" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">07</span>
+          <h2 class="section-title">The Circuit</h2>
+          <p class="section-body">
+            Circuit de la Sarthe — 13.6 kilometres of public roads and
+            purpose-built track. The 6-km Mulsanne Straight tested top speed; the
+            Porsche Curves demanded precision. For 24 hours, every weakness was
+            exposed.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 08: 24 Hours -->
+      <section id="24hours" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">08</span>
+          <h2 class="section-title">24 Hours</h2>
+          <p class="section-body">
+            June 18–19, 1966. Three Ford GT40s crossed the finish line in
+            formation — a 1-2-3 sweep that shattered Ferrari's six-year
+            stranglehold. It was the most dominant victory Le Mans had ever seen,
+            and it changed endurance racing forever.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 09: The People -->
+      <section id="people" class="content-section">
+        <div class="section-inner">
+          <span class="section-tag">09</span>
+          <h2 class="section-title">The People</h2>
+          <p class="section-body">
+            Carroll Shelby. Ken Miles. Bruce McLaren. Chris Amon. Behind the
+            machines were visionaries and daredevils who risked everything. Their
+            legacy endures — not just in trophies, but in the spirit of racing
+            itself.
+          </p>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <p>FORD GT40 &mdash; GO LIKE HELL &mdash; LE MANS 1966</p>
+      </footer>
+    </div>
+
+    <!-- ============================================================
+         FORD GT40 EXPLORATION EXPERIENCE MODAL
+         ============================================================ -->
+    <div id="ford-modal" class="exp-modal" role="dialog" aria-modal="true" aria-label="Ford GT40 Experience">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <button class="modal-back-btn" data-close-modal="ford-modal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>RETURN TO SHOWROOM</span>
+          </button>
+          <div class="modal-title-meta">
+            <span class="badge badge-ford">CHAPTER 01</span>
+            <span>/</span>
+            <span>FORD MOTOR COMPANY &bull; SHELBY AMERICAN</span>
+          </div>
+        </div>
+
+        <div class="modal-header-right">
+          <button class="modal-rev-btn" id="btn-modal-ford-rev">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            <span>REV 7.0L V8</span>
+          </button>
+          <button class="modal-close-btn" data-close-modal="ford-modal" aria-label="Close modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- Subnav Bar -->
+      <div class="modal-subnav-bar">
+        <button class="subnav-pill active active-ford" data-tab-group="ford" data-tab="overview">OVERVIEW</button>
+        <button class="subnav-pill" data-tab-group="ford" data-tab="henry-ford">HENRY FORD II</button>
+        <button class="subnav-pill" data-tab-group="ford" data-tab="shelby">CARROLL SHELBY</button>
+        <button class="subnav-pill" data-tab-group="ford" data-tab="miles">KEN MILES</button>
+        <button class="subnav-pill" data-tab-group="ford" data-tab="gt40">GT40 MK II DOSSIER</button>
+        <button class="subnav-pill" data-tab-group="ford" data-tab="team">THE TEAM</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- 1. OVERVIEW -->
+        <div class="exp-tab-content active" id="ford-tab-overview">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">THE DEARBORN VENDETTA &bull; 1963&ndash;1966</span>
+            <h1 class="exp-main-title">FORD GT40 PROGRAMME</h1>
+            <p class="exp-desc">
+              When Enzo Ferrari spurned Henry Ford II’s buyout bid in May 1963, Ford assembled America’s finest hot-rodders, aerospace engineers, and endurance drivers to accomplish what no American manufacturer had ever achieved: outright victory at the 24 Hours of Le Mans.
+            </p>
+          </div>
+
+          <!-- Curated Archival Photo Collage -->
+          <div class="exp-media-collage collage-layout-hero-stack">
+            <div class="collage-hero-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-overview.jpg" alt="1966 Ford GT40 Mk II Le Mans #1" class="collage-img" />
+                <div class="collage-caption">
+                  <span>1966 FORD GT40 MK II &bull; CHASSIS #GT40/106</span>
+                  <span class="collage-caption-tag">SHELBY AMERICAN</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-stack-col">
+              <div class="collage-sub-card">
+                <div class="collage-img-wrap">
+                  <img src="assets/images/history/ford-lemans-car2.jpg" alt="Car #2 Bruce McLaren Le Mans 1966" class="collage-img" />
+                  <div class="collage-caption">
+                    <span>OVERALL WINNER &bull; CAR #2</span>
+                    <span class="collage-caption-tag">MCLAREN / AMON</span>
+                  </div>
+                </div>
+              </div>
+              <div class="collage-sub-card">
+                <div class="collage-img-wrap">
+                  <img src="assets/images/history/ford-lemans-car5.jpg" alt="Car #5 Holman & Moody Le Mans 1966" class="collage-img" />
+                  <div class="collage-caption">
+                    <span>1-2-3 PODIUM SWEEP &bull; CAR #5</span>
+                    <span class="collage-caption-tag">HOLMAN &amp; MOODY</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="exp-cards-grid">
+            <div class="exp-card" data-jump-tab="henry-ford" data-tab-group="ford">
+              <div>
+                <span class="exp-card-tag">01 &bull; CORPORATE WILL</span>
+                <h3 class="exp-card-title">HENRY FORD II</h3>
+                <p class="exp-card-desc">The corporate monarch who issued the historic directive: "Go like hell and crush Ferrari on their home turf."</p>
+              </div>
+              <div class="exp-card-footer"><span>Explore Decisions & Timeline &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="shelby" data-tab-group="ford">
+              <div>
+                <span class="exp-card-tag">02 &bull; PROGRAMME CHIEF</span>
+                <h3 class="exp-card-title">CARROLL SHELBY</h3>
+                <p class="exp-card-desc">The 1959 Le Mans champion who rescued the failing GT40 project, installing big-block power and fearless leadership.</p>
+              </div>
+              <div class="exp-card-footer"><span>Explore Leadership & Victories &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="miles" data-tab-group="ford">
+              <div>
+                <span class="exp-card-tag">03 &bull; CHIEF TEST DRIVER</span>
+                <h3 class="exp-card-title">KEN MILES</h3>
+                <p class="exp-card-desc">The brilliant, uncompromising engineer-driver who dialed in the GT40 Mk II and dominated the 1966 race.</p>
+              </div>
+              <div class="exp-card-footer"><span>Explore 5-Category Deep Dive &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="gt40" data-tab-group="ford">
+              <div>
+                <span class="exp-card-tag">04 &bull; THE MACHINE</span>
+                <h3 class="exp-card-title">GT40 MK II DOSSIER</h3>
+                <p class="exp-card-desc">485 bhp 7.0-liter FE V8, quick-change brake calipers, and an aerodynamic Kamm tail built for 330 km/h.</p>
+              </div>
+              <div class="exp-card-footer"><span>Open Technical Blueprint &rarr;</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. HENRY FORD II -->
+        <div class="exp-tab-content" id="ford-tab-henry-ford">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">THE ARCHITECT OF REVENGE</span>
+            <h1 class="exp-main-title">HENRY FORD II ("THE DEUCE")</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ford-henry.jpg" alt="Henry Ford II" class="exp-profile-img" />
+              <div class="exp-profile-meta">HENRY FORD II &bull; CEO & PRESIDENT</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box">
+                <p class="exp-quote-text">"You better win."</p>
+                <span class="exp-quote-author">Henry Ford II handing Carroll Shelby his personal calling card before Le Mans 1966</span>
+              </div>
+              <p class="exp-desc">
+                In May 1963, Ford executives spent several weeks in Maranello auditing Ferrari’s books to finalize an $18 million buyout. At the eleventh hour, Enzo Ferrari read the contract clause granting Ford corporate veto over Ferrari’s racing division budget. Enzo cursed the American executives in Bolognese dialect, terminated negotiations, and threw Ford out into the street.
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                Furious, Henry Ford II summoned his top executives to Dearborn and formed the High-Performance Committee with one directive: "Spend whatever it takes. Win Le Mans." On June 19, 1966, Ford personally attended the finish as three GT40 Mk IIs swept the podium in a staged formation.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CARROLL SHELBY -->
+        <div class="exp-tab-content" id="ford-tab-shelby">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">PROGRAMME CHIEF & RACING ICON</span>
+            <h1 class="exp-main-title">CARROLL SHELBY</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ford-shelby.jpg" alt="Carroll Shelby" class="exp-profile-img" />
+              <div class="exp-profile-meta">CARROLL SHELBY &bull; SHELBY AMERICAN</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box">
+                <p class="exp-quote-text">"Yesterday's history, tomorrow's a mystery, so let's go like hell today."</p>
+                <span class="exp-quote-author">Carroll Shelby &bull; Shelby American</span>
+              </div>
+              <p class="exp-desc">
+                After the initial 1964 GT40 campaign ended in catastrophic mechanical DNFs under John Wyer, Ford delivered the entire racing programme to Carroll Shelby’s hangar at Los Angeles International Airport (LAX). Shelby immediately diagnosed the car's primary flaws: aerodynamic front lift, inadequate cooling, and an overburdened small-block motor.
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                Shelby replaced the small-block engine with the massive 427 cu in (7.0-liter) NASCAR V8, reshaped the front radiator ducting, and proved the concept by taking victory at the 1965 Daytona 2000 km and the 1966 12 Hours of Sebring.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. KEN MILES -->
+        <div class="exp-tab-content" id="ford-tab-miles">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">ENGINEER, RACER & HERO</span>
+            <h1 class="exp-main-title">KEN MILES</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ford-miles.jpg" alt="Ken Miles" class="exp-profile-img" />
+              <div class="exp-profile-meta">KEN MILES &bull; CHIEF DEVELOPMENT DRIVER</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box">
+                <p class="exp-quote-text">"There's a point at 7,000 RPM where everything fades. The machine becomes weightless. Just disappears. And all that's left is a body moving through space and time."</p>
+                <span class="exp-quote-author">Ken Miles &bull; Chief Development Driver</span>
+              </div>
+              <p class="exp-desc">
+                Ken Miles was the soul of the GT40 development. A former British tank mechanic and brilliant intuitive engineer, Miles spent hundreds of grueling test hours around Riverside Raceway in California, pushing prototypes until components fractured so they could be redesigned before France.
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                In the 1966 race, Miles and co-driver Denny Hulme shattered the Le Mans lap record. On Sunday morning, Miles held a commandingly comfortable lead. He was instructed by Leo Beebe to slow down to allow Bruce McLaren's #2 car and Ronnie Bucknum's #5 car to catch up for Ford's corporate publicity photo. When the flag waved, Le Mans officials awarded victory to McLaren because his car started 20 meters further back on the grid, cruelly robbing Miles of the historic Triple Crown (Daytona, Sebring, and Le Mans in a single calendar year).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. GT40 MK II DOSSIER -->
+        <div class="exp-tab-content" id="ford-tab-gt40">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">CHASSIS #GT/106 &bull; COMPETITION SPECIFICATION</span>
+            <h1 class="exp-main-title">FORD GT40 MK II SPECIFICATIONS</h1>
+          </div>
+
+          <!-- Technical Dual Collage -->
+          <div class="exp-media-collage collage-layout-dual">
+            <div class="collage-sub-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-gt40-profile-1966.jpg" alt="Ford GT40 Mk II Aerodynamic Profile" class="collage-img" />
+                <div class="collage-caption">
+                  <span>40-INCH COMPETITION SILHOUETTE &bull; AERODYNAMICS</span>
+                  <span class="collage-caption-tag">CHASSIS SPEC</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-sub-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-gt40-spec.jpg" alt="Ford GT40 Technical Details" class="collage-img" />
+                <div class="collage-caption">
+                  <span>7.0L FE 427 V8 &bull; PHIL REMINGTON BRAKES</span>
+                  <span class="collage-caption-tag">POWERTRAIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table class="exp-specs-table">
+            <tbody>
+              <tr>
+                <th>ENGINE ARCHITECTURE</th>
+                <td>Ford 427 FE (6,997 cc) 90° OHV V8 &bull; Cast-iron block, aluminum heads</td>
+              </tr>
+              <tr>
+                <th>HORSEPOWER & TORQUE</th>
+                <td>485 bhp @ 6,200 rpm &bull; 475 lb-ft @ 4,000 rpm</td>
+              </tr>
+              <tr>
+                <th>TOP SPEED</th>
+                <td>330 km/h (205+ mph) on Mulsanne Straight</td>
+              </tr>
+              <tr>
+                <th>CHASSIS & BODY</th>
+                <td>24-gauge sheet steel semi-monocoque center section &bull; Fiberglass bodywork</td>
+              </tr>
+              <tr>
+                <th>OVERALL HEIGHT</th>
+                <td>40.0 inches (1.02 m) to roofline &bull; Origin of "GT40" name</td>
+              </tr>
+              <tr>
+                <th>CURB WEIGHT</th>
+                <td>2,680 lbs (1,215 kg) wet race weight</td>
+              </tr>
+              <tr>
+                <th>BRAKE SYSTEM</th>
+                <td>Phil Remington Quick-Change Calipers &bull; 11.9-inch Girling ventilated discs</td>
+              </tr>
+              <tr>
+                <th>WHEELS & TIRES</th>
+                <td>Halibrand magnesium pin-drive wheels &bull; Goodyear Bluestreak racing slicks</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 6. THE TEAM -->
+        <div class="exp-tab-content" id="ford-tab-team">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">SHELBY AMERICAN &bull; HOLMAN MOODY</span>
+            <h1 class="exp-main-title">THE LE MANS 1966 ROSTER</h1>
+          </div>
+
+          <!-- Paddock Archival Collection Collage -->
+          <div class="exp-media-collage collage-layout-roster">
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-lemans-car2.jpg" alt="Bruce McLaren Car #2" class="collage-img" />
+                <div class="collage-caption">
+                  <span>BRUCE MCLAREN &bull; CHRIS AMON</span>
+                  <span class="collage-caption-tag">#2 WINNER</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-miles.jpg" alt="Ken Miles Testing" class="collage-img" />
+                <div class="collage-caption">
+                  <span>KEN MILES &bull; DENNY HULME</span>
+                  <span class="collage-caption-tag">#1 PACE</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-lemans-car5.jpg" alt="Ronnie Bucknum Car #5" class="collage-img" />
+                <div class="collage-caption">
+                  <span>BUCKNUM &bull; HUTCHERSON</span>
+                  <span class="collage-caption-tag">#5 PODIUM</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ford-lemans-formation.jpg" alt="1-2-3 Formation Finish" class="collage-img" />
+                <div class="collage-caption">
+                  <span>HISTORIC 1-2-3 SWEEP</span>
+                  <span class="collage-caption-tag">DEARBORN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="exp-cards-grid">
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CAR #2 &bull; 1ST PLACE WINNER</span>
+                <h3 class="exp-card-title">BRUCE MCLAREN & CHRIS AMON</h3>
+                <p class="exp-card-desc">Black #2 Shelby American GT40 Mk II. Covered 3,009.4 miles (4,843 km) at an average speed of 125.4 mph.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CAR #1 &bull; 2ND PLACE (CO-WINNER)</span>
+                <h3 class="exp-card-title">KEN MILES & DENNY HULME</h3>
+                <p class="exp-card-desc">Sky Blue #1 Shelby American GT40 Mk II. Led the race, set fastest lap (3:30.6), and executed the iconic formation finish.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CAR #5 &bull; 3RD PLACE PODIUM</span>
+                <h3 class="exp-card-title">RONNIE BUCKNUM & DICK HUTCHERSON</h3>
+                <p class="exp-card-desc">Gold #5 Holman & Moody GT40 Mk II. Completed the clean American 1-2-3 podium sweep.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CREW CHIEF & CHIEF ENGINEER</span>
+                <h3 class="exp-card-title">PHIL REMINGTON</h3>
+                <p class="exp-card-desc">Master craftsman who invented the quick-change brake bracket, allowing 90-second pad changes while Ferrari rotors cracked.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         FERRARI 330 P3 EXPLORATION EXPERIENCE MODAL
+         ============================================================ -->
+    <div id="ferrari-modal" class="exp-modal" role="dialog" aria-modal="true" aria-label="Ferrari 330 P3 Experience">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <button class="modal-back-btn ferrari-modal-back" data-close-modal="ferrari-modal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>RETURN TO SHOWROOM</span>
+          </button>
+          <div class="modal-title-meta">
+            <span class="badge badge-ferrari">CHAPTER 02</span>
+            <span>/</span>
+            <span>SCUDERIA FERRARI &bull; MARANELLO</span>
+          </div>
+        </div>
+
+        <div class="modal-header-right">
+          <button class="modal-rev-btn ferrari-rev-btn" id="btn-modal-ferrari-rev">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            <span>REV 4.0L V12</span>
+          </button>
+          <button class="modal-close-btn" data-close-modal="ferrari-modal" aria-label="Close modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- Subnav Bar -->
+      <div class="modal-subnav-bar">
+        <button class="subnav-pill active active-ferrari" data-tab-group="ferrari" data-tab="overview">OVERVIEW</button>
+        <button class="subnav-pill" data-tab-group="ferrari" data-tab="enzo">ENZO FERRARI</button>
+        <button class="subnav-pill" data-tab-group="ferrari" data-tab="forghieri">MAURO FORGHIERI</button>
+        <button class="subnav-pill" data-tab-group="ferrari" data-tab="bandini">LORENZO BANDINI</button>
+        <button class="subnav-pill" data-tab-group="ferrari" data-tab="p3">330 P3 DOSSIER</button>
+        <button class="subnav-pill" data-tab-group="ferrari" data-tab="scuderia">SCUDERIA ROSTER</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- 1. OVERVIEW -->
+        <div class="exp-tab-content active" id="ferrari-tab-overview">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">THE ITALIAN FORTRESS &bull; 6 CONSECUTIVE CROWNS (1960&ndash;1965)</span>
+            <h1 class="exp-main-title">SCUDERIA FERRARI</h1>
+            <p class="exp-desc">
+              Maranello ruled endurance racing with aristocratic supremacy. With six consecutive 24 Hours of Le Mans titles, Il Commendatore viewed motorsport as holy artistic combat, confronting Dearborn's corporate millions with Italian racing passion and operatic 12-cylinder engineering.
+            </p>
+          </div>
+
+          <!-- Curated Archival Photo Collage -->
+          <div class="exp-media-collage collage-layout-hero-stack ferrari-collage">
+            <div class="collage-hero-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-p3-profile.jpg" alt="Ferrari 330 P3 Tipo 0844" class="collage-img" />
+                <div class="collage-caption">
+                  <span>FERRARI 330 P3 &bull; TIPO 0844 SCUDERIA MARANELLO</span>
+                  <span class="collage-caption-tag">MARANELLO FACTORY</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-stack-col">
+              <div class="collage-sub-card">
+                <div class="collage-img-wrap">
+                  <img src="assets/images/history/ferrari-330p3-lemans-21.jpg" alt="Ferrari 330 P3 #21 Le Mans 1966" class="collage-img" />
+                  <div class="collage-caption">
+                    <span>CAR #21 BERLINETTA &bull; DE LA SARTHE</span>
+                    <span class="collage-caption-tag">PARKES / SCARFIOTTI</span>
+                  </div>
+                </div>
+              </div>
+              <div class="collage-sub-card">
+                <div class="collage-img-wrap">
+                  <img src="assets/images/history/ferrari-330p3-lemans-action.jpg" alt="Ferrari 330 P3 Night Battle" class="collage-img" />
+                  <div class="collage-caption">
+                    <span>NIGHT COMBAT &bull; CIRCUIT DE LA SARTHE</span>
+                    <span class="collage-caption-tag">ENDURANCE</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="exp-cards-grid">
+            <div class="exp-card" data-jump-tab="enzo" data-tab-group="ferrari">
+              <div>
+                <span class="exp-card-tag">01 &bull; IL COMMENDATORE</span>
+                <h3 class="exp-card-title">ENZO FERRARI</h3>
+                <p class="exp-card-desc">The imperious patriarch of Maranello who built road cars strictly to finance his racing Scuderia.</p>
+              </div>
+              <div class="exp-card-footer exp-card-footer-ferrari"><span>Read The Refusal & Philosophy &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="forghieri" data-tab-group="ferrari">
+              <div>
+                <span class="exp-card-tag">02 &bull; TECHNICAL GENIUS</span>
+                <h3 class="exp-card-title">MAURO FORGHIERI</h3>
+                <p class="exp-card-desc">The brilliant 27-year-old chief engineer who sculpted the featherweight 330 P3 tubular aerodynamic tub.</p>
+              </div>
+              <div class="exp-card-footer exp-card-footer-ferrari"><span>Explore Engineering Prowess &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="bandini" data-tab-group="ferrari">
+              <div>
+                <span class="exp-card-tag">03 &bull; TEAM LEADER</span>
+                <h3 class="exp-card-title">LORENZO BANDINI</h3>
+                <p class="exp-card-desc">Scuderia's fearless Italian hero who pushed the 330 P3 to the absolute limit in the opening night stages.</p>
+              </div>
+              <div class="exp-card-footer exp-card-footer-ferrari"><span>Read Driver Profile &rarr;</span></div>
+            </div>
+
+            <div class="exp-card" data-jump-tab="p3" data-tab-group="ferrari">
+              <div>
+                <span class="exp-card-tag">04 &bull; TIPO 0844</span>
+                <h3 class="exp-card-title">FERRARI 330 P3</h3>
+                <p class="exp-card-desc">420 bhp Quad-Cam V12 screaming to 8,200 rpm, wrapped in a 1,587 lb hand-hammered aerodynamic body.</p>
+              </div>
+              <div class="exp-card-footer exp-card-footer-ferrari"><span>Open Technical Blueprint &rarr;</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ENZO FERRARI -->
+        <div class="exp-tab-content" id="ferrari-tab-enzo">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">IL COMMENDATORE</span>
+            <h1 class="exp-main-title">ENZO FERRARI</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ferrari-enzo.jpg" alt="Enzo Ferrari" class="exp-profile-img" />
+              <div class="exp-profile-meta">ENZO FERRARI &bull; IL COMMENDATORE</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box ferrari-quote">
+                <p class="exp-quote-text">"I have never seen anyone win a race by saving fuel or saving brakes. The client is not always right. My cars are not commodities."</p>
+                <span class="exp-quote-author">Enzo Ferrari &bull; Maranello</span>
+              </div>
+              <p class="exp-desc">
+                Enzo Ferrari regarded production sports cars merely as necessary nuisances sold to wealthy aristocrats to pay for racing tires, fuel, and engine blocks. When Ford's corporate attorneys presented a 200-page buyout contract that restricted Scuderia Ferrari's racing independence, Enzo famously remarked that no committee in Detroit would ever dictate which races Ferrari entered.
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                He encircled the clause in purple ink, wrote "Non ci siamo" ("We are not agreed"), walked out of the conference room, and had lunch at the Ristorante Cavallino.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. MAURO FORGHIERI -->
+        <div class="exp-tab-content" id="ferrari-tab-forghieri">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">CHIEF TECHNICAL DIRECTOR</span>
+            <h1 class="exp-main-title">MAURO FORGHIERI</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ferrari-forghieri.jpg" alt="Mauro Forghieri" class="exp-profile-img" />
+              <div class="exp-profile-meta">MAURO FORGHIERI &bull; TECHNICAL DIRECTOR</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box ferrari-quote">
+                <p class="exp-quote-text">"Racing is a great laboratory. Every nut, every bolt must justify its weight in speed."</p>
+                <span class="exp-quote-author">Mauro Forghieri &bull; Scuderia Ferrari</span>
+              </div>
+              <p class="exp-desc">
+                Appointed by Enzo Ferrari at just 27 years old, Mauro Forghieri restructured Ferrari's technical department. For 1966, Forghieri replaced the spaceframe architecture with a semi-monocoque chassis featuring aero-stressed duralumin skins bonded to steel tubes, reducing chassis weight to barely 1,587 lbs (720 kg) &mdash; over 1,000 lbs lighter than the heavy Ford GT40!
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                Forghieri also introduced Lucas indirect mechanical fuel injection and twin overhead camshafts per cylinder bank, allowing the 4.0-liter V12 to rev past 8,200 rpm with razor-sharp throttle response.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. LORENZO BANDINI -->
+        <div class="exp-tab-content" id="ferrari-tab-bandini">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">THE ITALIAN HERO</span>
+            <h1 class="exp-main-title">LORENZO BANDINI</h1>
+          </div>
+
+          <div class="exp-profile-layout">
+            <div class="exp-profile-card">
+              <img src="assets/images/history/ferrari-bandini.jpg" alt="Lorenzo Bandini" class="exp-profile-img" />
+              <div class="exp-profile-meta">LORENZO BANDINI &bull; #20 FERRARI 330 P3</div>
+            </div>
+
+            <div class="exp-profile-content">
+              <div class="exp-quote-box ferrari-quote">
+                <p class="exp-quote-text">"When you drive for Ferrari, you drive for all of Italy. Every corner carries the heartbeat of millions."</p>
+                <span class="exp-quote-author">Lorenzo Bandini &bull; #20 Ferrari 330 P3</span>
+              </div>
+              <p class="exp-desc">
+                Lorenzo Bandini was beloved across Italy for his charm, courage, and blistering raw pace. Paired with 1964 Le Mans winner Jean Guichet in car #20, Bandini took the fight straight to Ford in the opening laps, trading the lead with Ken Miles as torrential rain swept the Sarthe circuit.
+              </p>
+              <p class="exp-desc" style="margin-top: 14px;">
+                The blistering pace set by Bandini forced Ford to run flat-out, eventually causing gearbox and head gasket failures across multiple Ford customer entries before water pump and transmission gremlins struck the factory Ferrari entries in the dead of night.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. 330 P3 DOSSIER -->
+        <div class="exp-tab-content" id="ferrari-tab-p3">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">CHASSIS #0844 &bull; SCUDERIA MARANELLO</span>
+            <h1 class="exp-main-title">FERRARI 330 P3 SPECIFICATIONS</h1>
+          </div>
+
+          <!-- Technical Dual Collage -->
+          <div class="exp-media-collage collage-layout-dual ferrari-collage">
+            <div class="collage-sub-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-p3-profile.jpg" alt="Ferrari 330 P3 Aerodynamic Stance" class="collage-img" />
+                <div class="collage-caption">
+                  <span>TIPO 0844 LOW-DRAG AERODYNAMICS</span>
+                  <span class="collage-caption-tag">DURALUMIN CHASSIS</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-sub-card">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-p3-spec.jpg" alt="Ferrari Tipo 237 Quad-Cam V12" class="collage-img" />
+                <div class="collage-caption">
+                  <span>TIPO 237 QUAD-CAM 4.0L V12 &bull; 8,200 RPM</span>
+                  <span class="collage-caption-tag">POWERTRAIN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table class="exp-specs-table">
+            <tbody>
+              <tr>
+                <th>ENGINE ARCHITECTURE</th>
+                <td>Ferrari Tipo 237 (3,967 cc) 60° Quad-Cam V12 &bull; 24-valve alloy block & heads</td>
+              </tr>
+              <tr>
+                <th>HORSEPOWER & REDLINE</th>
+                <td>420 bhp @ 8,200 rpm &bull; 583 bhp per ton power-to-weight</td>
+              </tr>
+              <tr>
+                <th>FUEL INDUCTION</th>
+                <td>Lucas indirect mechanical fuel injection between intake tracts</td>
+              </tr>
+              <tr>
+                <th>TOP SPEED</th>
+                <td>310 km/h (193 mph) with low-drag aerodynamic profile</td>
+              </tr>
+              <tr>
+                <th>CHASSIS ARCHITECTURE</th>
+                <td>Tubular steel spaceframe with stressed aeronautical duralumin skins</td>
+              </tr>
+              <tr>
+                <th>CURB WEIGHT</th>
+                <td>1,587 lbs (720 kg) &bull; Over 1,000 lbs lighter than Ford GT40</td>
+              </tr>
+              <tr>
+                <th>TRANSMISSION</th>
+                <td>ZF 5DS-25/1 5-speed manual transaxle</td>
+              </tr>
+              <tr>
+                <th>WHEELS & TIRES</th>
+                <td>Campagnolo magnesium alloy star wheels &bull; Dunlop racing tires</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 6. SCUDERIA ROSTER -->
+        <div class="exp-tab-content" id="ferrari-tab-scuderia">
+          <div class="exp-hero-header">
+            <span class="exp-eyebrow">SCUDERIA FERRARI &bull; MARANELLO ENTRANTS</span>
+            <h1 class="exp-main-title">THE 1966 DRIVER LINEUP</h1>
+          </div>
+
+          <!-- Scuderia Archival Collection Collage -->
+          <div class="exp-media-collage collage-layout-roster ferrari-collage">
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-guichet.jpg" alt="Jean Guichet Ferrari Driver" class="collage-img" />
+                <div class="collage-caption">
+                  <span>BANDINI &bull; GUICHET</span>
+                  <span class="collage-caption-tag">#20 SPYDER</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-parkes.jpg" alt="Mike Parkes Factory Driver" class="collage-img" />
+                <div class="collage-caption">
+                  <span>MIKE PARKES</span>
+                  <span class="collage-caption-tag">#21 FACTORY</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-scarfiotti.jpg" alt="Ludovico Scarfiotti" class="collage-img" />
+                <div class="collage-caption">
+                  <span>LUDOVICO SCARFIOTTI</span>
+                  <span class="collage-caption-tag">ITALIAN GP CHAMP</span>
+                </div>
+              </div>
+            </div>
+            <div class="collage-roster-item">
+              <div class="collage-img-wrap">
+                <img src="assets/images/history/ferrari-330p3-lemans-21.jpg" alt="Ferrari 330 P3 #21 on Track" class="collage-img" />
+                <div class="collage-caption">
+                  <span>#21 BERLINETTA ON TRACK</span>
+                  <span class="collage-caption-tag">DE LA SARTHE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="exp-cards-grid">
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CAR #20 &bull; SPYDER</span>
+                <h3 class="exp-card-title">LORENZO BANDINI & JEAN GUICHET</h3>
+                <p class="exp-card-desc">Factory Scuderia Ferrari 330 P3. Led early stages through torrential rain before throttle linkage and engine overheating forced retirement at 4:30 AM.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">CAR #21 &bull; BERLINETTA</span>
+                <h3 class="exp-card-title">MIKE PARKES & LUDOVICO SCARFIOTTI</h3>
+                <p class="exp-card-desc">Scuderia Ferrari 330 P3 Berlinetta. Involved in an accident while avoiding a spinning car during torrential midnight downpours.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">NART #27 &bull; PRIVATEER</span>
+                <h3 class="exp-card-title">PEDRO RODRIGUEZ & RICHIE GINTHER</h3>
+                <p class="exp-card-desc">North American Racing Team (NART) Ferrari 330 P3 Spyder. Fought into top 5 until gearbox failure in the 17th hour.</p>
+              </div>
+            </div>
+
+            <div class="exp-card">
+              <div>
+                <span class="exp-card-tag">MARANELLO CONCESSIONAIRES #19</span>
+                <h3 class="exp-card-title">JO BONNIER & DAVID PIPER</h3>
+                <p class="exp-card-desc">British Maranello Concessionaires Ferrari 365 P2. Carried Ferrari's hopes until cylinder head gasket failure on Sunday morning.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creative Frontend Vendor Engines -->
+    <script src="assets/js/vendor/lenis.min.js"></script>
+    <script src="assets/js/vendor/vanilla-tilt.min.js"></script>
+    <script src="assets/js/vendor/confetti.browser.min.js"></script>
+    <script src="assets/js/vendor/tsparticles.slim.bundle.min.js"></script>
+
+    <!-- Project Application Scripts -->
+    <script src="main.js"></script>
+    <script type="module" src="assets/js/game.js?v=2.8"></script>
+    <script type="module" src="assets/js/exploded-view.js?v=2.8"></script>
+  </body>
+</html>
