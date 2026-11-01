@@ -2608,3 +2608,488 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 
+
+/* =================================================================
+   CONTINUOUS CINEMATIC DESIGN DNA & MOTION DESIGN ARCHITECTURE
+   ================================================================= */
+
+/* 1. Global Continuous Paddock Atmosphere */
+#story-container {
+  background: radial-gradient(circle at 50% 0%, #0d121c 0%, #06070a 45%, #040507 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+#story-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center top;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Reset individual section background jumps to maintain unbroken continuity */
+.showroom-split-section,
+.game-section,
+.exploded-section,
+.content-section {
+  background: transparent !important;
+  position: relative;
+  z-index: 2;
+}
+
+.content-section:nth-child(even) {
+  background: transparent !important;
+}
+
+/* 2. Floating Telemetry Wayfinder HUD (Right Side Continuous Tracker) */
+.telemetry-wayfinder {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.wayfinder-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 18px 12px;
+  background: rgba(10, 14, 22, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+.wayfinder-needle {
+  position: absolute;
+  right: 17px;
+  top: 24px;
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(180deg, #d4af37, #ffffff);
+  border-radius: 2px;
+  box-shadow: 0 0 12px #d4af37, 0 0 24px rgba(212, 175, 55, 0.5);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+.wayfinder-node {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+}
+
+.node-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.node-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.08em;
+  transition: color 0.3s ease;
+}
+
+.node-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(10, 14, 22, 0.9);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+
+.node-pip::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.wayfinder-node:hover .node-label {
+  opacity: 1;
+  transform: translateX(0);
+  color: #ffffff;
+}
+
+.wayfinder-node:hover .node-pip {
+  border-color: rgba(212, 175, 55, 0.8);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.wayfinder-node.active .node-pip {
+  border-color: #d4af37;
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.8);
+}
+
+.wayfinder-node.active .node-pip::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.wayfinder-node.active .node-tag {
+  color: #d4af37;
+}
+
+.wayfinder-node.active .node-label {
+  opacity: 0.85;
+  transform: translateX(0);
+  color: #d4af37;
+}
+
+@media (max-width: 900px) {
+  .telemetry-wayfinder {
+    display: none;
+  }
+}
+
+/* 3. Aerodynamic Velocity Flow Bridges (Seamless Inter-Section Connectors) */
+.velocity-bridge {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bridge-streamlines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 24px;
+  gap: 24px;
+}
+
+.streamline {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), rgba(255, 255, 255, 0.4), transparent);
+  position: relative;
+}
+
+.streamline::after {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: 3px;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.6) 0%, transparent 70%);
+  animation: streamlinePulse 3s infinite ease-in-out;
+}
+
+@keyframes streamlinePulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+.bridge-telemetry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: rgba(12, 16, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #e5c158;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(212, 175, 55, 0.08);
+  white-space: nowrap;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+  box-shadow: 0 0 8px #d4af37;
+  animation: pulseBeacon 2s infinite ease-in-out;
+}
+
+@keyframes pulseBeacon {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+}
+
+/* 4. Continuous Le Mans 1966 Chronicle Exhibition */
+.chronicles-timeline-wrap {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px 120px;
+  z-index: 5;
+}
+
+.timeline-spine {
+  position: absolute;
+  top: 80px;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(180deg, 
+    rgba(212, 175, 55, 0.1) 0%, 
+    rgba(212, 175, 55, 0.4) 15%, 
+    rgba(255, 255, 255, 0.5) 50%, 
+    rgba(212, 175, 55, 0.4) 85%, 
+    rgba(212, 175, 55, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.timeline-glow-bead {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 16px #d4af37, 0 0 32px #d4af37;
+  transition: transform 0.1s linear;
+}
+
+@media (max-width: 960px) {
+  .timeline-spine {
+    left: 28px;
+  }
+}
+
+.chronicle-node {
+  position: relative;
+  min-height: auto;
+  padding: 60px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.chronicle-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  padding: 36px;
+  background: rgba(14, 18, 28, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.chronicle-card:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75), 0 0 30px rgba(212, 175, 55, 0.12);
+  transform: translateY(-4px);
+}
+
+.chronicle-card.reverse {
+  grid-template-columns: 1fr 1fr;
+}
+
+.chronicle-card.reverse .chronicle-card-media {
+  order: 2;
+}
+
+.chronicle-card.reverse .chronicle-card-body {
+  order: 1;
+}
+
+@media (max-width: 960px) {
+  .chronicle-card,
+  .chronicle-card.reverse {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 24px;
+    margin-left: 48px;
+  }
+  .chronicle-card.reverse .chronicle-card-media {
+    order: 1;
+  }
+  .chronicle-card.reverse .chronicle-card-body {
+    order: 2;
+  }
+}
+
+.chronicle-card-media {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chronicle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.chronicle-card:hover .chronicle-img {
+  transform: scale(1.06);
+}
+
+.chronicle-media-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(6, 8, 12, 0.85) 100%);
+  pointer-events: none;
+}
+
+.chronicle-year-pill {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  padding: 6px 14px;
+  background: rgba(10, 14, 22, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #e5c158;
+  text-transform: uppercase;
+}
+
+.chronicle-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.chronicle-card-body .section-tag {
+  color: #d4af37;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 8px;
+}
+
+.chronicle-card-body .section-title {
+  font-size: clamp(2.0rem, 3.2vw, 2.8rem);
+  line-height: 1.05;
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, rgba(220, 225, 235, 0.75) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.chronicle-card-body .section-body {
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 24px;
+}
+
+.chronicle-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.chronicle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px;
+  color: #f4f6fa;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  outline: none;
+}
+
+.chronicle-btn .arrow {
+  transition: transform 0.3s ease;
+  color: #d4af37;
+}
+
+.chronicle-btn:hover {
+  background: #d4af37;
+  color: #06070a;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+.chronicle-btn:hover .arrow {
+  color: #06070a;
+  transform: translateX(4px);
+}
+
+.chronicle-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.chronicle-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  box-shadow: none;
+}

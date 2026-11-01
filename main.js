@@ -802,6 +802,188 @@
     }
   }
 
+  // =================================================================
+  //  GSAP, ScrollTrigger & Continuous Motion Design Architecture
+  // =================================================================
+
+  function initGSAPMotionDesign() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      console.warn('GSAP or ScrollTrigger not loaded.');
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // 1. Synchronize Lenis and ScrollTrigger for buttery 120Hz scrubbing
+    if (lenisInstance) {
+      lenisInstance.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenisInstance.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    // 2. Continuous Telemetry Wayfinder Tracker & Needle
+    const wayfinder = document.getElementById('telemetry-wayfinder');
+    const needle = document.getElementById('wayfinder-needle');
+    const nodes = document.querySelectorAll('.wayfinder-node');
+
+    const sections = [
+      { id: 'hero-video-wrap', index: 0 },
+      { id: 'slide-2-showroom', index: 1 },
+      { id: 'game-section', index: 2 },
+      { id: 'exploded-section', index: 3 },
+      { id: 'story', index: 4 }
+    ];
+
+    function setActiveWayfinder(idx) {
+      nodes.forEach((n, i) => {
+        n.classList.toggle('active', i === idx);
+      });
+      if (needle && nodes[idx]) {
+        const nodeTop = nodes[idx].offsetTop;
+        needle.style.transform = `translateY(${nodeTop - 18}px)`;
+      }
+    }
+
+    sections.forEach((sec, idx) => {
+      const el = document.getElementById(sec.id);
+      if (!el) return;
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onEnter: () => setActiveWayfinder(idx),
+        onEnterBack: () => setActiveWayfinder(idx)
+      });
+    });
+
+    // Wayfinder interactive click navigation
+    nodes.forEach((node, idx) => {
+      node.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = node.dataset.target;
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          if (!videoFinished) finishHeroSequence();
+          if (lenisInstance) {
+            lenisInstance.scrollTo(targetEl, { duration: 1.4, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+          } else {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }
+          setActiveWayfinder(idx);
+        }
+      });
+    });
+
+    // 3. Kinetic Showroom Car Faceoff Stagger
+    const fordCar = document.querySelector('.split-half-ford .showroom-car-cutout');
+    const ferrariCar = document.querySelector('.split-half-ferrari .showroom-car-cutout');
+    if (fordCar && ferrariCar) {
+      gsap.fromTo(fordCar, 
+        { x: -100, opacity: 0 },
+        { 
+          x: 0, opacity: 1, duration: 1.3, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#slide-2-showroom',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+      gsap.fromTo(ferrariCar, 
+        { x: 100, opacity: 0 },
+        { 
+          x: 0, opacity: 1, duration: 1.3, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#slide-2-showroom',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // 4. 3D Game Simulator Viewport Materialization
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+      gsap.fromTo(gameContainer,
+        { scale: 0.94, opacity: 0.5, y: 30 },
+        {
+          scale: 1.0, opacity: 1.0, y: 0, duration: 1.2, ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#game-section',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // 5. 3D Exploded Technical Breakdown Materialization
+    const explodedContainer = document.getElementById('exploded-container');
+    if (explodedContainer) {
+      gsap.fromTo(explodedContainer,
+        { scale: 0.94, opacity: 0.5, y: 30 },
+        {
+          scale: 1.0, opacity: 1.0, y: 0, duration: 1.2, ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#exploded-section',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // 6. Continuous Timeline Bead Animation
+    const timelineBead = document.getElementById('timeline-glow-bead');
+    const timelineWrap = document.querySelector('.chronicles-timeline-wrap');
+    if (timelineBead && timelineWrap) {
+      ScrollTrigger.create({
+        trigger: timelineWrap,
+        start: 'top 70%',
+        end: 'bottom 80%',
+        scrub: 0.3,
+        onUpdate: (self) => {
+          const totalHeight = timelineWrap.offsetHeight - 160;
+          timelineBead.style.transform = `translateY(${self.progress * totalHeight}px)`;
+        }
+      });
+    }
+
+    // 7. Staggered Chronicle Cards Reveal
+    const chronicleCards = document.querySelectorAll('.chronicle-card');
+    chronicleCards.forEach((card) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 40, scale: 0.98 },
+        {
+          opacity: 1, y: 0, scale: 1.0, duration: 0.9, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+
+    // 8. Streamline Laser Pulses along Flow Bridges
+    document.querySelectorAll('.velocity-bridge').forEach((bridge) => {
+      gsap.fromTo(bridge.querySelector('.bridge-telemetry-badge'),
+        { opacity: 0, y: 15, scale: 0.95 },
+        {
+          opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'back.out(1.5)',
+          scrollTrigger: {
+            trigger: bridge,
+            start: 'top 90%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    });
+  }
+
   function initVanillaTilt() {
     if (typeof VanillaTilt !== 'undefined') {
       try {
@@ -959,6 +1141,7 @@
 
     // Creative Frontend Engines Initialization
     initLenis();
+    initGSAPMotionDesign();
     initVanillaTilt();
     initCustomCursor();
     initParticles();

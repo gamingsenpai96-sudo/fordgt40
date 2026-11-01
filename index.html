@@ -71,6 +71,38 @@
       </div>
     </div>
 
+    <!-- Floating Telemetry Wayfinder (Continuous Section Navigator) -->
+    <nav id="telemetry-wayfinder" class="telemetry-wayfinder" aria-label="Section Navigation">
+      <div class="wayfinder-rail">
+        <div class="wayfinder-needle" id="wayfinder-needle"></div>
+        <button class="wayfinder-node active" data-target="#hero-video-wrap" data-cursor="HERO">
+          <span class="node-pip"></span>
+          <span class="node-tag">00</span>
+          <span class="node-label">THE MACHINE</span>
+        </button>
+        <button class="wayfinder-node" data-target="#slide-2-showroom" data-cursor="RIVALRY">
+          <span class="node-pip"></span>
+          <span class="node-tag">01</span>
+          <span class="node-label">SHOWROOM 2D</span>
+        </button>
+        <button class="wayfinder-node" data-target="#game-section" data-cursor="DRIVE 3D">
+          <span class="node-pip"></span>
+          <span class="node-tag">02</span>
+          <span class="node-label">SIMULATOR 3D</span>
+        </button>
+        <button class="wayfinder-node" data-target="#exploded-section" data-cursor="ANATOMY 3D">
+          <span class="node-pip"></span>
+          <span class="node-tag">03</span>
+          <span class="node-label">ANATOMY 3D</span>
+        </button>
+        <button class="wayfinder-node" data-target="#story" data-cursor="CHRONICLES">
+          <span class="node-pip"></span>
+          <span class="node-tag">04</span>
+          <span class="node-label">CHRONICLES</span>
+        </button>
+      </div>
+    </nav>
+
     <!-- Cinematic Hero Video Wrapper -->
     <div id="hero-video-wrap" class="hero-video-wrap">
       <video
@@ -209,6 +241,18 @@
 
     <!-- ====== Content sections wrapper (unlocked on second deliberate scroll) ====== -->
     <div id="story-container">
+      <!-- Flow Bridge 01: Hero to Showroom -->
+      <div class="velocity-bridge bridge-hero-showroom">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 01 // RACING SHOWROOM &bull; FORD VS FERRARI</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
+
       <!-- ====== SLIDE 2: FORD GT40 VS FERRARI 330 P3 SPLIT SHOWROOM ====== -->
       <section id="slide-2-showroom" class="showroom-split-section">
         <div class="showroom-split-container" id="showroom-split-container">
@@ -273,6 +317,18 @@
           </div>
         </div>
       </section>
+
+      <!-- Flow Bridge 02: Showroom to Game Simulator -->
+      <div class="velocity-bridge bridge-showroom-game">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 02 // CIRCUIT DE LA SARTHE &bull; 485 BHP CHASE SIMULATOR</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
 
       <!-- ====== SLIDE 3: 3D INTERACTIVE LE MANS GAME ====== -->
       <section id="game-section" class="game-section content-section">
@@ -367,6 +423,18 @@
           </div>
         </div>
       </section>
+
+      <!-- Flow Bridge 03: Game Simulator to 3D Anatomy Breakdown -->
+      <div class="velocity-bridge bridge-game-exploded">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 03 // SHELBY ENGINEERING BAY &bull; 3D TECHNICAL CAD BREAKDOWN</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
 
       <!-- ====== SECTION: 3D EXPLODED TECHNICAL BREAKDOWN ====== -->
       <section id="exploded-section" class="exploded-section content-section">
@@ -531,89 +599,171 @@
         </div>
       </section>
 
-      <!-- Section 04: The Story -->
-      <section id="story" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">04</span>
-          <h2 class="section-title">The Story</h2>
-          <p class="section-body">
-            In 1963, Henry Ford II set out to buy Ferrari. When Enzo Ferrari
-            walked away from the deal, Ford launched a revenge campaign that would
-            become one of the greatest underdog stories in motorsport history —
-            building a car from scratch to dethrone Ferrari at their own race.
-          </p>
+      <!-- Flow Bridge 04: 3D Anatomy to Historic Chronicles -->
+      <div class="velocity-bridge bridge-exploded-story">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 04 // 1966 ARCHIVES &bull; THE GO LIKE HELL CHRONICLES</span>
+          </div>
+          <span class="streamline line-right"></span>
         </div>
-      </section>
+      </div>
 
-      <!-- Section 05: Ford vs Ferrari -->
-      <section id="ford-vs-ferrari" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">05</span>
-          <h2 class="section-title">Ford vs Ferrari</h2>
-          <p class="section-body">
-            Carroll Shelby and Ken Miles led the charge. Against corporate
-            politics, impossible deadlines, and the might of Maranello, they
-            engineered the GT40 into a Le Mans weapon — proving that American grit
-            could conquer European racing royalty.
-          </p>
+      <!-- ====== SECTION: THE LE MANS 1966 CHRONICLES (CONTINUOUS TIMELINE) ====== -->
+      <div class="chronicles-timeline-wrap">
+        <div class="timeline-spine">
+          <div class="timeline-glow-bead" id="timeline-glow-bead"></div>
         </div>
-      </section>
 
-      <!-- Section 06: The Cars -->
-      <section id="cars" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">06</span>
-          <h2 class="section-title">The Cars</h2>
-          <p class="section-body">
-            The GT40 Mark II packed a thundering 7.0-litre V8 producing 485 bhp.
-            Standing just 40 inches tall — hence the name — it sliced through the
-            air at over 220 km/h on the Mulsanne Straight, a marvel of aerodynamic
-            engineering for its era.
-          </p>
-        </div>
-      </section>
+        <!-- Milestone 04: The Story / The Accord Fails -->
+        <section id="story" class="chronicle-node content-section" data-year="1963">
+          <div class="chronicle-card" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ford-henry.jpg" alt="Henry Ford II" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">1963 &bull; THE CATALYST</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">04 // CORPORATE VENDETTA</span>
+              <h2 class="section-title">The Deal That Shook Motorsport</h2>
+              <p class="section-body">
+                In May 1963, Henry Ford II spent millions auditing Ferrari in Modena to finalize a buyout. When Enzo Ferrari abruptly walked away over control of Scuderia Ferrari, Ford ordered his executives to build a car with one goal: humiliate Maranello at the 24 Hours of Le Mans.
+              </p>
+              <div class="chronicle-actions">
+                <button class="chronicle-btn" data-open-modal="ford" data-tab="henry-ford">
+                  <span>HENRY FORD II DOSSIER</span>
+                  <span class="arrow">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <!-- Section 07: The Circuit -->
-      <section id="circuit" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">07</span>
-          <h2 class="section-title">The Circuit</h2>
-          <p class="section-body">
-            Circuit de la Sarthe — 13.6 kilometres of public roads and
-            purpose-built track. The 6-km Mulsanne Straight tested top speed; the
-            Porsche Curves demanded precision. For 24 hours, every weakness was
-            exposed.
-          </p>
-        </div>
-      </section>
+        <!-- Milestone 05: Ford vs Ferrari / Shelby Takes Charge -->
+        <section id="ford-vs-ferrari" class="chronicle-node content-section" data-year="1964">
+          <div class="chronicle-card reverse" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ford-shelby.jpg" alt="Carroll Shelby" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">1964 &bull; SHELBY AMERICAN</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">05 // RE-ENGINEERING</span>
+              <h2 class="section-title">American Grit Meets European Royalty</h2>
+              <p class="section-body">
+                After disastrous gearbox and aerodynamic failures in 1964, Ford handed the program to Carroll Shelby and mercurial test driver Ken Miles. In their Venice Beach and Santa Fe hangars, they redesigned cooling, fabricated lightweight components, and created a race-winning machine.
+              </p>
+              <div class="chronicle-actions">
+                <button class="chronicle-btn" data-open-modal="ford" data-tab="shelby">
+                  <span>CARROLL SHELBY FILES</span>
+                  <span class="arrow">&rarr;</span>
+                </button>
+                <button class="chronicle-btn secondary" data-open-modal="ford" data-tab="miles">
+                  <span>KEN MILES LOGS</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <!-- Section 08: 24 Hours -->
-      <section id="24hours" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">08</span>
-          <h2 class="section-title">24 Hours</h2>
-          <p class="section-body">
-            June 18–19, 1966. Three Ford GT40s crossed the finish line in
-            formation — a 1-2-3 sweep that shattered Ferrari's six-year
-            stranglehold. It was the most dominant victory Le Mans had ever seen,
-            and it changed endurance racing forever.
-          </p>
-        </div>
-      </section>
+        <!-- Milestone 06: The Cars / Big-Block 427 Mk II -->
+        <section id="cars" class="chronicle-node content-section" data-year="1965">
+          <div class="chronicle-card" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ford-gt40-profile-1966.jpg" alt="Ford GT40 Mk II Profile" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">1965 &bull; 7.0L NASCAR V8</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">06 // THE MACHINE</span>
+              <h2 class="section-title">40 Inches Tall. 485 Horsepower.</h2>
+              <p class="section-body">
+                Standing precisely 40 inches tall to pierce the aerodynamic barrier, the Mark II packed a NASCAR-derived 7.0-litre FE big-block V8 producing 485 bhp and 475 lb-ft of torque. Phil Remington's quick-change disc brakes and Kar Kraft's T-44 transaxle gave it endurance superiority at 212+ mph.
+              </p>
+              <div class="chronicle-actions">
+                <button class="chronicle-btn" data-open-modal="ford" data-tab="gt40">
+                  <span>INSPECT FULL GT40 MK II SPECS</span>
+                  <span class="arrow">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <!-- Section 09: The People -->
-      <section id="people" class="content-section">
-        <div class="section-inner">
-          <span class="section-tag">09</span>
-          <h2 class="section-title">The People</h2>
-          <p class="section-body">
-            Carroll Shelby. Ken Miles. Bruce McLaren. Chris Amon. Behind the
-            machines were visionaries and daredevils who risked everything. Their
-            legacy endures — not just in trophies, but in the spirit of racing
-            itself.
-          </p>
-        </div>
-      </section>
+        <!-- Milestone 07: The Circuit / Circuit de la Sarthe -->
+        <section id="circuit" class="chronicle-node content-section" data-year="1966">
+          <div class="chronicle-card reverse" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ferrari-330p3-lemans-action.jpg" alt="Ferrari 330 P3 Action" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">1966 &bull; LA SARTHE</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">07 // THE TEMPLE OF SPEED</span>
+              <h2 class="section-title">Circuit de la Sarthe: 13.6 Kilometres</h2>
+              <p class="section-body">
+                Public French asphalt transformed into motorsport's ultimate battleground. The terrifying 6-kilometre Mulsanne Straight pushed cars past 210 mph in torrential rain and pitch darkness. For 24 unbroken hours, every weld, gasket, and human nerve was pushed past the limit.
+              </p>
+              <div class="chronicle-actions">
+                <a href="#game-section" class="chronicle-btn">
+                  <span>DRIVE THE CIRCUIT IN 3D</span>
+                  <span class="arrow">&rarr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Milestone 08: 24 Hours / The Historic Formation Finish -->
+        <section id="24hours" class="chronicle-node content-section" data-year="1966">
+          <div class="chronicle-card" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ford-lemans-formation.jpg" alt="1966 Formation Finish" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">JUNE 19, 1966 &bull; 16:00</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">08 // HISTORIC TRIUMPH</span>
+              <h2 class="section-title">The 1-2-3 Formation Victory</h2>
+              <p class="section-body">
+                At 4:00 PM on June 19, 1966, three black and blue GT40 Mark IIs crossed the finish line abreast in formation — annihilating Ferrari's six-year winning streak. Bruce McLaren and Chris Amon took victory in Chassis P/1046, completing 3,009.4 miles at an average speed of 125.4 mph.
+              </p>
+              <div class="chronicle-actions">
+                <button class="chronicle-btn" data-open-modal="ford" data-tab="overview">
+                  <span>VIEW LE MANS RACE DOSSIER</span>
+                  <span class="arrow">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Milestone 09: The People / The Immortals -->
+        <section id="people" class="chronicle-node content-section" data-year="LEGACY">
+          <div class="chronicle-card reverse" data-tilt data-tilt-max="6" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="chronicle-card-media">
+              <img src="assets/images/history/ford-miles.jpg" alt="Ken Miles in Cockpit" class="chronicle-img" loading="lazy" />
+              <div class="chronicle-media-overlay"></div>
+              <span class="chronicle-year-pill">IMMORTALS &bull; LEGACY</span>
+            </div>
+            <div class="chronicle-card-body">
+              <span class="section-tag">09 // HUMAN SPIRIT</span>
+              <h2 class="section-title">The Men Who Refused to Lift</h2>
+              <p class="section-body">
+                Carroll Shelby, Ken Miles, Bruce McLaren, Chris Amon, Phil Remington, and Dan Gurney. Beyond corporate millions, the Ford victory was forged by men who risked their lives at 7,000 RPM in the dead of night. Their triumph lives on as the defining benchmark of American racing grit.
+              </p>
+              <div class="chronicle-actions">
+                <button class="chronicle-btn" data-open-modal="ford" data-tab="miles">
+                  <span>EXPLORE THE LEGENDS</span>
+                  <span class="arrow">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <footer class="site-footer">
         <p>FORD GT40 &mdash; GO LIKE HELL &mdash; LE MANS 1966</p>
@@ -1340,6 +1490,9 @@
       </div>
     </div>
 
+    <!-- GSAP & Motion Design Engines -->
+    <script src="assets/js/vendor/gsap.min.js"></script>
+    <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
     <!-- Creative Frontend Vendor Engines -->
     <script src="assets/js/vendor/lenis.min.js"></script>
     <script src="assets/js/vendor/vanilla-tilt.min.js"></script>
