@@ -95,9 +95,24 @@
           <span class="node-tag">03</span>
           <span class="node-label">ANATOMY 3D</span>
         </button>
-        <button class="wayfinder-node" data-target="#story" data-cursor="CHRONICLES">
+        <button class="wayfinder-node" data-target="#cockpit-sim-section" data-cursor="COCKPIT">
           <span class="node-pip"></span>
           <span class="node-tag">04</span>
+          <span class="node-label">COCKPIT SIM</span>
+        </button>
+        <button class="wayfinder-node" data-target="#circuit-section" data-cursor="CIRCUIT">
+          <span class="node-pip"></span>
+          <span class="node-tag">05</span>
+          <span class="node-label">LE MANS TRACK</span>
+        </button>
+        <button class="wayfinder-node" data-target="#race-clock-section" data-cursor="24H RACE">
+          <span class="node-pip"></span>
+          <span class="node-tag">06</span>
+          <span class="node-label">24H CRUCIBLE</span>
+        </button>
+        <button class="wayfinder-node" data-target="#story" data-cursor="CHRONICLES">
+          <span class="node-pip"></span>
+          <span class="node-tag">07</span>
           <span class="node-label">CHRONICLES</span>
         </button>
       </div>
@@ -635,13 +650,445 @@
         </div>
       </section>
 
-      <!-- Flow Bridge 04: 3D Anatomy to Historic Chronicles -->
-      <div class="velocity-bridge bridge-exploded-story">
+      <!-- Flow Bridge 04: 3D Anatomy to Cockpit Simulation -->
+      <div class="velocity-bridge bridge-exploded-cockpit">
         <div class="bridge-streamlines">
           <span class="streamline line-left"></span>
           <div class="bridge-telemetry-badge">
             <span class="badge-dot"></span>
-            <span>STAGE 04 // 1966 ARCHIVES &bull; THE GO LIKE HELL CHRONICLES</span>
+            <span>STAGE 04 // 40" ERGONOMICS &bull; FIRST-PERSON COCKPIT SIMULATION</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
+
+      <!-- ====== SECTION 04: FIRST-PERSON COCKPIT SIMULATION ====== -->
+      <section id="cockpit-sim-section" class="cockpit-sim-section content-section">
+        <div class="cockpit-sim-wrapper">
+          <div class="cockpit-header">
+            <div class="cockpit-header-top">
+              <span class="section-tag">04 &bull; DRIVER PERSPECTIVE</span>
+              <span class="cockpit-badge">
+                <span class="live-dot"></span>
+                SIT 40 INCHES OFF THE TARMAC
+              </span>
+            </div>
+            <h2 class="section-title">Enter the Cockpit</h2>
+            <p class="section-body">
+              Take the driver's seat of Bruce McLaren and Ken Miles. Fire up the 7.0-litre FE V8 with authentic starter crank, click through the 4-speed mechanical sill gate, and hammer the throttle down the Mulsanne Straight.
+            </p>
+          </div>
+
+          <!-- Interactive Cockpit Enclosure -->
+          <div class="cockpit-stage" id="cockpit-sim-container">
+            <!-- Windscreen Canvas with High-Speed Perspective Streamlines -->
+            <div class="cockpit-windscreen-wrap">
+              <canvas id="cockpit-windscreen-canvas"></canvas>
+              <div class="windscreen-gurney-bubble-tint">
+                <span class="bubble-callout">ROOF GURNEY BUBBLE (+1.75")</span>
+              </div>
+              <div class="windscreen-speed-watermark">
+                <span id="cockpit-speed-val">0</span>
+                <span class="unit">MPH</span>
+              </div>
+            </div>
+
+            <!-- Authentic 1966 Dashboard & Stewart-Warner Instrument Panel -->
+            <div class="cockpit-dash-console">
+              <!-- Gauges Cluster -->
+              <div class="cockpit-gauges-cluster">
+                <!-- Water Temp Mini Dial -->
+                <div class="gauge-card gauge-mini">
+                  <div class="gauge-dial dial-water">
+                    <div class="gauge-scale"><span>100</span><span>180</span><span>240°F</span></div>
+                    <div class="gauge-needle" id="cockpit-water-needle"></div>
+                    <div class="gauge-cap"></div>
+                  </div>
+                  <span class="gauge-name">WATER TEMP</span>
+                </div>
+
+                <!-- Main Tachometer (Center Stage 8,000 RPM) -->
+                <div class="gauge-card gauge-main-tach">
+                  <div class="gauge-dial dial-tach">
+                    <div class="gauge-bezel"></div>
+                    <div class="tach-face">
+                      <span class="tach-brand">STEWART-WARNER</span>
+                      <span class="tach-redline-band"></span>
+                      <div class="tach-numbers">
+                        <span class="t-0">0</span>
+                        <span class="t-2">2</span>
+                        <span class="t-4">4</span>
+                        <span class="t-6">6</span>
+                        <span class="t-7 red">7</span>
+                        <span class="t-8 red">8</span>
+                      </div>
+                      <div class="gauge-needle tach-needle-animated" id="cockpit-tach-needle"></div>
+                      <div class="gauge-cap"></div>
+                    </div>
+                  </div>
+                  <div class="gauge-telemetry-row">
+                    <span class="gauge-name">ENGINE TACHOMETER</span>
+                    <span class="gauge-digital-val"><strong id="cockpit-tach-val">0</strong> RPM</span>
+                  </div>
+                </div>
+
+                <!-- Main Speedometer -->
+                <div class="gauge-card gauge-main-speed">
+                  <div class="gauge-dial dial-speed">
+                    <div class="gauge-bezel"></div>
+                    <div class="speed-face">
+                      <span class="tach-brand">MILES PER HOUR</span>
+                      <div class="tach-numbers speed-numbers">
+                        <span class="s-0">0</span>
+                        <span class="s-60">60</span>
+                        <span class="s-120">120</span>
+                        <span class="s-180">180</span>
+                        <span class="s-220">220</span>
+                      </div>
+                      <div class="gauge-needle speed-needle-animated" id="cockpit-speed-needle"></div>
+                      <div class="gauge-cap"></div>
+                    </div>
+                  </div>
+                  <div class="gauge-telemetry-row">
+                    <span class="gauge-name">LE MANS SPEED</span>
+                    <span class="gauge-digital-val">TOP: 212 MPH</span>
+                  </div>
+                </div>
+
+                <!-- Oil Temp Mini Dial -->
+                <div class="gauge-card gauge-mini">
+                  <div class="gauge-dial dial-oil">
+                    <div class="gauge-scale"><span>50</span><span>150</span><span>250°F</span></div>
+                    <div class="gauge-needle" id="cockpit-oil-needle"></div>
+                    <div class="gauge-cap"></div>
+                  </div>
+                  <span class="gauge-name">OIL TEMP</span>
+                </div>
+              </div>
+
+              <!-- Interactive Controls Bar (Starter, H-Gate Shifter & Throttle) -->
+              <div class="cockpit-controls-bar">
+                <!-- Ignition / Starter Button -->
+                <div class="control-block starter-block">
+                  <button class="cockpit-ignition-btn" id="cockpit-btn-start" data-cursor="IGNITION">
+                    <span class="btn-lamp"></span>
+                    <span class="cockpit-btn-label">ENGINE START</span>
+                    <span class="btn-sub">FORD 427 V8</span>
+                  </button>
+                </div>
+
+                <!-- 4-Speed Gated Sill Shifter -->
+                <div class="control-block shifter-block">
+                  <span class="control-tag">KAR KRAFT T-44 GATE</span>
+                  <div class="cockpit-gate-console">
+                    <div class="gate-grid">
+                      <button class="cockpit-gate-slot active" data-gear="0"><span>N</span></button>
+                      <button class="cockpit-gate-slot" data-gear="1"><span>1</span></button>
+                      <button class="cockpit-gate-slot" data-gear="2"><span>2</span></button>
+                      <button class="cockpit-gate-slot" data-gear="3"><span>3</span></button>
+                      <button class="cockpit-gate-slot" data-gear="4"><span>4</span></button>
+                    </div>
+                    <div class="active-gear-indicator">
+                      <span>GEAR</span>
+                      <strong id="cockpit-gear-val">N</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Accelerator Pedal Action -->
+                <div class="control-block pedal-block">
+                  <button class="cockpit-accel-pedal" id="cockpit-btn-accel" data-cursor="FLOOR IT">
+                    <span class="pedal-ribs"></span>
+                    <span class="pedal-label">HAMMER THROTTLE</span>
+                    <span class="pedal-hint">CLICK & HOLD / SPACEBAR</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flow Bridge 05: Cockpit to Circuit Map -->
+      <div class="velocity-bridge bridge-cockpit-circuit">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 05 // 13.461 KM ARENA &bull; 1966 CIRCUIT DE LA SARTHE</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
+
+      <!-- ====== SECTION 05: INTERACTIVE LE MANS CIRCUIT MAP ====== -->
+      <section id="circuit-section" class="circuit-section content-section">
+        <div class="circuit-wrapper">
+          <div class="circuit-header">
+            <div class="circuit-header-top">
+              <span class="section-tag">05 &bull; THE BATTLEFIELD</span>
+              <span class="circuit-badge">
+                <span class="live-dot"></span>
+                13.461 KM HISTORIC CONFIGURATION
+              </span>
+            </div>
+            <h2 class="section-title">The 1966 Circuit de la Sarthe</h2>
+            <p class="section-body">
+              Explore the 8.365-mile temple of speed. Click any sector hotspot to examine gear selection, corner entry velocity, and historical moments where the Ford vs. Ferrari duel was fought.
+            </p>
+          </div>
+
+          <!-- Circuit Interactive Stage -->
+          <div class="circuit-stage-grid">
+            <!-- Left: Glowing SVG Track Map -->
+            <div class="circuit-map-container">
+              <svg class="circuit-svg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="track-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                <!-- Track Background Outer Ring -->
+                <path class="circuit-track-bg" d="M 180 390 L 130 380 Q 90 340 100 270 L 130 180 Q 150 140 190 120 L 250 100 Q 290 90 330 110 L 370 140 Q 400 150 430 140 L 710 140 Q 750 140 760 170 L 760 210 Q 750 240 710 240 L 450 260 Q 420 270 400 300 L 370 360 Q 350 400 300 410 L 220 400 Z" />
+
+                <!-- Active Racing Line -->
+                <path id="circuit-track-line" class="circuit-track-racing-line" d="M 180 390 L 130 380 Q 90 340 100 270 L 130 180 Q 150 140 190 120 L 250 100 Q 290 90 330 110 L 370 140 Q 400 150 430 140 L 710 140 Q 750 140 760 170 L 760 210 Q 750 240 710 240 L 450 260 Q 420 270 400 300 L 370 360 Q 350 400 300 410 L 220 400 Z" filter="url(#track-glow)" />
+
+                <!-- Directional Arrow Overlays -->
+                <path class="track-flow-arrow" d="M 520 135 L 560 140 L 520 145 Z" fill="#00d2ff" />
+
+                <!-- Hotspot Beacons -->
+                <!-- 01: Start / Finish -->
+                <g class="circuit-hotspot" data-sector="start-finish" transform="translate(180, 390)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-10" y="24">START / PITS</text>
+                </g>
+
+                <!-- 02: Dunlop Bridge -->
+                <g class="circuit-hotspot" data-sector="dunlop" transform="translate(110, 240)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-45" y="-14">DUNLOP BRIDGE</text>
+                </g>
+
+                <!-- 03: Tertre Rouge -->
+                <g class="circuit-hotspot" data-sector="tertre-rouge" transform="translate(250, 100)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-20" y="-14">TERTRE ROUGE</text>
+                </g>
+
+                <!-- 04: Mulsanne Straight -->
+                <g class="circuit-hotspot active" data-sector="mulsanne-straight" transform="translate(560, 140)">
+                  <circle class="hotspot-pulse-ring" r="18" />
+                  <circle class="hotspot-center-dot" r="7" />
+                  <text class="hotspot-svg-label" x="-30" y="-18">MULSANNE STRAIGHT (212 MPH)</text>
+                </g>
+
+                <!-- 05: Mulsanne Corner -->
+                <g class="circuit-hotspot" data-sector="mulsanne-corner" transform="translate(760, 190)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-60" y="24">MULSANNE CORNER</text>
+                </g>
+
+                <!-- 06: Indianapolis -->
+                <g class="circuit-hotspot" data-sector="indianapolis" transform="translate(520, 255)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-25" y="24">INDIANAPOLIS</text>
+                </g>
+
+                <!-- 07: Arnage -->
+                <g class="circuit-hotspot" data-sector="arnage" transform="translate(390, 320)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-20" y="24">ARNAGE</text>
+                </g>
+
+                <!-- 08: Maison Blanche -->
+                <g class="circuit-hotspot" data-sector="maison-blanche" transform="translate(280, 408)">
+                  <circle class="hotspot-pulse-ring" r="14" />
+                  <circle class="hotspot-center-dot" r="6" />
+                  <text class="hotspot-svg-label" x="-40" y="22">MAISON BLANCHE</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Right: Dynamic Sector Telemetry & Dossier Card -->
+            <div class="circuit-telemetry-dossier" id="circuit-dossier">
+              <div class="dossier-inner">
+                <div class="dossier-header">
+                  <div class="dossier-tag-row">
+                    <span class="dossier-french-name" id="track-sector-french">Ligne Droite des Hunaudières</span>
+                    <span class="sector-danger-badge danger-maximum" id="track-sector-danger">MAXIMUM</span>
+                  </div>
+                  <h3 class="dossier-title" id="track-sector-name">MULSANNE STRAIGHT</h3>
+                </div>
+
+                <div class="dossier-specs-grid">
+                  <div class="dossier-spec-item">
+                    <span class="spec-lbl">TOP SPEED</span>
+                    <span class="spec-num" id="track-sector-speed">212+ mph (341 km/h)</span>
+                  </div>
+                  <div class="dossier-spec-item">
+                    <span class="spec-lbl">GEAR SELECTION</span>
+                    <span class="spec-num" id="track-sector-gear">4th Gear (6,200 RPM)</span>
+                  </div>
+                </div>
+
+                <div class="dossier-media-wrap">
+                  <img src="assets/images/history/ford-lemans-car5.jpg" alt="Mulsanne Straight Action" class="dossier-img" id="track-sector-image" />
+                </div>
+
+                <p class="dossier-desc" id="track-sector-desc">
+                  3.7 miles of uninterrupted, heart-pounding flat-out asphalt with no modern chicanes. The 7.0-litre Ford 427 FE V8 roared for over 60 seconds continuous wide-open throttle, vibrating the entire steel semi-monocoque chassis as rain sheets battered the Plexiglas roof.
+                </p>
+
+                <blockquote class="dossier-quote" id="track-sector-quote">
+                  "Down Mulsanne at 210 mph in the pitch black with rain streaming sideways, you feel like you are flying a fighter jet on the runway." — Chris Amon
+                </blockquote>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flow Bridge 06: Circuit to The 24-Hour Race Clock -->
+      <div class="velocity-bridge bridge-circuit-clock">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 06 // JUNE 18–19, 1966 &bull; THE 24-HOUR CRUCIBLE</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
+
+      <!-- ====== SECTION 06: THE 24-HOUR INTERACTIVE RACE CLOCK ====== -->
+      <section id="race-clock-section" class="race-clock-section content-section">
+        <div class="race-clock-backdrop" id="race-clock-backdrop">
+          <canvas id="race-rain-canvas" class="race-rain-canvas"></canvas>
+        </div>
+
+        <div class="race-clock-wrapper">
+          <div class="race-clock-header">
+            <div class="race-clock-header-top">
+              <span class="section-tag">06 &bull; THE MASTER TIME-SCRUBBER</span>
+              <span class="race-clock-badge">
+                <span class="live-dot"></span>
+                00:00 &rarr; 24:00 LE MANS TIME-DIAL
+              </span>
+            </div>
+            <h2 class="section-title">The 24-Hour Crucible</h2>
+            <p class="section-body">
+              Drag the interactive dial through 24 hours of endurance warfare. Watch the paddock skies darken into midnight storms, track the devastating mechanical attrition of Ferrari, and experience the historic 1-2-3 photo finish.
+            </p>
+          </div>
+
+          <!-- Master Time-Scrubber Console -->
+          <div class="race-clock-console">
+            <!-- Top Timeline Controls Bar -->
+            <div class="race-timeline-bar">
+              <div class="timeline-clock-display">
+                <span class="clock-icon">⏱️</span>
+                <span class="clock-time-val" id="clock-dial-time">16:00 SATURDAY</span>
+              </div>
+
+              <!-- Quick Milestone Phase Buttons -->
+              <div class="race-hour-pills">
+                <button class="race-hour-marker active" data-hour="0">00:00 START</button>
+                <button class="race-hour-marker" data-hour="4">04:00 DUSK</button>
+                <button class="race-hour-marker" data-hour="8">08:00 MIDNIGHT</button>
+                <button class="race-hour-marker" data-hour="12">12:00 DAWN</button>
+                <button class="race-hour-marker" data-hour="16">16:00 BRAKES</button>
+                <button class="race-hour-marker" data-hour="20">20:00 ORDERS</button>
+                <button class="race-hour-marker" data-hour="22">22:00 TENSION</button>
+                <button class="race-hour-marker" data-hour="24">24:00 FINISH</button>
+              </div>
+            </div>
+
+            <!-- Giant Scrub Slider -->
+            <div class="race-slider-track-wrap">
+              <input type="range" id="race-time-slider" min="0" max="24" step="1" value="0" class="race-time-slider" />
+              <div class="race-slider-fill" id="race-slider-fill" style="width: 0%"></div>
+            </div>
+
+            <!-- Live Race Event & Telemetry Card Stage -->
+            <div class="race-stage-card">
+              <div class="race-stage-grid">
+                <!-- Left: Archival Photo & Atmosphere -->
+                <div class="race-card-media">
+                  <img src="assets/images/history/ford-team.jpg" alt="Race Moment" class="race-card-img" id="clock-phase-image" />
+                  <div class="race-media-badge-wrap">
+                    <span class="race-weather-tag" id="clock-weather-val">Clear • 24°C • Dry Track</span>
+                  </div>
+                </div>
+
+                <!-- Right: Telemetry & Narrative -->
+                <div class="race-card-content">
+                  <div class="race-phase-header">
+                    <span class="race-phase-tag" id="clock-phase-tag">HOUR 00:00 // THE LAUNCH</span>
+                    <h3 class="race-phase-title" id="clock-phase-title">THE SPRINT ACROSS THE TARMAC</h3>
+                  </div>
+
+                  <!-- Attrition Battle Monitor -->
+                  <div class="attrition-monitor-box">
+                    <div class="attrition-team team-ford">
+                      <span class="team-lbl">SHELBY / FORD GT40</span>
+                      <strong class="team-count" id="clock-ford-count">8 RUNNING / 0 RETIRED</strong>
+                    </div>
+                    <div class="attrition-vs">VS</div>
+                    <div class="attrition-team team-ferrari">
+                      <span class="team-lbl">SCUDERIA FERRARI</span>
+                      <strong class="team-count" id="clock-ferrari-count">14 RUNNING / 0 RETIRED</strong>
+                    </div>
+                  </div>
+
+                  <!-- Lap & Leader Datum -->
+                  <div class="race-live-datum-grid">
+                    <div class="datum-item">
+                      <span class="datum-lbl">RACE LEADER</span>
+                      <strong class="datum-val" id="clock-leader-val">Ford GT40 Mk II #1 (Ken Miles)</strong>
+                    </div>
+                    <div class="datum-item">
+                      <span class="datum-lbl">LAP PROGRESS</span>
+                      <strong class="datum-val" id="clock-lap-val">Lap 1 / 360</strong>
+                    </div>
+                    <div class="datum-item">
+                      <span class="datum-lbl">PACE / LAP TIME</span>
+                      <strong class="datum-val" id="clock-laptime-val">3:34.2 (136 mph)</strong>
+                    </div>
+                  </div>
+
+                  <p class="race-phase-desc" id="clock-phase-desc">
+                    Under the afternoon sun, Henry Ford II steps onto the grandstand balcony and waves the French tricolor. 55 drivers sprint across the asphalt in the traditional Le Mans start. Ken Miles slams into car #1, but the driver door fails to latch properly, forcing a rapid opening lap stop while Dan Gurney (#3) and Graham Hill launch into an immediate dogfight with the factory Ferraris.
+                  </p>
+
+                  <blockquote class="race-phase-quote" id="clock-phase-quote">
+                    "You've got 24 hours to prove that American engineering can conquer the world." — Henry Ford II
+                  </blockquote>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flow Bridge 07: 24-Hour Race to Historic Chronicles -->
+      <div class="velocity-bridge bridge-clock-story">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 07 // HISTORIC DOSSIERS &bull; THE GO LIKE HELL CHRONICLES</span>
           </div>
           <span class="streamline line-right"></span>
         </div>
@@ -1539,5 +1986,16 @@
     <script src="main.js"></script>
     <script type="module" src="assets/js/game.js?v=2.8"></script>
     <script type="module" src="assets/js/exploded-view.js?v=2.8"></script>
+    <script type="module">
+      import { GT40CockpitSimulator } from './assets/js/cockpit-sim.js';
+      import { LeMansTrackExperience } from './assets/js/lemans-track.js';
+      import { LeMansRaceClock } from './assets/js/race-clock.js';
+
+      window.addEventListener('DOMContentLoaded', () => {
+        window.gt40Cockpit = new GT40CockpitSimulator();
+        window.gt40Track = new LeMansTrackExperience();
+        window.gt40RaceClock = new LeMansRaceClock();
+      });
+    </script>
   </body>
 </html>

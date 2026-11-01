@@ -833,7 +833,10 @@
       { id: 'slide-2-showroom', index: 1 },
       { id: 'game-section', index: 2 },
       { id: 'exploded-section', index: 3 },
-      { id: 'story', index: 4 }
+      { id: 'cockpit-sim-section', index: 4 },
+      { id: 'circuit-section', index: 5 },
+      { id: 'race-clock-section', index: 6 },
+      { id: 'story', index: 7 }
     ];
 
     function setActiveWayfinder(idx) {
