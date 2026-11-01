@@ -707,6 +707,11 @@ export class GT40ExplodedViewer {
     const bodyRoughnessTex  = loadTex('Body_Roughness.png', false, false);
     const bodyMetallicTex   = loadTex('Body_Metallic.png', false, false);
 
+    const wheelsBaseColor   = loadTex('Wheels_BaseColor.png', true, false);
+    const wheelsRoughness   = loadTex('Wheels_Roughness.png', false, false);
+    const wheelsMetallic    = loadTex('Wheels_Metallic.png', false, false);
+    const wheelsNormal      = loadTex('Wheels_Normal.png', false, false);
+
     const engineBaseColor   = loadTex('Engine_BaseColor.png', true, true);
     const engineRoughness   = loadTex('Engine_Roughness.png', false, true);
     const engineMetallic    = loadTex('Engine_Metallic.png', false, true);
@@ -725,19 +730,89 @@ export class GT40ExplodedViewer {
 
     const lightsNoOpacBase  = loadTex('LIGHTSnoopacity_BaseColor.png', true, false);
 
-    // 1. Authentic 1966 Single-Stage Lacquer Race Paint (Satin gloss, realistic race finish)
-    // Using high-detail UV texture with twin Le Mans racing stripes, roundels, shutlines, rivets, and vents
+    // 1. Authentic 1966 Le Mans #2 Single-Stage Lacquer Race Paint (Gloss/satin black with crisp white racing stripes)
     this.bodySolidMaterial = new THREE.MeshStandardMaterial({
       map: bodyLiveryTex,
       roughnessMap: bodyRoughnessTex,
       metalnessMap: bodyMetallicTex,
-      roughness: 0.38,
-      metalness: 0.12,
-      envMapIntensity: 0.85,
+      roughness: 0.32,
+      metalness: 0.15,
+      envMapIntensity: 0.95,
       side: THREE.DoubleSide
     });
 
-    // X-Ray Ghosting Material
+    // Vector-Sharp 1966 Le Mans #2 Livery Shader Injection
+    this.bodySolidMaterial.onBeforeCompile = (shader) => {
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `#include <common>
+         varying vec3 vBodyPos;
+         varying vec3 vBodyNorm;`
+      ).replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+         vBodyPos = position;
+         vBodyNorm = normal;`
+      );
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <common>',
+        `#include <common>
+         varying vec3 vBodyPos;
+         varying vec3 vBodyNorm;`
+      ).replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+         float ax = abs(vBodyPos.x);
+         // Exterior upper panels (nose, hood, roof, rear deck, rear spoiler)
+         bool isExteriorTop = (vBodyPos.y > 0.16) && (vBodyNorm.y > -0.05) && !(vBodyPos.z > 0.95 && vBodyPos.y < 0.26 && vBodyNorm.y < 0.4);
+
+         bool isStripe = false;
+         if (isExteriorTop) {
+           // Main twin Le Mans white stripes
+           if (ax >= 0.012 && ax <= 0.068) {
+             isStripe = true;
+           }
+           // Outer accent pinstripe
+           if (ax >= 0.076 && ax <= 0.082) {
+             isStripe = true;
+           }
+           // Front bonnet competition roundel (passenger side)
+           if (length(vec2(vBodyPos.x - 0.24, vBodyPos.z - 1.16)) < 0.16 && vBodyPos.y > 0.20 && vBodyNorm.y > 0.35) {
+             isStripe = true;
+           }
+         }
+
+         // Door rocker sill white stripes
+         bool isRocker = (vBodyPos.y >= -0.02 && vBodyPos.y <= 0.065) && (abs(vBodyNorm.x) > 0.6) && (vBodyPos.z > -0.75 && vBodyPos.z < 0.85);
+         if (isRocker && (vBodyPos.y >= 0.012 && vBodyPos.y <= 0.038)) {
+           isStripe = true;
+         }
+
+         if (isStripe) {
+           diffuseColor.rgb = vec3(0.96, 0.96, 0.98);
+         } else {
+           diffuseColor.rgb = diffuseColor.rgb * vec3(0.14, 0.14, 0.16) + vec3(0.045, 0.045, 0.05);
+         }
+        `
+      ).replace(
+        '#include <roughnessmap_fragment>',
+        `#include <roughnessmap_fragment>
+         if (isStripe) {
+           roughnessFactor = 0.22;
+         } else {
+           roughnessFactor = 0.30;
+         }
+        `
+      ).replace(
+        '#include <metalnessmap_fragment>',
+        `#include <metalnessmap_fragment>
+         metalnessFactor = 0.12;
+        `
+      );
+    };
+
+    // X-Ray Ghosting Material (Only active when user clicks X-Ray button)
     this.bodyXRayMaterial = new THREE.MeshStandardMaterial({
       color: 0x48769b,
       metalness: 0.1,
@@ -748,15 +823,17 @@ export class GT40ExplodedViewer {
       side: THREE.DoubleSide
     });
 
-    // Glass material
+    // Glass material (Clear translucent competition Plexiglas)
     const glassMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x141a24,
-      roughness: 0.04,
-      transmission: 0.88,
-      thickness: 0.5,
-      ior: 1.52,
+      color: 0xeef4f8,
+      roughness: 0.06,
+      metalness: 0.08,
+      transmission: 0.90,
+      thickness: 0.2,
+      ior: 1.5,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.40,
+      depthWrite: false,
       side: THREE.DoubleSide
     });
 
@@ -956,10 +1033,13 @@ export class GT40ExplodedViewer {
         });
 
       } else if (name.includes('wheel')) {
-        // Authentic Solid Matte Black Goodyear Racing Slick Rubber Tire (100% solid, fully opaque)
+        // Authentic Solid Goodyear Blue Streak Racing Tires (100% solid, fully opaque, tread & sidewall details)
         const tireMat = new THREE.MeshStandardMaterial({
-          color: 0x141518,
-          roughness: 0.85,
+          map: wheelsBaseColor,
+          roughnessMap: wheelsRoughness,
+          normalMap: wheelsNormal,
+          color: 0x222428,
+          roughness: 0.88,
           metalness: 0.05,
           transparent: false,
           opacity: 1.0,
@@ -969,14 +1049,15 @@ export class GT40ExplodedViewer {
         this.parts.wheels = this.splitMeshByQuadrants(child, tireMat);
 
       } else if (name.includes('disk')) {
-        // Halibrand Magnesium Vintage Le Mans Racing Gold Rim, Spokes & Chrome Knockoff
-        const rimMat = new THREE.MeshPhysicalMaterial({
-          color: 0xb59238,
-          roughness: 0.32,
-          metalness: 0.80,
-          clearcoat: 0.20,
-          clearcoatRoughness: 0.20,
-          envMapIntensity: 0.85,
+        // Halibrand Magnesium 15" Vintage Le Mans Racing Gold Rims, Spokes & Chrome Knockoff
+        const rimMat = new THREE.MeshStandardMaterial({
+          map: wheelsBaseColor,
+          roughnessMap: wheelsRoughness,
+          metalnessMap: wheelsMetallic,
+          normalMap: wheelsNormal,
+          color: 0xd4af37, // Authentic Halibrand Racing Gold
+          roughness: 0.36,
+          metalness: 0.78,
           transparent: false,
           opacity: 1.0,
           depthWrite: true,
@@ -1005,10 +1086,8 @@ export class GT40ExplodedViewer {
              float cz = vRimPos.z > 0.0 ? 1.23 : -1.11;
              float cy = vRimPos.z > 0.0 ? 0.02 : -0.03;
              float r = length(vec2(vRimPos.y - cy, vRimPos.z - cz));
-             if (r < 0.048) {
-               diffuseColor.rgb = vec3(0.92, 0.92, 0.94); // Chrome Center Knockoff
-             } else {
-               diffuseColor.rgb = vec3(0.76, 0.60, 0.24); // Halibrand Gold
+             if (r < 0.052) {
+               diffuseColor.rgb = vec3(0.95, 0.95, 0.97); // Chrome Center Knockoff
              }
             `
           ).replace(
@@ -1017,10 +1096,8 @@ export class GT40ExplodedViewer {
              float cz2 = vRimPos.z > 0.0 ? 1.23 : -1.11;
              float cy2 = vRimPos.z > 0.0 ? 0.02 : -0.03;
              float r2 = length(vec2(vRimPos.y - cy2, vRimPos.z - cz2));
-             if (r2 < 0.048) {
+             if (r2 < 0.052) {
                roughnessFactor = 0.12;
-             } else {
-               roughnessFactor = 0.30;
              }
             `
           ).replace(
@@ -1029,10 +1106,8 @@ export class GT40ExplodedViewer {
              float cz3 = vRimPos.z > 0.0 ? 1.23 : -1.11;
              float cy3 = vRimPos.z > 0.0 ? 0.02 : -0.03;
              float r3 = length(vec2(vRimPos.y - cy3, vRimPos.z - cz3));
-             if (r3 < 0.048) {
+             if (r3 < 0.052) {
                metalnessFactor = 0.95;
-             } else {
-               metalnessFactor = 0.85;
              }
             `
           );
@@ -1675,13 +1750,9 @@ export class GT40ExplodedViewer {
       pin.classList.toggle('active', pin.dataset.target === sysName);
     });
 
-    // Un-jumble viewports: When inspecting Cockpit or Engine, make bodywork semi-transparent so internal assemblies are 100% visible
+    // Maintain authentic solid bodywork; only apply X-Ray if user toggles the X-Ray mode
     if (this.parts.body) {
-      if (sysName === 'cockpit' || sysName === 'engine') {
-        this.parts.body.material = this.bodyXRayMaterial;
-      } else {
-        this.parts.body.material = this.isXRay ? this.bodyXRayMaterial : this.bodySolidMaterial;
-      }
+      this.parts.body.material = this.isXRay ? this.bodyXRayMaterial : this.bodySolidMaterial;
     }
 
     const targetCfg = SYSTEM_CAMERAS[sysName];

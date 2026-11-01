@@ -419,48 +419,151 @@ export class LeMansGame {
 
         if (name.includes('body')) {
           // Authentic 1966 Le Mans #2 Black with White Racing Stripes Livery
-          child.material = new THREE.MeshStandardMaterial({
+          const bodyMat = new THREE.MeshStandardMaterial({
             map: bodyLivery,
             roughnessMap: bodyRoughness,
             metalnessMap: bodyMetallic,
-            roughness: 0.38,
-            metalness: 0.12,
+            roughness: 0.32,
+            metalness: 0.15,
             envMapIntensity: 1.1,
             side: THREE.DoubleSide
           });
+
+          // Vector-Sharp 1966 Le Mans #2 Livery Shader Injection
+          bodyMat.onBeforeCompile = (shader) => {
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <common>',
+              `#include <common>
+               varying vec3 vBodyPos;
+               varying vec3 vBodyNorm;`
+            ).replace(
+              '#include <begin_vertex>',
+              `#include <begin_vertex>
+               vBodyPos = position;
+               vBodyNorm = normal;`
+            );
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <common>',
+              `#include <common>
+               varying vec3 vBodyPos;
+               varying vec3 vBodyNorm;`
+            ).replace(
+              '#include <color_fragment>',
+              `#include <color_fragment>
+               float ax = abs(vBodyPos.x);
+               bool isExteriorTop = (vBodyPos.y > 0.16) && (vBodyNorm.y > -0.05) && !(vBodyPos.z > 0.95 && vBodyPos.y < 0.26 && vBodyNorm.y < 0.4);
+
+               bool isStripe = false;
+               if (isExteriorTop) {
+                 if (ax >= 0.012 && ax <= 0.068) isStripe = true;
+                 if (ax >= 0.076 && ax <= 0.082) isStripe = true;
+                 if (length(vec2(vBodyPos.x - 0.24, vBodyPos.z - 1.16)) < 0.16 && vBodyPos.y > 0.20 && vBodyNorm.y > 0.35) isStripe = true;
+               }
+
+               bool isRocker = (vBodyPos.y >= -0.02 && vBodyPos.y <= 0.065) && (abs(vBodyNorm.x) > 0.6) && (vBodyPos.z > -0.75 && vBodyPos.z < 0.85);
+               if (isRocker && (vBodyPos.y >= 0.012 && vBodyPos.y <= 0.038)) isStripe = true;
+
+               if (isStripe) {
+                 diffuseColor.rgb = vec3(0.96, 0.96, 0.98);
+               } else {
+                 diffuseColor.rgb = diffuseColor.rgb * vec3(0.14, 0.14, 0.16) + vec3(0.045, 0.045, 0.05);
+               }
+              `
+            ).replace(
+              '#include <roughnessmap_fragment>',
+              `#include <roughnessmap_fragment>
+               if (isStripe) roughnessFactor = 0.22; else roughnessFactor = 0.30;`
+            ).replace(
+              '#include <metalnessmap_fragment>',
+              `#include <metalnessmap_fragment>
+               metalnessFactor = 0.12;`
+            );
+          };
+          child.material = bodyMat;
+
         } else if (name.includes('wheel')) {
-          // Authentic Solid Goodyear Racing Slick Rubber Tire (100% solid, fully opaque)
+          // Authentic Solid Goodyear Blue Streak Racing Slick Rubber Tires
           child.material = new THREE.MeshStandardMaterial({
-            color: 0x141518,
-            roughness: 0.85,
+            map: wheelsBaseColor,
+            roughnessMap: wheelsRoughness,
+            normalMap: wheelsNormal,
+            color: 0x222428,
+            roughness: 0.88,
             metalness: 0.05,
             transparent: false,
             opacity: 1.0,
             depthWrite: true,
             side: THREE.DoubleSide
           });
+
         } else if (name.includes('disk')) {
-          // Halibrand Magnesium Vintage Le Mans Racing Gold Rim & Center Hub
-          child.material = new THREE.MeshStandardMaterial({
+          // Halibrand Magnesium Vintage Le Mans Racing Gold Rims & Chrome Knockoff
+          const rimMat = new THREE.MeshStandardMaterial({
             map: wheelsBaseColor,
             roughnessMap: wheelsRoughness,
             metalnessMap: wheelsMetallic,
             normalMap: wheelsNormal,
             color: 0xd4af37,
-            roughness: 0.35,
-            metalness: 0.75,
+            roughness: 0.36,
+            metalness: 0.78,
             transparent: false,
             opacity: 1.0,
             depthWrite: true,
             side: THREE.DoubleSide
           });
+
+          rimMat.onBeforeCompile = (shader) => {
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <common>',
+              `#include <common>
+               varying vec3 vRimPos;`
+            ).replace(
+              '#include <begin_vertex>',
+              `#include <begin_vertex>
+               vRimPos = position;`
+            );
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <common>',
+              `#include <common>
+               varying vec3 vRimPos;`
+            ).replace(
+              '#include <color_fragment>',
+              `#include <color_fragment>
+               float cz = vRimPos.z > 0.0 ? 1.23 : -1.11;
+               float cy = vRimPos.z > 0.0 ? 0.02 : -0.03;
+               float r = length(vec2(vRimPos.y - cy, vRimPos.z - cz));
+               if (r < 0.052) diffuseColor.rgb = vec3(0.95, 0.95, 0.97);`
+            ).replace(
+              '#include <roughnessmap_fragment>',
+              `#include <roughnessmap_fragment>
+               float cz2 = vRimPos.z > 0.0 ? 1.23 : -1.11;
+               float cy2 = vRimPos.z > 0.0 ? 0.02 : -0.03;
+               float r2 = length(vec2(vRimPos.y - cy2, vRimPos.z - cz2));
+               if (r2 < 0.052) roughnessFactor = 0.12;`
+            ).replace(
+              '#include <metalnessmap_fragment>',
+              `#include <metalnessmap_fragment>
+               float cz3 = vRimPos.z > 0.0 ? 1.23 : -1.11;
+               float cy3 = vRimPos.z > 0.0 ? 0.02 : -0.03;
+               float r3 = length(vec2(vRimPos.y - cy3, vRimPos.z - cz3));
+               if (r3 < 0.052) metalnessFactor = 0.95;`
+            );
+          };
+          child.material = rimMat;
+
         } else if (name.includes('glass')) {
-          child.material = new THREE.MeshStandardMaterial({
-            map: glassBaseColor,
-            roughness: 0.05,
-            metalness: 0.1,
+          child.material = new THREE.MeshPhysicalMaterial({
+            color: 0xeef4f8,
+            roughness: 0.06,
+            metalness: 0.08,
+            transmission: 0.90,
+            thickness: 0.2,
+            ior: 1.5,
             transparent: true,
-            opacity: 0.65,
+            opacity: 0.40,
+            depthWrite: false,
             side: THREE.DoubleSide
           });
         } else if (name.includes('interior')) {
