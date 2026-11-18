@@ -21,6 +21,35 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
+    def do_POST(self):
+        content_len = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_len)
+
+        if self.path.startswith('/api/save-usdz'):
+            target_path = os.path.join(DIRECTORY, 'assets/models/car/source/gt40.usdz')
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            with open(target_path, 'wb') as f:
+                f.write(post_data)
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(f'Saved USDZ ({len(post_data)} bytes) to {target_path}'.encode('utf-8'))
+            return
+
+        if self.path.startswith('/api/save-glb'):
+            target_path = os.path.join(DIRECTORY, 'assets/models/car/source/gt40_ar.glb')
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            with open(target_path, 'wb') as f:
+                f.write(post_data)
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(f'Saved GLB ({len(post_data)} bytes) to {target_path}'.encode('utf-8'))
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
     def guess_type(self, path):
         if path.endswith('.glb'):
             return 'model/gltf-binary'
