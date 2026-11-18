@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=2.9" />
     <script type="importmap">
     {
       "imports": {
@@ -524,7 +524,7 @@
 
           <!-- 3D Interactive Stage -->
           <div class="exploded-stage-container" id="exploded-container">
-            <div class="exploded-pitlane-bg" aria-hidden="true"></div>
+            <div class="exploded-pitlane-bg" aria-hidden="true" style="position: absolute; inset: -24px; background-image: url('assets/images/history/lemans_pit_lane_dusk.jpg'); background-size: cover; background-position: center 58%; filter: blur(14px) brightness(0.36) contrast(1.15) saturate(0.85); transform: scale(1.05); pointer-events: none; z-index: 0;"></div>
             <canvas id="exploded-canvas"></canvas>
 
             <!-- Paddock Viewport Telemetry Badge -->
@@ -1912,12 +1912,12 @@
 
     <!-- Project Application Scripts -->
     <script src="main.js"></script>
-    <script type="module" src="assets/js/game.js?v=2.8"></script>
-    <script type="module" src="assets/js/exploded-view.js?v=2.8"></script>
+    <script type="module" src="assets/js/game.js?v=2.9"></script>
+    <script type="module" src="assets/js/exploded-view.js?v=2.9"></script>
     <script type="module">
-      import { GT40CockpitSimulator } from './assets/js/cockpit-sim.js';
-      import { LeMansTrackExperience } from './assets/js/lemans-track.js';
-      import { LeMansRaceClock } from './assets/js/race-clock.js';
+      import { GT40CockpitSimulator } from './assets/js/cockpit-sim.js?v=2.9';
+      import { LeMansTrackExperience } from './assets/js/lemans-track.js?v=2.9';
+      import { LeMansRaceClock } from './assets/js/race-clock.js?v=2.9';
 
       window.addEventListener('DOMContentLoaded', () => {
         window.gt40Cockpit = new GT40CockpitSimulator();
