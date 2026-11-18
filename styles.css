@@ -4019,3 +4019,630 @@ img[src*="ferrari-p3-beauty"] {
   }
 }
 
+
+/* ============================================================
+   REIMAGINED INTERACTIVE ENHANCEMENTS (Ignition, Drag, Env, Cockpit)
+   ============================================================ */
+
+/* Hero Pre-Flight Ignition Protocol Deck */
+.hero-ignition-deck {
+  margin-top: 18px;
+  background: rgba(8, 12, 18, 0.78);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+  padding: 12px 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ignition-deck-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #d4af37;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.ignition-switches-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ignition-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(20, 24, 33, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.ignition-toggle-btn:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.ignition-toggle-btn .toggle-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+  transition: all 0.25s ease;
+}
+
+.ignition-toggle-btn.active {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(74, 222, 128, 0.5);
+  color: #fff;
+}
+
+.ignition-toggle-btn.active .toggle-led {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+}
+
+.ignition-fire-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ignition-fire-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.65);
+}
+
+.ignition-fire-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.hero-throttle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 6px;
+  color: #fbbf24;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.hero-throttle-btn:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.8);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+.hero-throttle-btn:active,
+.hero-throttle-btn.revving {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #fff;
+  border-color: #f59e0b;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.8);
+  transform: scale(0.98);
+}
+
+/* Specs Unit Switcher */
+.specs-unit-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 8px;
+}
+
+.unit-toggle-btn {
+  background: transparent;
+  border: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.unit-toggle-btn:hover {
+  color: #fff;
+}
+
+.unit-toggle-btn.active {
+  color: #d4af37;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+.unit-sep {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Showroom Interactive Command Deck */
+.showroom-interactive-deck {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 960px);
+  z-index: 25;
+  background: rgba(8, 12, 18, 0.88);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 16px;
+  padding: 16px 22px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 175, 55, 0.1);
+  pointer-events: auto;
+}
+
+.showroom-rev-duel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.duel-rev-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ford-duel-btn {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.ford-duel-btn:hover {
+  border-color: rgba(59, 130, 246, 0.7);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+}
+
+.ferrari-duel-btn {
+  background: linear-gradient(135deg, rgba(153, 27, 27, 0.35) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.ferrari-duel-btn:hover {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-flag {
+  font-size: 1.4rem;
+}
+
+.btn-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.btn-info strong {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: #fff;
+}
+
+.btn-info small {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rev-wave-icon {
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.duel-vs-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  color: #d4af37;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Drag Strip Sprint Simulator */
+.showroom-drag-sim {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+}
+
+.drag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.drag-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #d4af37;
+}
+
+.drag-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s ease;
+}
+
+.drag-launch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.55);
+}
+
+.drag-launch-btn.racing {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+  pointer-events: none;
+}
+
+.drag-strip-track {
+  background: #06090e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drag-lane {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+  padding: 0 10px;
+  overflow: hidden;
+}
+
+.lane-tag {
+  z-index: 2;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  width: 130px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.drag-car-progress {
+  position: absolute;
+  left: 140px;
+  right: 170px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.drag-car-dot {
+  position: absolute;
+  top: -6px;
+  left: 0%;
+  width: 22px;
+  height: 16px;
+  border-radius: 4px;
+  transform: translateX(-50%);
+  transition: left 0.05s linear;
+}
+
+.ford-lane .drag-car-dot {
+  background: #38bdf8;
+  border: 1px solid #fff;
+  box-shadow: 0 0 12px #38bdf8;
+}
+
+.ferrari-lane .drag-car-dot {
+  background: #ef4444;
+  border: 1px solid #fff;
+  box-shadow: 0 0 12px #ef4444;
+}
+
+.lane-stat {
+  z-index: 2;
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.8);
+  width: 155px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Exploded View 3D Scene Switcher */
+.exploded-env-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 8px;
+  padding: 4px 8px;
+  backdrop-filter: blur(8px);
+}
+
+.env-switcher-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(212, 175, 55, 0.85);
+  margin-right: 4px;
+}
+
+.exploded-env-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exploded-env-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.5);
+  color: #fff;
+}
+
+.exploded-env-btn.active {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #080c12;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.45);
+}
+
+/* Cockpit Live Telemetry Cluster */
+.cockpit-live-telemetry {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.telem-box {
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 75px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.telem-lbl {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.telem-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.telem-val.highlight-gold {
+  color: #d4af37;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.status-box {
+  min-width: 110px;
+}
+
+.status-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ef4444;
+}
+
+.status-val.running {
+  color: #22c55e;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+/* Cockpit Quick HUD Flex Adjustments */
+.cockpit-quick-hud {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.cockpit-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(10, 14, 22, 0.88);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 12px;
+  padding: 8px 14px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
+  pointer-events: auto;
+  flex-wrap: wrap;
+}
+
+.cockpit-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 6px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cockpit-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cockpit-action-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-engine-start {
+  background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.4);
+}
+
+.btn-engine-start.running {
+  background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-throttle {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+.btn-throttle:hover,
+.btn-throttle:active,
+.btn-throttle.active {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+}
+
+.btn-shift {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+}
+
+.btn-shift:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #d4af37;
+}
+
+.btn-lights.active {
+  background: #fbbf24;
+  color: #080c12;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.6);
+}
+
+.btn-wipers.active {
+  background: #38bdf8;
+  color: #080c12;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+}

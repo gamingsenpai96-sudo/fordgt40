@@ -1,28 +1,20 @@
-/**
- * Ford GT40 Mk II — Authentic First-Person 3D Cockpit Experience
- * Exact 1966 Bruce McLaren & Chris Amon Le Mans Winner (Chassis P/1046)
- *
- * Fully Modelled & Textured 1966 Competition Interior:
- * - Stewart-Warner 8-Gauge Analog Cluster (Tachometer, Speedometer, Oil Press, Water Temp, Oil Temp, Fuel, Ammeter)
- * - 3-Spoke Drilled Aluminum Competition Steering Wheel with Textured Leather Rim & Shelby Emblem
- * - Sill-Mounted RHD 4-Speed Gated Shifter & Exposed Mechanical Linkage
- * - Drilled Aluminum Endurance Pedal Box (Clutch, Brake, Throttle)
- * - Deep Racing Bucket Seat with Classic Silver Ventilation Grommets & 4-Point Willans Harness
- * - Aviation Toggle Switches with Red Flip Guards & Push-Button Starter
- * - Tubular Steel Roll Cage, A-Pillar Bracing & Framed Rear Engine Window
- *
- * Photorealistic 1966 Le Mans Circuit de la Sarthe Pit Straight Exterior:
- * - Starting Grid Box #2 with Weathered Asphalt & Tire Rubber Grooves
- * - 1966 Low Concrete Pit Wall with Shelby American #2 Timing Board, Goodyear Tire Stacks & Churns
- * - Covered Multi-Tier Main Grandstands & Trackside Armco Barriers with 1966 Banners (Dunlop, Total, Ferodo, BP)
- * - Iconic Dunlop Tire Bridge Cresting in Forward Distance
- * - 360° Atmospheric Sky Dome with Natural Le Mans Daylight Lighting
- *
- * Stationary Driver Camera with Constrained Look-Around & Smooth View Presets
- */
+/* =================================================================
+   Ford GT40 Mk II (Chassis P/1046) — Ultra-Detailed 1st-Person Cockpit Simulator
+   =================================================================
+   - True 1st-person driver eye position inside authentic 1966 RHD GT40 Mk II
+   - Stewart-Warner 8-gauge cluster with procedural canvas faces & animated needles
+   - Tactile interactive 3D switchgear: Starter button, toggle switches, gated shifter
+   - Interactive Web Audio engine acoustic synthesis (starter crank, idle, rev roar, shifter clack)
+   - Moto-Lita 15" competition steering wheel with 18 countersunk rim rivets
+   - Sill-mounted 4-speed Kar-Kraft T-44 gated shifter with physical H-pattern movement
+   - Drilled aluminum pedals, Willans 4-point harness, and tubular roll cage
+   - Rotating side window Plexiglas air scoops, Ken Miles lap clipboard, wiper assembly
+   - Rear bulkhead glass window looking directly into 7.0L FE V8 velocity stacks
+   - 1966 Circuit de la Sarthe exterior with mechanics, pit wall, grandstands & Dunlop bridge
+   ================================================================= */
 
-import * as THREE from './three.module.js';
-import { GLTFLoader } from './GLTFLoader.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/GLTFLoader.js';
 
 export class GT40CockpitSimulator {
   constructor() {
@@ -38,6 +30,19 @@ export class GT40CockpitSimulator {
     this.loaderFill = document.getElementById('cockpit-loader-fill');
     this.loaderSub = document.getElementById('cockpit-loader-sub');
 
+    // Interactive Action Controls in HUD
+    this.btnStart = document.getElementById('cockpit-start-btn');
+    this.btnAccel = document.getElementById('cockpit-accel-btn');
+    this.btnShift = document.getElementById('cockpit-shift-btn');
+    this.btnLights = document.getElementById('cockpit-lights-btn');
+    this.btnWipers = document.getElementById('cockpit-wipers-btn');
+
+    // Telemetry DOM readouts
+    this.telemetryRPM = document.getElementById('cockpit-rpm-val');
+    this.telemetrySpeed = document.getElementById('cockpit-speed-val');
+    this.telemetryGear = document.getElementById('cockpit-gear-val');
+    this.telemetryStatus = document.getElementById('cockpit-engine-status');
+
     // Stationary driver eye position inside Ford GT40 Mk II (Right-Hand Drive)
     // Chassis P/1046: X = 0.28m (RHD driver seat center), Y = 0.38m (driver eye level), Z = 0.10m (driver head)
     this.eyePosition = new THREE.Vector3(0.28, 0.38, 0.10);
@@ -47,12 +52,12 @@ export class GT40CockpitSimulator {
     // Forward is +Z direction (yaw = 0)
     this.currentYaw = 0;
     this.targetYaw = 0;
-    this.currentPitch = -0.06; // subtle natural downward glance at dash & windscreen
+    this.currentPitch = -0.06; // natural subtle downward glance at instruments
     this.targetPitch = -0.06;
 
-    // Strict rotational boundaries to prevent clipping seat backrest, roof, floor or exterior
-    this.yawMin = -1.92;  // -110 deg (right window, pit wall, door sill, wing mirror)
-    this.yawMax = 2.18;   // +125 deg (center console, passenger seat, left grandstands, rear engine bay)
+    // Strict rotational boundaries
+    this.yawMin = -1.92;   // -110 deg (right window, door sill, wing mirror)
+    this.yawMax = 2.18;    // +125 deg (center console, passenger seat, rear engine bay)
     this.pitchMin = -0.78; // -45 deg (pedals, steering wheel, lower Stewart-Warner dials)
     this.pitchMax = 0.61;  // +35 deg (windscreen top, roof, Gurney bubble, rearview mirror)
 
@@ -64,10 +69,218 @@ export class GT40CockpitSimulator {
     this.isInitialized = false;
     this.animationFrameId = null;
 
+    // Physical Engine Simulation State
+    this.engineRunning = false;
+    this.isCranking = false;
+    this.currentRPM = 0;
+    this.targetRPM = 0;
+    this.currentSpeed = 0;
+    this.currentGear = 'N'; // N, 1, 2, 3, 4
+    this.gearIndex = 0; // 0=N, 1=1st, 2=2nd, 3=3rd, 4=4th
+    this.isAccelerating = false;
+    this.headlightsOn = false;
+    this.wipersOn = false;
+    this.fuelPumpOn = true;
+    this.ignitionOn = true;
+    this.ventOpen = false;
+
+    // 3D Animated Components Registry
+    this.needles = {};
+    this.interactiveObjects = [];
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
+    // Web Audio Engine Synthesizer
+    this.audioCtx = null;
+    this.engineGain = null;
+    this.engineOsc = null;
+    this.engineNoise = null;
+
     this.initThree();
     this.bindEvents();
     this.loadModel();
   }
+
+  // =================================================================
+  //  Web Audio Procedural Sound Engine
+  // =================================================================
+
+  initAudio() {
+    if (this.audioCtx) return;
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      this.audioCtx = new AudioContextClass();
+
+      // Master Cockpit Gain
+      this.masterGain = this.audioCtx.createGain();
+      this.masterGain.gain.setValueAtTime(0.7, this.audioCtx.currentTime);
+      this.masterGain.connect(this.audioCtx.destination);
+    } catch (e) {
+      console.warn('Web Audio initialization fallback:', e);
+    }
+  }
+
+  playClickSound() {
+    if (!this.audioCtx) this.initAudio();
+    if (!this.audioCtx) return;
+
+    try {
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1400, this.audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, this.audioCtx.currentTime + 0.04);
+
+      gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.04);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + 0.04);
+    } catch (e) {}
+  }
+
+  playGearClackSound() {
+    if (!this.audioCtx) this.initAudio();
+    if (!this.audioCtx) return;
+
+    try {
+      const t = this.audioCtx.currentTime;
+      // Dual metallic gate impact (shifter hitting gate slot)
+      const osc1 = this.audioCtx.createOscillator();
+      const osc2 = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+
+      osc1.type = 'square';
+      osc1.frequency.setValueAtTime(680, t);
+      osc1.frequency.exponentialRampToValueAtTime(120, t + 0.07);
+
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(2200, t);
+      osc2.frequency.exponentialRampToValueAtTime(450, t + 0.05);
+
+      gain.gain.setValueAtTime(0.45, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + 0.08);
+      osc2.stop(t + 0.08);
+    } catch (e) {}
+  }
+
+  playStarterCrankSound() {
+    if (!this.audioCtx) this.initAudio();
+    if (!this.audioCtx) return;
+
+    try {
+      const t = this.audioCtx.currentTime;
+      // Whining starter motor and compression pulses
+      const starterOsc = this.audioCtx.createOscillator();
+      const starterGain = this.audioCtx.createGain();
+
+      starterOsc.type = 'sawtooth';
+      starterOsc.frequency.setValueAtTime(120, t);
+      // Pulses for starter cranking
+      for (let p = 0; p < 6; p++) {
+        starterOsc.frequency.setValueAtTime(110, t + (p * 0.12));
+        starterOsc.frequency.linearRampToValueAtTime(145, t + (p * 0.12) + 0.06);
+      }
+
+      starterGain.gain.setValueAtTime(0.35, t);
+      starterGain.gain.linearRampToValueAtTime(0.4, t + 0.7);
+      starterGain.gain.exponentialRampToValueAtTime(0.01, t + 0.85);
+
+      starterOsc.connect(starterGain);
+      starterGain.connect(this.masterGain);
+
+      starterOsc.start(t);
+      starterOsc.stop(t + 0.85);
+    } catch (e) {}
+  }
+
+  startEngineAudioLoop() {
+    if (!this.audioCtx) this.initAudio();
+    if (!this.audioCtx) return;
+
+    if (this.engineOsc) return;
+
+    try {
+      // 7.0L FE V8 big-block rumble: Low fundamental + subharmonic lope
+      this.engineOsc = this.audioCtx.createOscillator();
+      this.engineOsc.type = 'sawtooth';
+      this.engineOsc.frequency.setValueAtTime(38, this.audioCtx.currentTime); // ~1140 RPM (38 Hz firing)
+
+      // V8 Sub-harmonic lope
+      this.subOsc = this.audioCtx.createOscillator();
+      this.subOsc.type = 'triangle';
+      this.subOsc.frequency.setValueAtTime(19, this.audioCtx.currentTime);
+
+      this.engineGain = this.audioCtx.createGain();
+      this.engineGain.gain.setValueAtTime(0.22, this.audioCtx.currentTime);
+
+      // Low pass filter for deep muffled cockpit acoustic insulation
+      this.engineFilter = this.audioCtx.createBiquadFilter();
+      this.engineFilter.type = 'lowpass';
+      this.engineFilter.frequency.setValueAtTime(280, this.audioCtx.currentTime);
+      this.engineFilter.Q.setValueAtTime(3.5, this.audioCtx.currentTime);
+
+      this.engineOsc.connect(this.engineFilter);
+      this.subOsc.connect(this.engineFilter);
+      this.engineFilter.connect(this.engineGain);
+      this.engineGain.connect(this.masterGain);
+
+      this.engineOsc.start();
+      this.subOsc.start();
+    } catch (e) {}
+  }
+
+  stopEngineAudioLoop() {
+    if (this.engineOsc) {
+      try {
+        this.engineOsc.stop();
+        this.engineOsc.disconnect();
+        this.engineOsc = null;
+      } catch (e) {}
+    }
+    if (this.subOsc) {
+      try {
+        this.subOsc.stop();
+        this.subOsc.disconnect();
+        this.subOsc = null;
+      } catch (e) {}
+    }
+  }
+
+  updateEngineAudio() {
+    if (!this.engineOsc || !this.audioCtx) return;
+
+    try {
+      const t = this.audioCtx.currentTime;
+      // Scale fundamental frequency from RPM: 1000 RPM ~ 33 Hz, 6000 RPM ~ 200 Hz
+      const hz = Math.max(20, (this.currentRPM / 60) * 2);
+      this.engineOsc.frequency.setTargetAtTime(hz, t, 0.05);
+      if (this.subOsc) this.subOsc.frequency.setTargetAtTime(hz / 2, t, 0.05);
+
+      // Filter opens up as throttle opens
+      const filterFreq = 260 + (this.currentRPM / 6500) * 1200;
+      this.engineFilter.frequency.setTargetAtTime(filterFreq, t, 0.05);
+
+      // Gain increases with throttle
+      const gainVal = 0.20 + (this.currentRPM / 6500) * 0.40;
+      this.engineGain.gain.setTargetAtTime(gainVal, t, 0.05);
+    } catch (e) {}
+  }
+
+  // =================================================================
+  //  Three.js Scene, Camera, Lighting & Track Setup
+  // =================================================================
 
   initThree() {
     // 1. Scene
@@ -169,8 +382,6 @@ export class GT40CockpitSimulator {
     this.scene.add(keyLight);
 
     // 4. Dedicated Interior Gauge & Dashboard Inspection Warm Light
-    // Positioned directly in front of driver's chest to illuminate Stewart-Warner dials,
-    // toggle switches, steering wheel rim, and Kar Kraft shifter gate
     const dashWarmLight = new THREE.PointLight(0xffeedb, 1.45, 1.8);
     dashWarmLight.position.set(0.28, 0.32, 0.45);
     this.scene.add(dashWarmLight);
@@ -180,16 +391,25 @@ export class GT40CockpitSimulator {
     cabinLight.position.set(-0.20, 0.40, 0.12);
     this.scene.add(cabinLight);
 
-    // 6. Rear engine bulkhead soft warm glow (visible through rear cockpit divider window)
-    const engineBayGlow = new THREE.PointLight(0xff9933, 1.25, 2.5);
+    // 6. Rear engine bulkhead soft warm glow
+    const engineBayGlow = new THREE.PointLight(0xff9933, 1.45, 2.8);
     engineBayGlow.position.set(0.0, 0.42, -0.65);
     this.scene.add(engineBayGlow);
+
+    // 7. Headlight Beams (Visible when Headlights are switched ON)
+    this.headlightSpotL = new THREE.SpotLight(0xfffae0, 0, 120, Math.PI / 6, 0.45, 1.2);
+    this.headlightSpotL.position.set(0.65, 0.25, 2.1);
+    this.headlightSpotL.target.position.set(0.65, -0.2, 45);
+    this.scene.add(this.headlightSpotL);
+    this.scene.add(this.headlightSpotL.target);
+
+    this.headlightSpotR = new THREE.SpotLight(0xfffae0, 0, 120, Math.PI / 6, 0.45, 1.2);
+    this.headlightSpotR.position.set(-0.65, 0.25, 2.1);
+    this.headlightSpotR.target.position.set(-0.65, -0.2, 45);
+    this.scene.add(this.headlightSpotR);
+    this.scene.add(this.headlightSpotR.target);
   }
 
-  /**
-   * Photorealistic 1966 Le Mans Circuit de la Sarthe Pit Straight Exterior
-   * Renders the track outside windshield, side windows, and rear window
-   */
   setupTrackEnvironment() {
     const trackGroup = new THREE.Group();
     trackGroup.name = 'LeMansPitStraightTrack';
@@ -214,7 +434,7 @@ export class GT40CockpitSimulator {
     road.receiveShadow = true;
     trackGroup.add(road);
 
-    // 2. Rubbered-in Racing Line (Dark Groove)
+    // 2. Rubbered-in Racing Line
     const grooveMat = new THREE.MeshBasicMaterial({
       color: 0x111317,
       transparent: true,
@@ -227,13 +447,11 @@ export class GT40CockpitSimulator {
 
     // 3. Starting Grid Slot #2 (Bruce McLaren & Chris Amon - Chassis P/1046)
     const gridMat = new THREE.MeshBasicMaterial({ color: 0xdedede });
-    // Front line of grid slot
     const frontLine = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.22), gridMat);
     frontLine.rotation.x = -Math.PI / 2;
     frontLine.position.set(0.28, -0.372, 2.8);
     trackGroup.add(frontLine);
 
-    // Side box lines
     const leftLine = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 5.5), gridMat);
     leftLine.rotation.x = -Math.PI / 2;
     leftLine.position.set(-1.32, -0.372, 0.05);
@@ -277,14 +495,13 @@ export class GT40CockpitSimulator {
       roughness: 0.94,
       metalness: 0.05
     });
-    const wallGeo = new THREE.BoxGeometry(0.55, 0.95, 180);
-    const pitWall = new THREE.Mesh(wallGeo, concreteMat);
+    const pitWall = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.95, 180), concreteMat);
     pitWall.position.set(3.4, 0.10, 30);
     pitWall.castShadow = true;
     pitWall.receiveShadow = true;
     trackGroup.add(pitWall);
 
-    // 6. Shelby American Pit Stall Board (#2 McLaren / Amon)
+    // Shelby American Pit Stall Board
     const boardCanvas = document.createElement('canvas');
     boardCanvas.width = 512;
     boardCanvas.height = 256;
@@ -310,13 +527,12 @@ export class GT40CockpitSimulator {
 
     const boardTex = new THREE.CanvasTexture(boardCanvas);
     boardTex.colorSpace = THREE.SRGBColorSpace;
-    const boardMat = new THREE.MeshBasicMaterial({ map: boardTex });
-    const boardMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), boardMat);
+    const boardMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), new THREE.MeshBasicMaterial({ map: boardTex }));
     boardMesh.position.set(3.08, 0.40, 2.2);
     boardMesh.rotation.y = -Math.PI / 2;
     trackGroup.add(boardMesh);
 
-    // 7. Stack of Goodyear Blue Streak Racing Tires by the Pit Wall
+    // 6. Stack of Goodyear Tires by the Pit Wall
     const tireMat = new THREE.MeshStandardMaterial({ color: 0x181a1e, roughness: 0.92 });
     for (let i = 0; i < 4; i++) {
       const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.28, 20), tireMat);
@@ -325,18 +541,13 @@ export class GT40CockpitSimulator {
       trackGroup.add(tire);
     }
 
-    // 8. Trackside Steel Armco Guardrail & 1966 Banners (Driver's Left Side)
-    const armcoMat = new THREE.MeshStandardMaterial({
-      color: 0x9ca3af,
-      metalness: 0.85,
-      roughness: 0.35
-    });
-    const armcoGeo = new THREE.BoxGeometry(0.18, 0.65, 220);
-    const armco = new THREE.Mesh(armcoGeo, armcoMat);
+    // 7. Trackside Steel Armco Guardrail & 1966 Banners (Driver's Left Side)
+    const armcoMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.85, roughness: 0.35 });
+    const armco = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.65, 220), armcoMat);
     armco.position.set(-14.2, 0.05, 30);
     trackGroup.add(armco);
 
-    // 1966 Historic Sponsor Banners along opposite fence (Dunlop, Total, Ferodo, BP)
+    // Historic Sponsor Banners
     const makeBanner = (brand, bgColor, textColor, zPos) => {
       const bCanvas = document.createElement('canvas');
       bCanvas.width = 512;
@@ -367,7 +578,7 @@ export class GT40CockpitSimulator {
     makeBanner('SEV MARCHAL', '#0f172a', '#38bdf8', 5);
     makeBanner('CHAMPION', '#ffffff', '#dc2626', -5);
 
-    // 9. 1966 Le Mans Main Covered Grandstand (Opposite Pit Straight)
+    // 8. Covered Main Grandstand (Opposite Pit Straight)
     const standMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.85 });
     const standRoofMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.70 });
 
@@ -380,22 +591,16 @@ export class GT40CockpitSimulator {
     standRoof.rotation.z = -0.15;
     trackGroup.add(standRoof);
 
-    // 10. Iconic Dunlop Tire Bridge (In Forward Distance over Crest)
+    // 9. Iconic Dunlop Tire Bridge
     const bridgeGroup = new THREE.Group();
     bridgeGroup.position.set(-4.0, 0.0, 115);
-
-    const bridgeArchMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      metalness: 0.4,
-      roughness: 0.6
-    });
+    const bridgeArchMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.4, roughness: 0.6 });
     const arch = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 4.5, 32, 1, false, 0, Math.PI), bridgeArchMat);
     arch.rotation.z = Math.PI / 2;
     arch.rotation.y = Math.PI / 2;
     arch.position.set(0, 2.5, 0);
     bridgeGroup.add(arch);
 
-    // Dunlop Yellow Lettering on Bridge
     const dunlopCanvas = document.createElement('canvas');
     dunlopCanvas.width = 512;
     dunlopCanvas.height = 128;
@@ -409,21 +614,17 @@ export class GT40CockpitSimulator {
     dCtx.fillText('DUNLOP', 256, 64);
     const dunlopTex = new THREE.CanvasTexture(dunlopCanvas);
     dunlopTex.colorSpace = THREE.SRGBColorSpace;
-    const dunlopBanner = new THREE.Mesh(
-      new THREE.PlaneGeometry(16, 4.0),
-      new THREE.MeshBasicMaterial({ map: dunlopTex })
-    );
+    const dunlopBanner = new THREE.Mesh(new THREE.PlaneGeometry(16, 4.0), new THREE.MeshBasicMaterial({ map: dunlopTex }));
     dunlopBanner.position.set(0, 8.2, -0.5);
     bridgeGroup.add(dunlopBanner);
     trackGroup.add(bridgeGroup);
 
-    // 11. French Countryside Trees Lining Track Perimeter
+    // 10. Countryside Trees
     const treeMat = new THREE.MeshStandardMaterial({ color: 0x1b3b22, roughness: 0.95 });
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2b1f, roughness: 0.90 });
 
     for (let i = 0; i < 18; i++) {
       const z = -40 + (i * 18);
-      // Left trees beyond grandstand
       const treeL = new THREE.Mesh(new THREE.ConeGeometry(3.5, 9, 8), treeMat);
       treeL.position.set(-28 + (Math.sin(i) * 3), 4.5, z);
       trackGroup.add(treeL);
@@ -432,7 +633,6 @@ export class GT40CockpitSimulator {
       trunkL.position.set(-28 + (Math.sin(i) * 3), 0.8, z);
       trackGroup.add(trunkL);
 
-      // Right trees beyond pit lane
       const treeR = new THREE.Mesh(new THREE.ConeGeometry(3.2, 8.5, 8), treeMat);
       treeR.position.set(16 + (Math.cos(i) * 3), 4.2, z);
       trackGroup.add(treeR);
@@ -444,7 +644,6 @@ export class GT40CockpitSimulator {
   loadModel() {
     const loader = new GLTFLoader();
 
-    // Reuse the shared Promise cache if exploded-view or game already initiated streaming
     if (!window.__GT40_GLTF_PROMISE__) {
       window.__GT40_GLTF_PROMISE__ = new Promise((resolve, reject) => {
         loader.load(
@@ -463,7 +662,6 @@ export class GT40CockpitSimulator {
     }
 
     window.__GT40_GLTF_PROMISE__.then((gltf) => {
-      // Clone the complete, unexploded GT40 Mk II car
       this.carRoot = gltf.scene.clone(true);
       this.setupCarMaterials();
       this.buildDetailedInterior();
@@ -508,8 +706,6 @@ export class GT40CockpitSimulator {
     const interiorRoughness = loadTex('Interior_Roughness.1001.png', false, false);
     const interiorNormal    = loadTex('Interior_Normal.1001.png', false, false);
 
-    // 1. Exterior & Interior Body Shell: Double-sided so roof, A-pillars, doors,
-    // and Gurney bubble ceiling render correctly without backface culling from inside
     const bodyMat = new THREE.MeshStandardMaterial({
       map: bodyLiveryTex,
       roughnessMap: bodyRoughnessTex,
@@ -519,7 +715,6 @@ export class GT40CockpitSimulator {
       side: THREE.DoubleSide
     });
 
-    // 2. Race Cockpit Base Tub: Double-sided matte black chassis tub
     const interiorMat = new THREE.MeshStandardMaterial({
       map: interiorBaseColor,
       roughnessMap: interiorRoughness,
@@ -529,8 +724,6 @@ export class GT40CockpitSimulator {
       side: THREE.DoubleSide
     });
 
-    // 3. Clear Plexiglas Competition Glass: Translucent with high transmission
-    // Clear windscreen forward, side quarter windows, and rear engine window
     const glassMat = new THREE.MeshPhysicalMaterial({
       color: 0xedf4f8,
       roughness: 0.05,
@@ -542,7 +735,6 @@ export class GT40CockpitSimulator {
       side: THREE.DoubleSide
     });
 
-    // 4. Engine bay visible behind the rear cockpit window
     const engineMat = new THREE.MeshStandardMaterial({
       map: engineBaseColor,
       roughnessMap: engineRoughness,
@@ -552,7 +744,6 @@ export class GT40CockpitSimulator {
       side: THREE.DoubleSide
     });
 
-    // 5. Wheels & Tires
     const wheelMat = new THREE.MeshStandardMaterial({
       map: wheelsBaseColor,
       roughnessMap: wheelsRoughness,
@@ -582,10 +773,10 @@ export class GT40CockpitSimulator {
     });
   }
 
-  /**
-   * Builds the Complete, Authentic 1966 GT40 Mk II Interior Geometry & PBR Detailing
-   * Stewart-Warner Instruments, 3-Spoke Wheel, Sill Shifter, Pedals, Willans Harness, Roll Cage
-   */
+  // =================================================================
+  //  Ultra-Detailed 1966 GT40 Mk II Cockpit Interior Hardware
+  // =================================================================
+
   buildDetailedInterior() {
     const cockpitGroup = new THREE.Group();
     cockpitGroup.name = 'GT40AuthenticInterior';
@@ -601,6 +792,12 @@ export class GT40CockpitSimulator {
       color: 0xc8cdd4,
       metalness: 0.82,
       roughness: 0.32
+    });
+
+    const flockedDashMat = new THREE.MeshStandardMaterial({
+      color: 0x121418,
+      roughness: 0.96, // Flocked matte crinkle anti-glare finish
+      metalness: 0.02
     });
 
     const matteBlackMat = new THREE.MeshStandardMaterial({
@@ -624,17 +821,28 @@ export class GT40CockpitSimulator {
     });
 
     // ----------------------------------------------------
-    // 1. DASHBOARD HOUSING & BRUSHED ALUMINUM INSTRUMENT PANEL
+    // 1. DASHBOARD HOUSING & INSTRUMENT PANEL
     // ----------------------------------------------------
     const dashGroup = new THREE.Group();
     dashGroup.position.set(0, 0.28, 0.62);
 
-    // Curved dashboard cowl
+    // Curved dashboard cowl with flocked anti-glare finish
     const cowlGeo = new THREE.BoxGeometry(1.22, 0.16, 0.24);
-    const dashCowl = new THREE.Mesh(cowlGeo, matteBlackMat);
+    const dashCowl = new THREE.Mesh(cowlGeo, flockedDashMat);
     dashCowl.position.set(0, 0, 0);
     dashCowl.rotation.x = 0.18;
     dashGroup.add(dashCowl);
+
+    // Twin Defroster Louvers along windscreen base
+    const louverMat = new THREE.MeshBasicMaterial({ color: 0x080a0e });
+    [-0.32, 0.32].forEach((lx) => {
+      for (let l = 0; l < 4; l++) {
+        const louver = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.005, 0.015), louverMat);
+        louver.position.set(lx, 0.075, 0.04 + (l * 0.025));
+        louver.rotation.x = 0.18;
+        dashGroup.add(louver);
+      }
+    });
 
     // Stamped aluminum driver instrument plate
     const alumPlateGeo = new THREE.BoxGeometry(0.58, 0.14, 0.015);
@@ -643,12 +851,24 @@ export class GT40CockpitSimulator {
     alumPlate.rotation.x = 0.18;
     dashGroup.add(alumPlate);
 
+    // Red High-Intensity Shift Warning Light (Mounted top of cowl)
+    const shiftLightGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.018, 16);
+    this.shiftLightMat = new THREE.MeshStandardMaterial({
+      color: 0x450a0a,
+      emissive: new THREE.Color(0x000000),
+      roughness: 0.3
+    });
+    this.shiftLight = new THREE.Mesh(shiftLightGeo, this.shiftLightMat);
+    this.shiftLight.rotation.x = 0.18;
+    this.shiftLight.position.set(0.28, 0.09, 0.09);
+    dashGroup.add(this.shiftLight);
+
     // Period Shelby Chassis Plaque on passenger side
     const plaqueCanvas = document.createElement('canvas');
     plaqueCanvas.width = 512;
     plaqueCanvas.height = 128;
     const pCtx = plaqueCanvas.getContext('2d');
-    pCtx.fillStyle = '#b89728'; // Brass plate
+    pCtx.fillStyle = '#b89728';
     pCtx.fillRect(0, 0, 512, 128);
     pCtx.strokeStyle = '#332408';
     pCtx.lineWidth = 6;
@@ -673,31 +893,27 @@ export class GT40CockpitSimulator {
     dashGroup.add(plaqueMesh);
 
     // ----------------------------------------------------
-    // 2. STEWART-WARNER ANALOG GAUGES
+    // 2. STEWART-WARNER ANALOG GAUGES & ANIMATED NEEDLES
     // ----------------------------------------------------
     const createGauge = (type, title, unit, min, max, redlineStart, needleVal, size) => {
       const gGroup = new THREE.Group();
 
-      // Procedural High-Res Dial Face Canvas
       const c = document.createElement('canvas');
       c.width = 512;
       c.height = 512;
       const ctx = c.getContext('2d');
 
-      // Dial face background
       ctx.fillStyle = '#0a0c10';
       ctx.beginPath();
       ctx.arc(256, 256, 250, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outer border ring
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 5;
       ctx.beginPath();
       ctx.arc(256, 256, 238, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Tick marks and scale arc (240 deg sweep from -210 deg to +30 deg)
       const startAngle = Math.PI * 0.75;
       const endAngle = Math.PI * 2.25;
       const sweep = endAngle - startAngle;
@@ -717,7 +933,6 @@ export class GT40CockpitSimulator {
         const x2 = 256 + Math.cos(angle) * outerR;
         const y2 = 256 + Math.sin(angle) * outerR;
 
-        // Redline colouring
         if (redlineStart !== null && val >= redlineStart) {
           ctx.strokeStyle = '#ef4444';
           ctx.lineWidth = isMajor ? 8 : 4;
@@ -731,7 +946,6 @@ export class GT40CockpitSimulator {
         ctx.lineTo(x2, y2);
         ctx.stroke();
 
-        // Numerals for major ticks
         if (isMajor) {
           const numR = 155;
           const nx = 256 + Math.cos(angle) * numR;
@@ -745,7 +959,6 @@ export class GT40CockpitSimulator {
         }
       }
 
-      // Title & Branding
       ctx.font = 'bold 28px Oswald, sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
@@ -762,14 +975,12 @@ export class GT40CockpitSimulator {
       const dialTex = new THREE.CanvasTexture(c);
       dialTex.colorSpace = THREE.SRGBColorSpace;
 
-      // Chrome bezel & dial cylinder
       const depth = 0.035;
       const bezelGeo = new THREE.CylinderGeometry(size, size * 1.04, depth, 32);
       const bezelMesh = new THREE.Mesh(bezelGeo, chromeMat);
       bezelMesh.rotation.x = Math.PI / 2;
       gGroup.add(bezelMesh);
 
-      // Recessed face
       const faceGeo = new THREE.CircleGeometry(size * 0.94, 32);
       const faceMat = new THREE.MeshStandardMaterial({
         map: dialTex,
@@ -804,16 +1015,26 @@ export class GT40CockpitSimulator {
       needleGroup.rotation.z = needleAngle;
       gGroup.add(needleGroup);
 
-      // Glass Cover
       const glassMesh = new THREE.Mesh(new THREE.CircleGeometry(size * 0.96, 32), gaugeGlassMat);
       glassMesh.position.z = depth * 0.54;
       gGroup.add(glassMesh);
+
+      // Save needle reference and metadata for dynamic physics animation
+      this.needles[type] = {
+        group: needleGroup,
+        min,
+        max,
+        startAngle,
+        sweep,
+        currentVal: needleVal,
+        targetVal: needleVal
+      };
 
       return gGroup;
     };
 
     // 1. Tachometer (Large Central Dial - 0-8000 RPM, redline 6200)
-    const tach = createGauge('tach', 'RPM', 'x1000', 0, 8000, 6200, 1100, 0.055);
+    const tach = createGauge('tach', 'RPM', 'x1000', 0, 8000, 6200, 0, 0.055);
     tach.position.set(0.28, 0.02, 0.12);
     tach.rotation.x = 0.18;
     dashGroup.add(tach);
@@ -825,57 +1046,60 @@ export class GT40CockpitSimulator {
     dashGroup.add(speedo);
 
     // 3. Oil Pressure (0-100 PSI)
-    const oilPress = createGauge('oilp', 'OIL', 'PSI', 0, 100, 20, 65, 0.034);
+    const oilPress = createGauge('oilp', 'OIL', 'PSI', 0, 100, 20, 0, 0.034);
     oilPress.position.set(0.14, 0.04, 0.12);
     oilPress.rotation.x = 0.18;
     dashGroup.add(oilPress);
 
     // 4. Water Temp (100-240 °F)
-    const waterTemp = createGauge('watert', 'WATER', '°F', 100, 240, 220, 185, 0.034);
+    const waterTemp = createGauge('watert', 'WATER', '°F', 100, 240, 220, 110, 0.034);
     waterTemp.position.set(0.14, -0.04, 0.12);
     waterTemp.rotation.x = 0.18;
     dashGroup.add(waterTemp);
 
     // 5. Oil Temp (100-300 °F)
-    const oilTemp = createGauge('oilt', 'OIL T', '°F', 100, 300, 260, 210, 0.034);
+    const oilTemp = createGauge('oilt', 'OIL T', '°F', 100, 300, 260, 120, 0.034);
     oilTemp.position.set(0.53, 0.04, 0.12);
     oilTemp.rotation.x = 0.18;
     dashGroup.add(oilTemp);
 
     // 6. Fuel Gauge
-    const fuelG = createGauge('fuel', 'FUEL', 'LEVEL', 0, 100, 15, 80, 0.034);
+    const fuelG = createGauge('fuel', 'FUEL', 'LEVEL', 0, 100, 15, 85, 0.034);
     fuelG.position.set(0.53, -0.04, 0.12);
     fuelG.rotation.x = 0.18;
     dashGroup.add(fuelG);
 
     // ----------------------------------------------------
-    // 3. AVIATION TOGGLE SWITCHES & ENGINE START BUTTON
+    // 3. INTERACTIVE AVIATION TOGGLE SWITCHES & STARTER
     // ----------------------------------------------------
     const switchRow = new THREE.Group();
     switchRow.position.set(0.28, -0.065, 0.12);
     switchRow.rotation.x = 0.18;
 
+    this.toggleMeshes = [];
     const toggleGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.022, 12);
     const redGuardGeo = new THREE.BoxGeometry(0.016, 0.028, 0.014);
     const redGuardMat = new THREE.MeshStandardMaterial({ color: 0xef4444, metalness: 0.6, roughness: 0.3 });
+
+    const switchLabels = ['IGNITION', 'FUEL PUMP', 'HEADLIGHTS', 'WIPERS', 'AUX FAN', 'PIT RADIO'];
 
     for (let i = 0; i < 6; i++) {
       const swGroup = new THREE.Group();
       const x = -0.15 + (i * 0.06);
       swGroup.position.set(x, 0, 0);
 
-      // Base nut
       const baseNut = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.004, 6), chromeMat);
       baseNut.rotation.x = Math.PI / 2;
       swGroup.add(baseNut);
 
-      // Toggle lever
       const lever = new THREE.Mesh(toggleGeo, chromeMat);
-      lever.rotation.x = 0.35;
+      lever.rotation.x = 0.35; // UP (ON)
       lever.position.set(0, 0.006, 0.01);
+      lever.name = `toggle_${i}_${switchLabels[i]}`;
       swGroup.add(lever);
+      this.toggleMeshes.push(lever);
+      this.interactiveObjects.push(lever);
 
-      // Red flip-guard on Ignition (#0) and Starter (#1)
       if (i < 2) {
         const guard = new THREE.Mesh(redGuardGeo, redGuardMat);
         guard.position.set(0, 0.012, 0.014);
@@ -888,13 +1112,15 @@ export class GT40CockpitSimulator {
     dashGroup.add(switchRow);
 
     // Big Red "ENGINE START" push-button
-    const startBtn = new THREE.Mesh(
+    this.starterBtnMesh = new THREE.Mesh(
       new THREE.CylinderGeometry(0.014, 0.014, 0.015, 24),
       new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3, metalness: 0.2 })
     );
-    startBtn.rotation.x = 0.18;
-    startBtn.position.set(0.03, -0.06, 0.12);
-    dashGroup.add(startBtn);
+    this.starterBtnMesh.name = 'starter_button';
+    this.starterBtnMesh.rotation.x = 0.18;
+    this.starterBtnMesh.position.set(0.03, -0.06, 0.12);
+    this.interactiveObjects.push(this.starterBtnMesh);
+    dashGroup.add(this.starterBtnMesh);
 
     const startBezel = new THREE.Mesh(
       new THREE.CylinderGeometry(0.018, 0.018, 0.008, 24),
@@ -904,14 +1130,14 @@ export class GT40CockpitSimulator {
     startBezel.position.set(0.03, -0.06, 0.115);
     dashGroup.add(startBezel);
 
-    // Convex Rear-View Mirror atop cowl
+    // Convex Rear-View Mirror
     const mirrorStem = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.06, 12), chromeMat);
     mirrorStem.position.set(0.0, 0.11, 0.05);
     dashGroup.add(mirrorStem);
 
     const mirrorBody = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.045, 0.02), chromeMat);
     mirrorBody.position.set(0.0, 0.14, 0.05);
-    mirrorBody.rotation.y = 0.12; // Angled toward RHD driver
+    mirrorBody.rotation.y = 0.12;
     dashGroup.add(mirrorBody);
 
     const mirrorGlass = new THREE.Mesh(
@@ -925,34 +1151,43 @@ export class GT40CockpitSimulator {
     cockpitGroup.add(dashGroup);
 
     // ----------------------------------------------------
-    // 4. 3-SPOKE COMPETITION STEERING WHEEL & COLUMN
+    // 4. MOTO-LITA 15" COMPETITION STEERING WHEEL WITH RIVETS
     // ----------------------------------------------------
     const wheelGroup = new THREE.Group();
-    // Positioned directly in front of driver's chest ($X = 0.28m, Y = 0.25m, Z = 0.44m$)
     wheelGroup.position.set(0.28, 0.25, 0.44);
-    wheelGroup.rotation.x = -0.32; // Angled backward toward driver
+    wheelGroup.rotation.x = -0.32;
 
     // Steering Column
-    const colGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.32, 16);
-    const colMesh = new THREE.Mesh(colGeo, matteBlackMat);
+    const colMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.32, 16), matteBlackMat);
     colMesh.position.set(0, -0.12, 0.12);
     colMesh.rotation.x = Math.PI / 2;
     wheelGroup.add(colMesh);
 
-    // Outer Rim wrapped in textured racing leather (15-inch vintage wheel)
+    // 15-inch vintage wheel rim with 18 countersunk aluminum rivets
     const rimRadius = 0.185;
     const rimTube = 0.015;
-    const rimGeo = new THREE.TorusGeometry(rimRadius, rimTube, 16, 48);
-    const rimMesh = new THREE.Mesh(rimGeo, leatherMat);
+    const rimMesh = new THREE.Mesh(new THREE.TorusGeometry(rimRadius, rimTube, 16, 48), leatherMat);
     wheelGroup.add(rimMesh);
 
+    // Countersunk aluminum rivets around rim
+    const rivetMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.92, roughness: 0.2 });
+    for (let r = 0; r < 18; r++) {
+      const ang = (r / 18) * Math.PI * 2;
+      const rx = Math.cos(ang) * rimRadius;
+      const ry = Math.sin(ang) * rimRadius;
+
+      const rivet = new THREE.Mesh(new THREE.CylinderGeometry(0.0025, 0.0025, 0.004, 8), rivetMat);
+      rivet.position.set(rx, ry, 0.013);
+      rivet.rotation.x = Math.PI / 2;
+      wheelGroup.add(rivet);
+    }
+
     // Central Hub
-    const hubGeo = new THREE.CylinderGeometry(0.042, 0.042, 0.025, 24);
-    const hubMesh = new THREE.Mesh(hubGeo, brushedAlumMat);
+    const hubMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.025, 24), brushedAlumMat);
     hubMesh.rotation.x = Math.PI / 2;
     wheelGroup.add(hubMesh);
 
-    // Shelby Cobra / Ford Motorsport Medallion
+    // Shelby Cobra / Ford Medallion
     const emblemCanvas = document.createElement('canvas');
     emblemCanvas.width = 256;
     emblemCanvas.height = 256;
@@ -964,13 +1199,13 @@ export class GT40CockpitSimulator {
     eCtx.strokeStyle = '#d4af37';
     eCtx.lineWidth = 10;
     eCtx.stroke();
-    // Ford Blue & Gold Shield
     eCtx.fillStyle = '#1e3a8a';
     eCtx.fillRect(78, 68, 100, 120);
     eCtx.font = 'bold 38px Oswald, sans-serif';
     eCtx.fillStyle = '#ffffff';
     eCtx.textAlign = 'center';
     eCtx.fillText('GT40', 128, 140);
+
     const emblemTex = new THREE.CanvasTexture(emblemCanvas);
     emblemTex.colorSpace = THREE.SRGBColorSpace;
     const emblemMesh = new THREE.Mesh(
@@ -980,61 +1215,48 @@ export class GT40CockpitSimulator {
     emblemMesh.position.z = 0.014;
     wheelGroup.add(emblemMesh);
 
-    // 3 Drilled Aluminum Spokes at 0 deg, 120 deg, 240 deg
+    // 3 Drilled Lightening Spokes
     const makeSpoke = (angle) => {
       const spGroup = new THREE.Group();
       spGroup.rotation.z = angle;
 
-      // Solid spoke blade
-      const spokeBlade = new THREE.Mesh(
-        new THREE.BoxGeometry(0.036, rimRadius * 0.88, 0.005),
-        brushedAlumMat
-      );
+      const spokeBlade = new THREE.Mesh(new THREE.BoxGeometry(0.036, rimRadius * 0.88, 0.005), brushedAlumMat);
       spokeBlade.position.y = (rimRadius * 0.88) / 2 + 0.015;
       spGroup.add(spokeBlade);
 
-      // 3 Drilled lightening holes
       for (let h = 0; h < 3; h++) {
         const holeR = 0.007 + (h * 0.002);
-        const holeMesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(holeR, holeR, 0.006, 16),
-          new THREE.MeshBasicMaterial({ color: 0x07090e })
-        );
+        const holeMesh = new THREE.Mesh(new THREE.CylinderGeometry(holeR, holeR, 0.006, 16), new THREE.MeshBasicMaterial({ color: 0x07090e }));
         holeMesh.rotation.x = Math.PI / 2;
         holeMesh.position.set(0, 0.065 + (h * 0.045), 0);
         spGroup.add(holeMesh);
       }
-
       return spGroup;
     };
 
-    wheelGroup.add(makeSpoke(0)); // Top-right
-    wheelGroup.add(makeSpoke((Math.PI * 2) / 3)); // Top-left
-    wheelGroup.add(makeSpoke((Math.PI * 4) / 3)); // Bottom spoke
+    wheelGroup.add(makeSpoke(0));
+    wheelGroup.add(makeSpoke((Math.PI * 2) / 3));
+    wheelGroup.add(makeSpoke((Math.PI * 4) / 3));
 
     cockpitGroup.add(wheelGroup);
 
     // ----------------------------------------------------
-    // 5. SILL-MOUNTED 4-SPEED GATED SHIFTER (Authentic GT40 RHD)
+    // 5. SILL-MOUNTED 4-SPEED GATED SHIFTER WITH PHYSICAL H-GATE
     // ----------------------------------------------------
     const shifterGroup = new THREE.Group();
-    // In real GT40 RHD, the shifter is bolted directly into the driver's right sill box
     shifterGroup.position.set(0.54, 0.08, 0.22);
 
-    // Polished aluminum gate plate
     const gateCanvas = document.createElement('canvas');
     gateCanvas.width = 256;
     gateCanvas.height = 256;
     const gCtx = gateCanvas.getContext('2d');
     gCtx.fillStyle = '#b0b8c4';
     gCtx.fillRect(0, 0, 256, 256);
-    // H-pattern slots
     gCtx.fillStyle = '#0f172a';
     gCtx.fillRect(40, 40, 24, 176);  // R - 1
     gCtx.fillRect(116, 40, 24, 176); // 2 - 3
     gCtx.fillRect(192, 40, 24, 176); // 4
     gCtx.fillRect(40, 116, 176, 24); // crossbar
-    // Gear labels
     gCtx.font = 'bold 32px Space Mono, monospace';
     gCtx.fillStyle = '#1e293b';
     gCtx.fillText('R', 42, 32);
@@ -1051,53 +1273,59 @@ export class GT40CockpitSimulator {
     );
     shifterGroup.add(gatePlate);
 
-    // Chrome shift lever
+    // Movable Shift Lever Group
+    this.shifterLever = new THREE.Group();
+    this.shifterLever.name = 'gated_shifter_lever';
+
     const leverGeo = new THREE.CylinderGeometry(0.005, 0.006, 0.18, 12);
     const leverMesh = new THREE.Mesh(leverGeo, chromeMat);
     leverMesh.position.set(0, 0.08, 0);
-    leverMesh.rotation.z = -0.12; // angled towards driver
-    shifterGroup.add(leverMesh);
+    this.shifterLever.add(leverMesh);
 
-    // Spherical Bakelite knob atop lever
     const knobGeo = new THREE.SphereGeometry(0.018, 16, 16);
     const knobMesh = new THREE.Mesh(
       knobGeo,
       new THREE.MeshStandardMaterial({ color: 0x0f1115, roughness: 0.15, metalness: 0.2 })
     );
-    knobMesh.position.set(-0.012, 0.17, 0);
-    shifterGroup.add(knobMesh);
+    knobMesh.position.set(0, 0.17, 0);
+    this.shifterLever.add(knobMesh);
 
+    this.interactiveObjects.push(this.shifterLever);
+    shifterGroup.add(this.shifterLever);
     cockpitGroup.add(shifterGroup);
 
     // ----------------------------------------------------
-    // 6. DRILLED ALUMINUM ENDURANCE PEDALS
+    // 6. DRILLED ALUMINUM ENDURANCE PEDALS WITH RETURN SPRINGS
     // ----------------------------------------------------
     const pedalGroup = new THREE.Group();
     pedalGroup.position.set(0.28, -0.16, 0.82);
 
-    const makePedal = (xOffset, width, height) => {
+    const makePedal = (xOffset, width, height, name) => {
       const p = new THREE.Group();
+      p.name = name;
       p.position.set(xOffset, 0, 0);
 
-      // Pedal Arm
       const arm = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.14, 0.008), matteBlackMat);
       arm.position.y = 0.05;
       arm.rotation.x = 0.28;
       p.add(arm);
 
-      // Curved Drilled Facepad
       const pad = new THREE.Mesh(new THREE.BoxGeometry(width, height, 0.006), brushedAlumMat);
       pad.position.set(0, 0, 0.02);
       pad.rotation.x = -0.22;
       p.add(pad);
 
+      this.interactiveObjects.push(p);
       return p;
     };
 
-    pedalGroup.add(makePedal(-0.065, 0.038, 0.065)); // Clutch
-    pedalGroup.add(makePedal(0.000, 0.042, 0.070));  // Brake
-    pedalGroup.add(makePedal(0.075, 0.032, 0.110));  // Accelerator
+    this.pedalClutch = makePedal(-0.065, 0.038, 0.065, 'pedal_clutch');
+    this.pedalBrake = makePedal(0.000, 0.042, 0.070, 'pedal_brake');
+    this.pedalThrottle = makePedal(0.075, 0.032, 0.110, 'pedal_throttle');
 
+    pedalGroup.add(this.pedalClutch);
+    pedalGroup.add(this.pedalBrake);
+    pedalGroup.add(this.pedalThrottle);
     cockpitGroup.add(pedalGroup);
 
     // ----------------------------------------------------
@@ -1106,44 +1334,26 @@ export class GT40CockpitSimulator {
     const seatGroup = new THREE.Group();
     seatGroup.position.set(0.28, 0.02, -0.06);
 
-    // Low-slung racing bucket seat
-    const seatBase = new THREE.Mesh(
-      new THREE.BoxGeometry(0.44, 0.12, 0.48),
-      leatherMat
-    );
+    const seatBase = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.12, 0.48), leatherMat);
     seatBase.position.set(0, -0.18, 0.10);
     seatGroup.add(seatBase);
 
-    const seatBack = new THREE.Mesh(
-      new THREE.BoxGeometry(0.44, 0.52, 0.08),
-      leatherMat
-    );
+    const seatBack = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.52, 0.08), leatherMat);
     seatBack.position.set(0, 0.12, -0.12);
-    seatBack.rotation.x = 0.24; // Angled recline
+    seatBack.rotation.x = 0.24;
     seatGroup.add(seatBack);
 
-    // Iconic GT40 Silver Ventilation Grommets on Seat Backrest
     const grommetMat = new THREE.MeshStandardMaterial({ color: 0xd8dde4, metalness: 0.9, roughness: 0.2 });
     for (let row = 0; row < 5; row++) {
       for (let col = -1; col <= 1; col += 2) {
-        const grommet = new THREE.Mesh(
-          new THREE.TorusGeometry(0.015, 0.004, 8, 16),
-          grommetMat
-        );
+        const grommet = new THREE.Mesh(new THREE.TorusGeometry(0.015, 0.004, 8, 16), grommetMat);
         grommet.position.set(col * 0.12, -0.05 + (row * 0.085), -0.075 - (row * 0.02));
         grommet.rotation.x = 0.24;
         seatGroup.add(grommet);
       }
     }
 
-    // 4-Point Willans Competition Harness
-    const harnessMat = new THREE.MeshStandardMaterial({
-      color: 0x1d4ed8, // Classic Le Mans Royal Blue Webbing
-      roughness: 0.85,
-      metalness: 0.05
-    });
-
-    // Shoulder Straps descending from rear roll bar
+    const harnessMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.85, metalness: 0.05 });
     const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.048, 0.44, 0.006), harnessMat);
     strapL.position.set(-0.11, 0.18, -0.04);
     strapL.rotation.x = 0.38;
@@ -1154,11 +1364,7 @@ export class GT40CockpitSimulator {
     strapR.rotation.x = 0.38;
     seatGroup.add(strapR);
 
-    // Central Rotary Quick-Release Cam-Lock Latch
-    const camLock = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.028, 0.028, 0.014, 24),
-      chromeMat
-    );
+    const camLock = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.014, 24), chromeMat);
     camLock.rotation.x = 0.45;
     camLock.position.set(0, -0.02, 0.08);
     seatGroup.add(camLock);
@@ -1166,20 +1372,95 @@ export class GT40CockpitSimulator {
     cockpitGroup.add(seatGroup);
 
     // ----------------------------------------------------
-    // 8. TUBULAR STEEL ROLL CAGE & REAR BULKHEAD WINDOW
+    // 8. PASSENGER SIDE KEN MILES LAP LOG CLIPBOARD
+    // ----------------------------------------------------
+    const clipCanvas = document.createElement('canvas');
+    clipCanvas.width = 512;
+    clipCanvas.height = 512;
+    const cctx = clipCanvas.getContext('2d');
+    cctx.fillStyle = '#f8fafc';
+    cctx.fillRect(0, 0, 512, 512);
+    cctx.fillStyle = '#0f172a';
+    cctx.font = 'bold 24px Oswald, sans-serif';
+    cctx.fillText('SHELBY AMERICAN INC. // LE MANS 1966', 20, 45);
+    cctx.font = 'bold 20px Space Mono, monospace';
+    cctx.fillText('CAR #2 : McLAREN / AMON  (CHASSIS P/1046)', 20, 80);
+    cctx.fillStyle = '#475569';
+    cctx.fillRect(20, 95, 472, 2);
+    cctx.font = '18px Space Mono, monospace';
+    cctx.fillText('04:00 - RAIN BEGINS. T-44 GEARBOX SMOOTH', 20, 135);
+    cctx.fillText('08:00 - FERRARI P3 RETIREMENTS MOUNTING', 20, 175);
+    cctx.fillText('12:00 - MILES LEADS. OIL PRESS 65 PSI OK', 20, 215);
+    cctx.fillText('18:00 - MULSANNE TOP TRAP: 212.4 MPH', 20, 255);
+    cctx.fillText('22:00 - FORD 1-2-3 FORMATION ORDERED', 20, 295);
+    cctx.fillStyle = '#b91c1c';
+    cctx.font = 'bold 22px Space Mono, monospace';
+    cctx.fillText('NOTE: B. McLAREN DECLARED WINNER P1', 20, 360);
+
+    const clipTex = new THREE.CanvasTexture(clipCanvas);
+    clipTex.colorSpace = THREE.SRGBColorSpace;
+    const clipboard = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.26, 0.32),
+      new THREE.MeshStandardMaterial({ map: clipTex, roughness: 0.7 })
+    );
+    clipboard.position.set(-0.28, 0.02, 0.32);
+    clipboard.rotation.x = -0.42;
+    clipboard.rotation.y = 0.22;
+    cockpitGroup.add(clipboard);
+
+    // ----------------------------------------------------
+    // 9. CIRCULAR PLEXIGLAS WINDOW AIR SCOOPS (Interactive)
+    // ----------------------------------------------------
+    const ventMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      transmission: 0.9,
+      roughness: 0.1,
+      transparent: true,
+      opacity: 0.45
+    });
+
+    this.ventScoopR = new THREE.Group();
+    this.ventScoopR.name = 'vent_scoop_rhd';
+    this.ventScoopR.position.set(0.60, 0.36, 0.18);
+    const ventOuter = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 12, 24), chromeMat);
+    this.ventScoopR.add(ventOuter);
+    const scoopFlap = new THREE.Mesh(new THREE.CircleGeometry(0.042, 16), ventMat);
+    scoopFlap.rotation.y = 0.35;
+    this.ventScoopR.add(scoopFlap);
+    this.interactiveObjects.push(this.ventScoopR);
+    cockpitGroup.add(this.ventScoopR);
+
+    // ----------------------------------------------------
+    // 10. WINDSHIELD WIPER ASSEMBLY
+    // ----------------------------------------------------
+    const wiperMotor = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 0.04), chromeMat);
+    wiperMotor.position.set(0.0, 0.26, 0.72);
+    cockpitGroup.add(wiperMotor);
+
+    this.wiperArm = new THREE.Group();
+    this.wiperArm.position.set(0.0, 0.27, 0.72);
+    const armRod = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.32, 0.004), matteBlackMat);
+    armRod.position.y = 0.16;
+    this.wiperArm.add(armRod);
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.28, 0.008), matteBlackMat);
+    blade.position.set(0, 0.16, 0.006);
+    this.wiperArm.add(blade);
+    this.wiperArm.rotation.x = -0.45;
+    cockpitGroup.add(this.wiperArm);
+
+    // ----------------------------------------------------
+    // 11. ROLL CAGE & REAR ENGINE WINDOW
     // ----------------------------------------------------
     const rollCageGroup = new THREE.Group();
     const tubeMat = new THREE.MeshStandardMaterial({ color: 0x2d3748, roughness: 0.6, metalness: 0.7 });
     const tubeR = 0.020;
 
-    // Main roll hoop behind driver's head ($Z = -0.26m$)
     const hoopGeo = new THREE.CylinderGeometry(tubeR, tubeR, 1.05, 16);
     const hoopTop = new THREE.Mesh(hoopGeo, tubeMat);
     hoopTop.position.set(0, 0.52, -0.26);
     hoopTop.rotation.z = Math.PI / 2;
     rollCageGroup.add(hoopTop);
 
-    // Left and right hoop uprights
     const uprightL = new THREE.Mesh(new THREE.CylinderGeometry(tubeR, tubeR, 0.65, 16), tubeMat);
     uprightL.position.set(-0.52, 0.22, -0.26);
     rollCageGroup.add(uprightL);
@@ -1188,19 +1469,12 @@ export class GT40CockpitSimulator {
     uprightR.position.set(0.52, 0.22, -0.26);
     rollCageGroup.add(uprightR);
 
-    // Forward roof bracing bars
-    const roofBarR = new THREE.Mesh(new THREE.CylinderGeometry(tubeR, tubeR, 0.62, 16), tubeMat);
-    roofBarR.position.set(0.48, 0.50, 0.05);
-    roofBarR.rotation.x = Math.PI / 2;
-    rollCageGroup.add(roofBarR);
-
     // Rear Engine Bulkhead Framed Window
     const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.7 });
     const windowFrame = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.32, 0.02), winFrameMat);
     windowFrame.position.set(0, 0.34, -0.38);
     rollCageGroup.add(windowFrame);
 
-    // Clear divider window glass looking into the 427 V8
     const divGlass = new THREE.Mesh(
       new THREE.PlaneGeometry(0.78, 0.26),
       new THREE.MeshPhysicalMaterial({
@@ -1214,13 +1488,145 @@ export class GT40CockpitSimulator {
     divGlass.position.set(0, 0.34, -0.37);
     rollCageGroup.add(divGlass);
 
-    cockpitGroup.add(rollCageGroup);
+    // 8 Velocity Stacks (Air Horns) of 427 V8 visible through rear glass
+    const stackMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.95, roughness: 0.1 });
+    for (let s = 0; s < 8; s++) {
+      const col = s % 2 === 0 ? -0.09 : 0.09;
+      const row = Math.floor(s / 2);
+      const stack = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.020, 0.14, 16, 1, true), stackMat);
+      stack.position.set(col, 0.32, -0.55 - (row * 0.12));
+      rollCageGroup.add(stack);
+    }
 
+    cockpitGroup.add(rollCageGroup);
     this.carRoot.add(cockpitGroup);
   }
 
+  // =================================================================
+  //  Interactive Simulator Actions & Physics Engine
+  // =================================================================
+
+  startEngine() {
+    this.initAudio();
+    if (this.engineRunning) {
+      // Cut ignition
+      this.engineRunning = false;
+      this.isAccelerating = false;
+      this.targetRPM = 0;
+      this.stopEngineAudioLoop();
+      this.playClickSound();
+      if (this.telemetryStatus) {
+        this.telemetryStatus.textContent = 'ENGINE: OFF';
+        this.telemetryStatus.classList.remove('running');
+      }
+      if (this.btnStart) {
+        this.btnStart.classList.remove('running');
+        this.btnStart.innerHTML = '<span class="action-icon">⚡</span><span class="action-text">START ENGINE</span>';
+      }
+      return;
+    }
+
+    if (this.isCranking) return;
+    this.isCranking = true;
+    this.playStarterCrankSound();
+
+    if (this.telemetryStatus) {
+      this.telemetryStatus.textContent = 'STARTER CRANKING...';
+      this.telemetryStatus.classList.remove('running');
+    }
+    if (this.btnStart) {
+      this.btnStart.innerHTML = '<span class="action-icon">⏳</span><span class="action-text">CRANKING...</span>';
+    }
+
+    setTimeout(() => {
+      this.isCranking = false;
+      this.engineRunning = true;
+      this.targetRPM = 1150; // Idle RPM
+      this.startEngineAudioLoop();
+
+      if (this.telemetryStatus) {
+        this.telemetryStatus.textContent = 'ENGINE: 7.0L V8 IDLE';
+        this.telemetryStatus.classList.add('running');
+      }
+      if (this.btnStart) {
+        this.btnStart.classList.add('running');
+        this.btnStart.innerHTML = '<span class="action-icon">🛑</span><span class="action-text">CUT IGNITION</span>';
+      }
+    }, 850);
+  }
+
+  accelerate(active) {
+    this.isAccelerating = active;
+    if (!this.engineRunning) {
+      if (active) this.startEngine();
+      return;
+    }
+
+    if (active) {
+      this.targetRPM = 6200 + Math.random() * 80; // Full 7.0L throttle
+      if (this.pedalThrottle) this.pedalThrottle.rotation.x = 0.12;
+    } else {
+      this.targetRPM = 1150; // Return to idle
+      if (this.pedalThrottle) this.pedalThrottle.rotation.x = 0.0;
+    }
+  }
+
+  shiftGear() {
+    this.playGearClackSound();
+    const gears = ['N', '1', '2', '3', '4'];
+    this.gearIndex = (this.gearIndex + 1) % gears.length;
+    this.currentGear = gears[this.gearIndex];
+
+    if (this.telemetryGear) this.telemetryGear.textContent = this.currentGear;
+    if (this.btnShift) this.btnShift.innerHTML = `<span class="action-icon">⚙️</span><span class="action-text">GEAR: ${this.currentGear}</span>`;
+
+    // Physically animate 3D gated shifter position
+    if (this.shifterLever) {
+      const positions = {
+        'N': { x: 0, z: 0 },
+        '1': { x: -0.015, z: 0.025 },
+        '2': { x: -0.015, z: -0.025 },
+        '3': { x: 0.015, z: 0.025 },
+        '4': { x: 0.015, z: -0.025 }
+      };
+      const p = positions[this.currentGear] || { x: 0, z: 0 };
+      this.shifterLever.position.set(p.x, 0.08, p.z);
+    }
+  }
+
+  toggleHeadlights() {
+    this.playClickSound();
+    this.headlightsOn = !this.headlightsOn;
+    const intensity = this.headlightsOn ? 2.8 : 0;
+    if (this.headlightSpotL) this.headlightSpotL.intensity = intensity;
+    if (this.headlightSpotR) this.headlightSpotR.intensity = intensity;
+
+    if (this.btnLights) {
+      this.btnLights.classList.toggle('active', this.headlightsOn);
+    }
+  }
+
+  toggleWipers() {
+    this.playClickSound();
+    this.wipersOn = !this.wipersOn;
+    if (this.btnWipers) {
+      this.btnWipers.classList.toggle('active', this.wipersOn);
+    }
+  }
+
+  toggleVent() {
+    this.playClickSound();
+    this.ventOpen = !this.ventOpen;
+    if (this.ventScoopR) {
+      this.ventScoopR.rotation.z = this.ventOpen ? Math.PI / 2 : 0;
+    }
+  }
+
+  // =================================================================
+  //  Event Binding & 3D Raycasting
+  // =================================================================
+
   bindEvents() {
-    // Pointer Drag to Look Around
     const onPointerDown = (e) => {
       this.isDragging = true;
       this.lastPointerX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
@@ -1230,6 +1636,9 @@ export class GT40CockpitSimulator {
         this.dragHint.classList.add('faded');
         this.hasInteracted = true;
       }
+
+      // Check 3D Raycasting click on dashboard switches, starter, or shifter
+      this.checkRaycastClick(e);
     };
 
     const onPointerMove = (e) => {
@@ -1243,12 +1652,10 @@ export class GT40CockpitSimulator {
       this.lastPointerX = clientX;
       this.lastPointerY = clientY;
 
-      // Sensitivity tuned for smooth stationary driver head movement
       const sensitivity = 0.0035;
       this.targetYaw -= deltaX * sensitivity;
       this.targetPitch -= deltaY * sensitivity;
 
-      // Constrain within physical cockpit bounds
       this.targetYaw = Math.max(this.yawMin, Math.min(this.yawMax, this.targetYaw));
       this.targetPitch = Math.max(this.pitchMin, Math.min(this.pitchMax, this.targetPitch));
     };
@@ -1268,6 +1675,39 @@ export class GT40CockpitSimulator {
       window.addEventListener('touchend', onPointerUp, { passive: true });
     }
 
+    // Interactive Action Buttons
+    if (this.btnStart) this.btnStart.addEventListener('click', () => this.startEngine());
+    if (this.btnShift) this.btnShift.addEventListener('click', () => this.shiftGear());
+    if (this.btnLights) this.btnLights.addEventListener('click', () => this.toggleHeadlights());
+    if (this.btnWipers) this.btnWipers.addEventListener('click', () => this.toggleWipers());
+
+    if (this.btnAccel) {
+      this.btnAccel.addEventListener('mousedown', () => this.accelerate(true));
+      window.addEventListener('mouseup', () => this.accelerate(false));
+      this.btnAccel.addEventListener('touchstart', () => this.accelerate(true), { passive: true });
+      window.addEventListener('touchend', () => this.accelerate(false), { passive: true });
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return;
+      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
+        this.accelerate(true);
+      } else if (e.code === 'ShiftLeft' || e.code === 'KeyG') {
+        this.shiftGear();
+      } else if (e.code === 'KeyE') {
+        this.startEngine();
+      } else if (e.code === 'KeyL') {
+        this.toggleHeadlights();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
+        this.accelerate(false);
+      }
+    });
+
     // Reset View Button
     if (this.btnReset) {
       this.btnReset.addEventListener('click', () => {
@@ -1281,7 +1721,7 @@ export class GT40CockpitSimulator {
         btn.addEventListener('click', () => {
           const yaw = parseFloat(btn.dataset.yaw || '0');
           const pitch = parseFloat(btn.dataset.pitch || '0');
-          const name = btn.dataset.preset || 'PRESET';
+          const name = btn.dataset.preset || btn.textContent.trim() || 'PRESET';
           this.setCameraPreset(yaw, pitch, name);
 
           this.presetBtns.forEach(b => b.classList.remove('active'));
@@ -1290,8 +1730,43 @@ export class GT40CockpitSimulator {
       });
     }
 
-    // Resize
     window.addEventListener('resize', () => this.onResize());
+  }
+
+  checkRaycastClick(e) {
+    if (!this.canvas || !this.camera || this.interactiveObjects.length === 0) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+    this.mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
+
+    if (intersects.length > 0) {
+      let hitObj = intersects[0].object;
+      while (hitObj && !hitObj.name && hitObj.parent) {
+        hitObj = hitObj.parent;
+      }
+      const name = hitObj ? hitObj.name : '';
+
+      if (name.includes('starter')) {
+        this.startEngine();
+      } else if (name.includes('shifter')) {
+        this.shiftGear();
+      } else if (name.includes('throttle')) {
+        this.accelerate(true);
+        setTimeout(() => this.accelerate(false), 500);
+      } else if (name.includes('toggle')) {
+        this.playClickSound();
+        if (name.includes('HEADLIGHT')) this.toggleHeadlights();
+        else if (name.includes('WIPER')) this.toggleWipers();
+      } else if (name.includes('vent')) {
+        this.toggleVent();
+      }
+    }
   }
 
   setCameraPreset(yaw, pitch, name) {
@@ -1328,28 +1803,77 @@ export class GT40CockpitSimulator {
   }
 
   update() {
-    // Smooth camera rotation interpolation (Damping: 0.12)
+    const now = performance.now();
+
+    // 1. Smooth camera rotation interpolation
     this.currentYaw += (this.targetYaw - this.currentYaw) * 0.12;
     this.currentPitch += (this.targetPitch - this.currentPitch) * 0.12;
 
-    // Convert spherical yaw/pitch to forward vector from driver eye position
-    // Forward direction: +Z
     const cosPitch = Math.cos(this.currentPitch);
     const dirX = Math.sin(this.currentYaw) * cosPitch;
     const dirY = Math.sin(this.currentPitch);
     const dirZ = Math.cos(this.currentYaw) * cosPitch;
 
+    // Subtle engine idle lope micro-vibration in camera
+    let vibeY = 0;
+    if (this.engineRunning) {
+      vibeY = Math.sin(now * 0.035) * 0.0008;
+    }
+
     this.lookTarget.set(
       this.eyePosition.x + dirX,
-      this.eyePosition.y + dirY,
+      this.eyePosition.y + dirY + vibeY,
       this.eyePosition.z + dirZ
     );
-
     this.camera.lookAt(this.lookTarget);
 
-    // Update Telemetry Orientation Indicator (rate limited)
-    if (this.lookIndicator && (!this.lastTelemetryTime || performance.now() - this.lastTelemetryTime > 80)) {
-      this.lastTelemetryTime = performance.now();
+    // 2. Physical Engine RPM & Speed Dynamics
+    if (this.engineRunning) {
+      this.currentRPM += (this.targetRPM - this.currentRPM) * 0.12;
+      // Add natural lope flutter
+      const lope = (Math.sin(now * 0.02) + Math.cos(now * 0.045)) * 25;
+      const displayRPM = Math.round(this.currentRPM + lope);
+
+      // Gear speed multipliers (MPH)
+      const gearRatios = { 'N': 0, '1': 0.011, '2': 0.018, '3': 0.026, '4': 0.034 };
+      const ratio = gearRatios[this.currentGear] || 0;
+      this.currentSpeed += ((this.currentRPM * ratio) - this.currentSpeed) * 0.08;
+
+      // Update Shift Warning Light
+      if (this.shiftLightMat) {
+        if (this.currentRPM > 6000) {
+          const flash = Math.sin(now * 0.03) > 0;
+          this.shiftLightMat.emissive.setHex(flash ? 0xff0000 : 0x000000);
+        } else {
+          this.shiftLightMat.emissive.setHex(0x000000);
+        }
+      }
+
+      this.updateEngineAudio();
+
+      // Update DOM Telemetry
+      if (this.telemetryRPM) this.telemetryRPM.textContent = displayRPM.toLocaleString();
+      if (this.telemetrySpeed) this.telemetrySpeed.textContent = Math.round(this.currentSpeed);
+    } else {
+      this.currentRPM += (0 - this.currentRPM) * 0.15;
+      this.currentSpeed += (0 - this.currentSpeed) * 0.15;
+      if (this.shiftLightMat) this.shiftLightMat.emissive.setHex(0x000000);
+      if (this.telemetryRPM) this.telemetryRPM.textContent = '0';
+      if (this.telemetrySpeed) this.telemetrySpeed.textContent = '0';
+    }
+
+    // 3. Update Stewart-Warner Analog Gauge Needles
+    this.updateGauges();
+
+    // 4. Animate Windshield Wiper
+    if (this.wipersOn && this.wiperArm) {
+      const sweep = Math.sin(now * 0.007) * 0.65;
+      this.wiperArm.rotation.z = sweep;
+    }
+
+    // 5. Rate-limited Telemetry Look Indicator
+    if (this.lookIndicator && (!this.lastTelemetryTime || now - this.lastTelemetryTime > 80)) {
+      this.lastTelemetryTime = now;
       const degYaw = Math.round(THREE.MathUtils.radToDeg(this.currentYaw));
       const degPitch = Math.round(THREE.MathUtils.radToDeg(this.currentPitch));
 
@@ -1364,6 +1888,36 @@ export class GT40CockpitSimulator {
     }
   }
 
+  updateGauges() {
+    const updateNeedle = (needleMeta, targetVal) => {
+      if (!needleMeta || !needleMeta.group) return;
+      needleMeta.currentVal += (targetVal - needleMeta.currentVal) * 0.14;
+      const t = Math.min(1, Math.max(0, (needleMeta.currentVal - needleMeta.min) / (needleMeta.max - needleMeta.min)));
+      const angle = needleMeta.startAngle + t * needleMeta.sweep;
+      needleMeta.group.rotation.z = angle;
+    };
+
+    // Tachometer
+    updateNeedle(this.needles.tach, this.currentRPM);
+
+    // Speedometer
+    updateNeedle(this.needles.speedo, this.currentSpeed);
+
+    // Oil Pressure: 65 PSI when running, 0 when off
+    const targetOilP = this.engineRunning ? (55 + (this.currentRPM / 6500) * 25) : 0;
+    updateNeedle(this.needles.oilp, targetOilP);
+
+    // Water & Oil Temp: climbs to operating temperature when running
+    const targetWaterT = this.engineRunning ? 185 : 100;
+    updateNeedle(this.needles.watert, targetWaterT);
+
+    const targetOilT = this.engineRunning ? 210 : 100;
+    updateNeedle(this.needles.oilt, targetOilT);
+
+    // Fuel level (slow burn)
+    updateNeedle(this.needles.fuel, 82);
+  }
+
   render() {
     if (this.renderer && this.scene && this.camera) {
       this.renderer.render(this.scene, this.camera);
@@ -1374,6 +1928,7 @@ export class GT40CockpitSimulator {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
+    this.stopEngineAudioLoop();
     if (this.renderer) {
       this.renderer.dispose();
     }

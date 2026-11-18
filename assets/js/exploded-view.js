@@ -340,10 +340,10 @@ export class GT40ExplodedViewer {
   }
 
   initThree() {
-    // 1. Scene with transparent background to reveal cinematic blurred pit-lane environment
+    // 1. Scene with atmospheric paddock dusk background
     this.scene = new THREE.Scene();
-    this.scene.background = null;
-    this.scene.fog = null;
+    this.scene.background = new THREE.Color(0x10141e);
+    this.scene.fog = new THREE.FogExp2(0x10141e, 0.010);
 
     // 2. Camera
     const width = this.canvas.clientWidth || (this.container ? this.container.clientWidth : 0) || window.innerWidth || 1440;
@@ -386,6 +386,9 @@ export class GT40ExplodedViewer {
 
     // 7. Authentic Asphalt Track Ground & Weathered Pit Markings
     this.setupFloor();
+
+    // 8. 3D 1966 Le Mans Pit Garage Workshop & Victory Podium Environment
+    this.build3DEnvironment();
   }
 
   setupEnvironmentMap() {
@@ -601,7 +604,511 @@ export class GT40ExplodedViewer {
     this.scene.add(shadowPlane);
   }
 
-  loadModel() {
+  // =================================================================
+  //  3D 1966 Le Mans Pit Garage Workshop & Victory Podium Environment
+  // =================================================================
+
+  build3DEnvironment() {
+    this.envRoot = new THREE.Group();
+    this.envRoot.name = 'Exploded3DEnvironment';
+    this.scene.add(this.envRoot);
+
+    this.currentEnvMode = 'pitstop'; // 'pitstop' | 'podium' | 'cad'
+
+    // Groups
+    this.pitStopGroup = new THREE.Group();
+    this.pitStopGroup.name = 'PitStopPaddockEnvironment';
+    this.envRoot.add(this.pitStopGroup);
+
+    this.podiumGroup = new THREE.Group();
+    this.podiumGroup.name = 'VictoryPodiumEnvironment';
+    this.podiumGroup.visible = false;
+    this.envRoot.add(this.podiumGroup);
+
+    // Build sub-environments
+    this.buildPitStopPaddock();
+    this.buildVictoryPodium();
+  }
+
+  buildPitStopPaddock() {
+    const texLoader = new THREE.TextureLoader();
+
+    // 1. Procedural 1966 Le Mans Pit Garage Rear Brick Wall Canvas
+    const wallCanvas = document.createElement('canvas');
+    wallCanvas.width = 1024;
+    wallCanvas.height = 512;
+    const wCtx = wallCanvas.getContext('2d');
+
+    // Weathered red-brown brick base
+    wCtx.fillStyle = '#3a2b25';
+    wCtx.fillRect(0, 0, 1024, 512);
+
+    // Brick pattern
+    const bW = 32, bH = 14;
+    wCtx.strokeStyle = '#271c18';
+    wCtx.lineWidth = 2;
+    for (let y = 0; y < 512; y += bH) {
+      const offset = (Math.floor(y / bH) % 2) * (bW / 2);
+      for (let x = -bW; x < 1024 + bW; x += bW) {
+        // Subtle brick color variation
+        const shade = Math.floor(Math.sin(x * 12.3 + y * 4.5) * 12);
+        wCtx.fillStyle = `rgb(${58 + shade}, ${43 + shade / 2}, ${37 + shade / 3})`;
+        wCtx.fillRect(x + offset, y, bW - 2, bH - 2);
+      }
+    }
+
+    // Weathering stains and damp concrete header
+    wCtx.fillStyle = '#4a4e58';
+    wCtx.fillRect(0, 0, 1024, 60);
+
+    // Stencil Header on Wall
+    wCtx.fillStyle = '#f1f5f9';
+    wCtx.font = 'bold 36px Oswald, sans-serif';
+    wCtx.textAlign = 'center';
+    wCtx.fillText('SHELBY AMERICAN INC.  //  FORD RACING DIVISION', 512, 110);
+
+    wCtx.fillStyle = '#d4af37';
+    wCtx.font = 'bold 24px Oswald, sans-serif';
+    wCtx.fillText('24 HEURES DU MANS 1966  •  OFFICIAL PADDOCK PIT STALL #02', 512, 145);
+
+    // Hand-painted vintage sponsor signs
+    // Champion Spark Plugs
+    wCtx.fillStyle = '#dc2626';
+    wCtx.fillRect(120, 200, 210, 85);
+    wCtx.strokeStyle = '#ffffff';
+    wCtx.lineWidth = 4;
+    wCtx.strokeRect(124, 204, 202, 77);
+    wCtx.fillStyle = '#ffffff';
+    wCtx.font = '900 28px Oswald, sans-serif';
+    wCtx.fillText('CHAMPION', 225, 245);
+    wCtx.font = '14px Space Mono, monospace';
+    wCtx.fillText('SPARK PLUGS', 225, 268);
+
+    // Castrol Motor Oil
+    wCtx.fillStyle = '#15803d';
+    wCtx.beginPath();
+    wCtx.arc(512, 245, 50, 0, Math.PI * 2);
+    wCtx.fill();
+    wCtx.fillStyle = '#ffffff';
+    wCtx.fillRect(452, 235, 120, 22);
+    wCtx.fillStyle = '#dc2626';
+    wCtx.font = 'bold 20px Oswald, sans-serif';
+    wCtx.fillText('CASTROL', 512, 252);
+
+    // Ferodo Brake Linings
+    wCtx.fillStyle = '#991b1b';
+    wCtx.fillRect(700, 200, 210, 85);
+    wCtx.strokeStyle = '#ffffff';
+    wCtx.lineWidth = 4;
+    wCtx.strokeRect(704, 204, 202, 77);
+    wCtx.fillStyle = '#ffffff';
+    wCtx.font = '900 28px Oswald, sans-serif';
+    wCtx.fillText('FERODO', 805, 245);
+    wCtx.font = '14px Space Mono, monospace';
+    wCtx.fillText('BRAKE LININGS', 805, 268);
+
+    // Chalkboard Pit Timing Board on the wall
+    wCtx.fillStyle = '#111827';
+    wCtx.fillRect(160, 320, 704, 150);
+    wCtx.strokeStyle = '#854d0e';
+    wCtx.lineWidth = 6;
+    wCtx.strokeRect(160, 320, 704, 150);
+
+    wCtx.fillStyle = '#fef08a';
+    wCtx.font = 'bold 22px Space Mono, monospace';
+    wCtx.textAlign = 'left';
+    wCtx.fillText('CIRCUIT DE LA SARTHE // 18-19 JUIN 1966', 185, 355);
+    wCtx.fillStyle = '#ffffff';
+    wCtx.font = '18px Space Mono, monospace';
+    wCtx.fillText('CAR #02 : B. McLAREN / C. AMON  [CHASSIS P/1046]', 185, 390);
+    wCtx.fillText('TARGET LAP : 3:30.0   |   MULSANNE TRAP : 212 MPH (341 KM/H)', 185, 420);
+    wCtx.fillStyle = '#4ade80';
+    wCtx.fillText('STATUS: P1 LEADER // TRANSMISSION: T-44 OK // TIRES: GOODYEAR OK', 185, 450);
+
+    const wallTex = new THREE.CanvasTexture(wallCanvas);
+    wallTex.colorSpace = THREE.SRGBColorSpace;
+    const wallMat = new THREE.MeshStandardMaterial({
+      map: wallTex,
+      roughness: 0.88,
+      metalness: 0.12
+    });
+
+    const rearWall = new THREE.Mesh(new THREE.BoxGeometry(16.0, 6.5, 0.4), wallMat);
+    rearWall.position.set(0, 2.875, -4.3);
+    rearWall.receiveShadow = true;
+    this.pitStopGroup.add(rearWall);
+
+    // 2. Industrial Steel Overhead Trusses & Ceiling Beams ($Y = 3.8m$)
+    const steelMat = new THREE.MeshStandardMaterial({ color: 0x222630, roughness: 0.65, metalness: 0.75 });
+    const beamZ = [-3.5, -1.0, 1.5, 3.5];
+
+    beamZ.forEach((z) => {
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(16.0, 0.28, 0.18), steelMat);
+      beam.position.set(0, 3.8, z);
+      this.pitStopGroup.add(beam);
+
+      // Hanging Yellow Industrial Cage Worklights
+      [-2.2, 2.2].forEach((x) => {
+        const lightGroup = new THREE.Group();
+        lightGroup.position.set(x, 3.8, z);
+
+        // Cord
+        const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 1.3, 8), steelMat);
+        cord.position.y = -0.65;
+        lightGroup.add(cord);
+
+        // Enamel Yellow Cone Shade
+        const shadeMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.35, metalness: 0.4 });
+        const shade = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.22, 16, 1, true), shadeMat);
+        shade.position.y = -1.3;
+        lightGroup.add(shade);
+
+        // Glowing Emissive Bulb
+        const bulb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.08, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0xffea88 })
+        );
+        bulb.position.y = -1.32;
+        lightGroup.add(bulb);
+
+        // Real Warm Work Light Point Source
+        const workPoint = new THREE.PointLight(0xffea88, 0.95, 5.5);
+        workPoint.position.y = -1.38;
+        lightGroup.add(workPoint);
+
+        this.pitStopGroup.add(lightGroup);
+      });
+    });
+
+    // 3. Left Workshop Partition Wall & Roll-Up Door ($X = -4.8m$)
+    const sideWallMat = new THREE.MeshStandardMaterial({ color: 0x333842, roughness: 0.9, metalness: 0.1 });
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, 6.5, 9.0), sideWallMat);
+    leftWall.position.set(-4.8, 2.875, 0.2);
+    leftWall.receiveShadow = true;
+    this.pitStopGroup.add(leftWall);
+
+    // Corrugated Roll-Up Door Plate
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x52525b, roughness: 0.6, metalness: 0.5 });
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.6, 4.2), doorMat);
+    door.position.set(-4.62, 1.45, 0.2);
+    this.pitStopGroup.add(door);
+
+    // Wall Equipment: Vintage Red Fire Extinguisher
+    const extGroup = new THREE.Group();
+    extGroup.position.set(-4.6, 0.95, -2.2);
+    const extBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.10, 0.10, 0.55, 16),
+      new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35, metalness: 0.4 })
+    );
+    extGroup.add(extBody);
+    const extHead = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.06, 0.12, 12),
+      new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 })
+    );
+    extHead.position.y = 0.32;
+    extGroup.add(extHead);
+    this.pitStopGroup.add(extGroup);
+
+    // Coiled Pneumatic Air Hose Reel
+    const hoseReel = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.24, 0.24, 0.16, 16),
+      new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.7, metalness: 0.3 })
+    );
+    hoseReel.rotation.z = Math.PI / 2;
+    hoseReel.position.set(-4.6, 1.45, -2.8);
+    this.pitStopGroup.add(hoseReel);
+
+    // 4. Right Pit Lane Low Barrier Wall ($X = +4.5m$)
+    const barrierMat = new THREE.MeshStandardMaterial({ color: 0x71717a, roughness: 0.95 });
+    const barrier = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.95, 9.0), barrierMat);
+    barrier.position.set(4.5, 0.10, 0.2);
+    barrier.receiveShadow = true;
+    this.pitStopGroup.add(barrier);
+
+    // Pit Lane Pit Board Hanging on Wall
+    const pbCanvas = document.createElement('canvas');
+    pbCanvas.width = 512;
+    pbCanvas.height = 256;
+    const pbCtx = pbCanvas.getContext('2d');
+    pbCtx.fillStyle = '#0f172a';
+    pbCtx.fillRect(0, 0, 512, 256);
+    pbCtx.strokeStyle = '#d4af37';
+    pbCtx.lineWidth = 10;
+    pbCtx.strokeRect(8, 8, 496, 240);
+    pbCtx.font = 'bold 38px Oswald, sans-serif';
+    pbCtx.fillStyle = '#f8fafc';
+    pbCtx.textAlign = 'center';
+    pbCtx.fillText('SHELBY AMERICAN // STALL 02', 256, 55);
+    pbCtx.font = 'bold 64px Oswald, sans-serif';
+    pbCtx.fillStyle = '#d4af37';
+    pbCtx.fillText('P1 MILES  +42s', 256, 130);
+    pbCtx.font = 'bold 30px Space Mono, monospace';
+    pbCtx.fillStyle = '#ef4444';
+    pbCtx.fillText('LAP 360  //  IN IN IN', 256, 190);
+
+    const pbTex = new THREE.CanvasTexture(pbCanvas);
+    pbTex.colorSpace = THREE.SRGBColorSpace;
+    const pitBoard = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.8, 0.9),
+      new THREE.MeshBasicMaterial({ map: pbTex })
+    );
+    pitBoard.position.set(4.25, 0.35, 1.2);
+    pitBoard.rotation.y = -Math.PI / 2;
+    this.pitStopGroup.add(pitBoard);
+
+    // 5. 3D Props around the Paddock Bay
+    // Stack of 4 Goodyear Blue Streak Racing Tires on 15" Halibrand Wheels
+    const tireGroup = new THREE.Group();
+    tireGroup.position.set(-3.2, -0.375, -2.4);
+
+    const tireMat = new THREE.MeshStandardMaterial({ color: 0x181a1e, roughness: 0.92 });
+    const halibrandMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.85, roughness: 0.25 });
+    const spinnerMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.90, roughness: 0.20 });
+
+    for (let t = 0; t < 4; t++) {
+      const tireMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.28, 24), tireMat);
+      tireMesh.position.y = 0.14 + (t * 0.29);
+      tireMesh.castShadow = true;
+      tireGroup.add(tireMesh);
+
+      // Halibrand wheel rim center
+      const wheelRim = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.29, 20), halibrandMat);
+      wheelRim.position.y = 0.14 + (t * 0.29);
+      tireGroup.add(wheelRim);
+
+      // 3-eared gold knock-off spinner on top tire
+      if (t === 3) {
+        const spinner = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.08, 12), spinnerMat);
+        spinner.position.y = 0.14 + (t * 0.29) + 0.16;
+        tireGroup.add(spinner);
+      }
+    }
+    // Yellow nylon ratchet tie-down strap
+    const strapMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.8 });
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.2, 0.8), strapMat);
+    strap.position.y = 0.58;
+    tireGroup.add(strap);
+    this.pitStopGroup.add(tireGroup);
+
+    // Red Snap-on / Kennedy Mechanic Roll-Away Tool Cabinet
+    const chestGroup = new THREE.Group();
+    chestGroup.position.set(-3.4, -0.375, 1.0);
+    const chestMat = new THREE.MeshStandardMaterial({ color: 0xbe123c, roughness: 0.35, metalness: 0.5 });
+    const chestBody = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.15, 0.65), chestMat);
+    chestBody.position.y = 0.65;
+    chestBody.castShadow = true;
+    chestGroup.add(chestBody);
+
+    // Drawer seams & chrome pull handles
+    const chromeMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.95, roughness: 0.1 });
+    for (let d = 0; d < 6; d++) {
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.02, 0.02), chromeMat);
+      handle.position.set(0.44, 0.30 + (d * 0.14), 0);
+      chestGroup.add(handle);
+    }
+    this.pitStopGroup.add(chestGroup);
+
+    // 55-Gallon Steel Castrol / Gulf Oil Drum
+    const drumMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5, metalness: 0.55 });
+    const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.92, 20), drumMat);
+    drum.position.set(3.5, 0.085, -2.5);
+    drum.castShadow = true;
+    this.pitStopGroup.add(drum);
+
+    // Heavy-duty Hydraulic Racing Floor Jack
+    const jackGroup = new THREE.Group();
+    jackGroup.position.set(2.6, -0.375, 1.2);
+    jackGroup.rotation.y = -0.4;
+    const jackMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.45, metalness: 0.6 });
+    const jackBody = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.14, 0.95), jackMat);
+    jackBody.position.y = 0.07;
+    jackGroup.add(jackBody);
+
+    const jackHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.1, 12), steelMat);
+    jackHandle.rotation.x = 0.6;
+    jackHandle.position.set(0, 0.52, -0.45);
+    jackGroup.add(jackHandle);
+    this.pitStopGroup.add(jackGroup);
+
+    // Sturdy Wooden Mechanic's Workbench
+    const benchGroup = new THREE.Group();
+    benchGroup.position.set(-3.2, -0.375, -3.6);
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.85 });
+    const benchTop = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 0.9), woodMat);
+    benchTop.position.y = 0.86;
+    benchTop.castShadow = true;
+    benchGroup.add(benchTop);
+
+    // Bench legs
+    [[-1.0, -0.35], [1.0, -0.35], [-1.0, 0.35], [1.0, 0.35]].forEach(([bx, bz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.80, 0.10), steelMat);
+      leg.position.set(bx, 0.40, bz);
+      benchGroup.add(leg);
+    });
+
+    // Cast iron bench vise on workbench corner
+    const vise = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.20, 0.24), steelMat);
+    vise.position.set(-0.85, 0.98, 0.25);
+    benchGroup.add(vise);
+    this.pitStopGroup.add(benchGroup);
+  }
+
+  buildVictoryPodium() {
+    // 1. Three-Tiered Victory Rostrum Platform
+    const woodPlankMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.8 });
+    const brassTrimMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
+
+    // 1st Place Central Elevated Riser
+    const p1 = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.70, 2.2), woodPlankMat);
+    p1.position.set(0, -0.025, -3.5);
+    p1.receiveShadow = true;
+    this.podiumGroup.add(p1);
+
+    // 1st Place Brass Plaque
+    const plaqueCanvas = document.createElement('canvas');
+    plaqueCanvas.width = 512;
+    plaqueCanvas.height = 256;
+    const plCtx = plaqueCanvas.getContext('2d');
+    plCtx.fillStyle = '#b45309';
+    plCtx.fillRect(0, 0, 512, 256);
+    plCtx.strokeStyle = '#fef08a';
+    plCtx.lineWidth = 10;
+    plCtx.strokeRect(8, 8, 496, 240);
+    plCtx.fillStyle = '#ffffff';
+    plCtx.font = 'bold 36px Oswald, sans-serif';
+    plCtx.textAlign = 'center';
+    plCtx.fillText('24 HEURES DU MANS 1966', 256, 55);
+    plCtx.font = '900 68px Oswald, sans-serif';
+    plCtx.fillStyle = '#fef08a';
+    plCtx.fillText('1ST PLACE OVERALL', 256, 128);
+    plCtx.font = 'bold 24px Space Mono, monospace';
+    plCtx.fillStyle = '#ffffff';
+    plCtx.fillText('FORD GT40 MK II // McLAREN & AMON', 256, 175);
+    plCtx.font = '20px Space Mono, monospace';
+    plCtx.fillText('DISTANCE RECORD: 4,843.09 KM', 256, 215);
+
+    const plTex = new THREE.CanvasTexture(plaqueCanvas);
+    plTex.colorSpace = THREE.SRGBColorSpace;
+    const plMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.8, 0.9),
+      new THREE.MeshStandardMaterial({ map: plTex, metalness: 0.8, roughness: 0.3 })
+    );
+    plMesh.position.set(0, 0.05, -2.38);
+    this.podiumGroup.add(plMesh);
+
+    // 2nd Place Left Riser
+    const p2 = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.45, 2.0), woodPlankMat);
+    p2.position.set(-2.8, -0.15, -3.5);
+    p2.receiveShadow = true;
+    this.podiumGroup.add(p2);
+
+    // 3rd Place Right Riser
+    const p3 = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.30, 2.0), woodPlankMat);
+    p3.position.set(2.8, -0.225, -3.5);
+    p3.receiveShadow = true;
+    this.podiumGroup.add(p3);
+
+    // 2. Magnificent Gold Le Mans Championship Perpetual Trophy
+    const trophyGroup = new THREE.Group();
+    trophyGroup.position.set(0, 0.32, -3.5);
+
+    // Trophy base
+    const tBase = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.18, 0.35), new THREE.MeshStandardMaterial({ color: 0x111827 }));
+    trophyGroup.add(tBase);
+
+    // Golden Cup Body
+    const tCup = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.14, 0.55, 24), brassTrimMat);
+    tCup.position.y = 0.38;
+    trophyGroup.add(tCup);
+
+    // Twin curved handles
+    [-0.30, 0.30].forEach((hx) => {
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.025, 12, 24), brassTrimMat);
+      handle.position.set(hx, 0.40, 0);
+      trophyGroup.add(handle);
+    });
+    this.podiumGroup.add(trophyGroup);
+
+    // 3. Laurel Victory Wreaths
+    const wreathMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 });
+    const wreath = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.06, 12, 32), wreathMat);
+    wreath.position.set(0, 0.55, -2.4);
+    this.podiumGroup.add(wreath);
+
+    // 4. Celebratory Flagpoles (French Tricolor & American Stars)
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
+
+    // French Flagpole (Left)
+    const poleL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 5.0, 16), poleMat);
+    poleL.position.set(-3.8, 2.1, -4.2);
+    this.podiumGroup.add(poleL);
+
+    // American Flagpole (Right)
+    const poleR = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 5.0, 16), poleMat);
+    poleR.position.set(3.8, 2.1, -4.2);
+    this.podiumGroup.add(poleR);
+
+    // French Flag Banner
+    const fCanvas = document.createElement('canvas');
+    fCanvas.width = 300;
+    fCanvas.height = 180;
+    const fCtx = fCanvas.getContext('2d');
+    fCtx.fillStyle = '#1d4ed8'; fCtx.fillRect(0, 0, 100, 180);
+    fCtx.fillStyle = '#ffffff'; fCtx.fillRect(100, 0, 100, 180);
+    fCtx.fillStyle = '#dc2626'; fCtx.fillRect(200, 0, 100, 180);
+    const fTex = new THREE.CanvasTexture(fCanvas);
+    const fMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.1), new THREE.MeshBasicMaterial({ map: fTex, side: THREE.DoubleSide }));
+    fMesh.position.set(-2.8, 3.8, -4.2);
+    this.podiumGroup.add(fMesh);
+
+    // American Flag Banner
+    const aCanvas = document.createElement('canvas');
+    aCanvas.width = 300;
+    aCanvas.height = 180;
+    const aCtx = aCanvas.getContext('2d');
+    // Stripes
+    for (let s = 0; s < 13; s++) {
+      aCtx.fillStyle = (s % 2 === 0) ? '#dc2626' : '#ffffff';
+      aCtx.fillRect(0, s * (180 / 13), 300, 180 / 13);
+    }
+    // Canton
+    aCtx.fillStyle = '#1e3a8a';
+    aCtx.fillRect(0, 0, 120, 97);
+    aCtx.fillStyle = '#ffffff';
+    aCtx.font = 'bold 16px sans-serif';
+    aCtx.fillText('★ ★ ★ ★', 15, 55);
+
+    const aTex = new THREE.CanvasTexture(aCanvas);
+    const aMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.1), new THREE.MeshBasicMaterial({ map: aTex, side: THREE.DoubleSide }));
+    aMesh.position.set(2.8, 3.8, -4.2);
+    this.podiumGroup.add(aMesh);
+
+    // Celebratory Golden Hour Sun Spotlight
+    this.podiumLight = new THREE.DirectionalLight(0xffdd88, 0.0);
+    this.podiumLight.position.set(0, 8.0, 4.0);
+    this.podiumGroup.add(this.podiumLight);
+  }
+
+  setEnvironmentMode(mode) {
+    this.currentEnvMode = mode;
+    if (this.pitStopGroup) this.pitStopGroup.visible = (mode === 'pitstop');
+    if (this.podiumGroup) this.podiumGroup.visible = (mode === 'podium');
+
+    const envBtns = document.querySelectorAll('.exploded-env-btn');
+    envBtns.forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-env') === mode);
+    });
+
+    if (mode === 'podium') {
+      this.renderer.toneMappingExposure = 1.25;
+      if (this.podiumLight) this.podiumLight.intensity = 2.2;
+    } else {
+      this.renderer.toneMappingExposure = 1.05;
+      if (this.podiumLight) this.podiumLight.intensity = 0.0;
+    }
+  }
+
+  async loadModel() {
     const loader = new GLTFLoader();
 
     if (!window.__GT40_GLTF_PROMISE__) {
@@ -2415,6 +2922,18 @@ export class GT40ExplodedViewer {
     if (this.revBtn) {
       this.revBtn.addEventListener('click', () => this.revEngine());
     }
+
+    // 3D Environment Mode Switcher: Pit Stop Garage vs Victory Podium
+    const envBtns = document.querySelectorAll('.exploded-env-btn');
+    envBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const mode = btn.getAttribute('data-env');
+        if (mode) {
+          this.setEnvironmentMode(mode);
+          this.playClickSound();
+        }
+      });
+    });
 
     window.addEventListener('resize', () => this.onResize());
   }

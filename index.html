@@ -179,20 +179,51 @@
         </button>
       </header>
 
-      <!-- Hero text -->
+      <!-- Hero text & Interactive Pre-Flight Ignition Console -->
       <div class="hero">
         <p class="hero-sub animate-in" data-delay="0">FORD GT40 MK II &bull; LE MANS 1966</p>
         <h1 class="hero-title animate-in" data-delay="150">GO LIKE HELL</h1>
         <p class="hero-tagline animate-in" data-delay="300">
           THE 24-HOUR BATTLE FOR MOTORSPORT SUPREMACY
         </p>
+
+        <!-- Interactive Ignition Protocol Deck -->
+        <div class="hero-ignition-deck animate-in" data-delay="380">
+          <div class="ignition-deck-header">
+            <span class="pulse-dot"></span>
+            <span>427 FE V8 PRE-FLIGHT IGNITION PROTOCOL</span>
+          </div>
+          <div class="ignition-switches-row">
+            <button class="ignition-toggle-btn active" id="hero-btn-master" data-cursor="BATTERY">
+              <span class="toggle-led"></span>
+              <span class="toggle-name">MASTER</span>
+            </button>
+            <button class="ignition-toggle-btn active" id="hero-btn-fuel" data-cursor="FUEL PUMPS">
+              <span class="toggle-led"></span>
+              <span class="toggle-name">FUEL PUMPS</span>
+            </button>
+            <button class="ignition-fire-btn" id="hero-btn-start" data-cursor="IGNITE V8">
+              <span class="fire-btn-glow"></span>
+              <span class="fire-btn-cap">START 7.0L V8</span>
+            </button>
+            <button class="hero-throttle-btn" id="hero-btn-throttle" data-cursor="HOLD TO REV">
+              <span class="throttle-icon">🔥</span>
+              <span class="throttle-text">HOLD TO REV 7,000 RPM</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- Specs panel with 3D Tilt and Rolling Odometer Values -->
+      <!-- Specs panel with 3D Tilt, Rolling Odometer Values & Unit Toggle -->
       <aside class="specs animate-in" data-delay="450" data-tilt data-tilt-max="10" data-tilt-glare data-tilt-max-glare="0.2">
         <div class="specs-header">
           <span class="specs-line"></span>
           <span class="specs-label">SPECIFICATIONS</span>
+          <div class="specs-unit-toggle" id="specs-unit-toggle">
+            <button class="unit-toggle-btn active" data-unit="metric">METRIC</button>
+            <span class="unit-sep">/</span>
+            <button class="unit-toggle-btn" data-unit="imperial">IMPERIAL</button>
+          </div>
         </div>
         <dl class="specs-list">
           <div class="spec-row">
@@ -340,6 +371,60 @@
             </div>
           </div>
         </div>
+
+        <!-- Floating Interactive Showroom Command Deck -->
+        <div class="showroom-interactive-deck">
+          <!-- Rev Duel Buttons -->
+          <div class="showroom-rev-duel">
+            <button class="duel-rev-btn ford-duel-btn" id="btn-duel-ford" data-cursor="REV FORD">
+              <span class="btn-flag">🇺🇸</span>
+              <span class="btn-info">
+                <strong>REV FORD 7.0L V8</strong>
+                <small>485 BHP &bull; 475 LB-FT @ 6,200 RPM</small>
+              </span>
+              <span class="rev-wave-icon">🔊</span>
+            </button>
+
+            <div class="duel-vs-badge">VS</div>
+
+            <button class="duel-rev-btn ferrari-duel-btn" id="btn-duel-ferrari" data-cursor="REV FERRARI">
+              <span class="btn-flag">🇮🇹</span>
+              <span class="btn-info">
+                <strong>REV FERRARI 4.0L V12</strong>
+                <small>420 BHP &bull; 290 LB-FT @ 8,200 RPM</small>
+              </span>
+              <span class="rev-wave-icon">🔊</span>
+            </button>
+          </div>
+
+          <!-- Drag Strip Sprint Simulator -->
+          <div class="showroom-drag-sim">
+            <div class="drag-header">
+              <span class="drag-title">MULSANNE STRAIGHT 0–200 MPH ACCELERATION SIMULATOR</span>
+              <button class="drag-launch-btn" id="btn-drag-launch" data-cursor="LAUNCH">
+                <span class="launch-icon">🚦</span>
+                <span>LAUNCH DRAG SPRINT</span>
+              </button>
+            </div>
+
+            <div class="drag-strip-track" id="drag-track">
+              <div class="drag-lane ford-lane">
+                <span class="lane-tag">FORD GT40 MK II</span>
+                <div class="drag-car-progress" id="drag-ford-bar">
+                  <div class="drag-car-dot"></div>
+                </div>
+                <span class="lane-stat" id="drag-ford-stat">0.0s &bull; 0 MPH</span>
+              </div>
+              <div class="drag-lane ferrari-lane">
+                <span class="lane-tag">FERRARI 330 P3</span>
+                <div class="drag-car-progress" id="drag-ferrari-bar">
+                  <div class="drag-car-dot"></div>
+                </div>
+                <span class="lane-stat" id="drag-ferrari-stat">0.0s &bull; 0 MPH</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Flow Bridge 02: Showroom to Game Simulator -->
@@ -479,8 +564,21 @@
             </p>
           </div>
 
-          <!-- System Navigation Pills -->
+          <!-- System Navigation Pills & 3D Environment Switcher -->
           <div class="exploded-nav-bar">
+            <!-- 3D Environment Switcher -->
+            <div class="exploded-env-switcher" role="group" aria-label="3D Background Scene">
+              <span class="env-switcher-label">3D SCENE:</span>
+              <button class="exploded-env-btn active" data-env="pitstop" data-cursor="PIT BAY">
+                <span class="env-icon">🔧</span>
+                <span>1966 SHELBY PIT BAY</span>
+              </button>
+              <button class="exploded-env-btn" data-env="podium" data-cursor="PODIUM">
+                <span class="env-icon">🏆</span>
+                <span>VICTORY PODIUM</span>
+              </button>
+            </div>
+
             <button class="exploded-system-btn active" data-system="all" data-cursor="EXPLODE ALL">
               <span class="btn-icon">⬡</span>
               <span class="btn-name">FULL EXPLODED</span>
@@ -694,27 +792,73 @@
           <div class="cockpit-stage" id="cockpit-sim-container">
             <canvas id="cockpit-canvas"></canvas>
 
-            <!-- Minimal Unobtrusive Telemetry HUD -->
+            <!-- Live Cockpit Telemetry HUD Strip -->
             <div class="cockpit-viewport-badge">
-              <div class="cad-indicator"><span class="pulse-dot"></span> FIRST-PERSON DRIVER PERSPECTIVE</div>
+              <div class="cad-indicator"><span class="pulse-dot"></span> FIRST-PERSON DRIVER PERSPECTIVE &bull; CHASSIS P/1046</div>
               <div class="cad-coords" id="cockpit-look-indicator">LOOK: FORWARD &bull; YAW: 0&deg; &bull; PITCH: -3&deg;</div>
+            </div>
+
+            <!-- Top Right Live Gauges Cluster -->
+            <div class="cockpit-live-telemetry">
+              <div class="telem-box">
+                <span class="telem-lbl">ENGINE RPM</span>
+                <span class="telem-val" id="cockpit-rpm-val">0</span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-lbl">SPEED (MPH)</span>
+                <span class="telem-val" id="cockpit-speed-val">0</span>
+              </div>
+              <div class="telem-box">
+                <span class="telem-lbl">T-44 GEAR</span>
+                <span class="telem-val highlight-gold" id="cockpit-gear-val">N</span>
+              </div>
+              <div class="telem-box status-box">
+                <span class="telem-lbl">SYSTEM STATUS</span>
+                <span class="telem-val status-val" id="cockpit-engine-status">ENGINE: OFF</span>
+              </div>
             </div>
 
             <!-- Drag Prompt Overlay (Disappears on first user interaction) -->
             <div class="cockpit-drag-hint" id="cockpit-drag-hint">
               <span class="hint-icon">✥</span>
-              <span class="hint-text">DRAG TO LOOK AROUND</span>
+              <span class="hint-text">DRAG TO LOOK AROUND &bull; CLICK SWITCHES IN 3D</span>
             </div>
 
-            <!-- Minimal Bottom Controls HUD -->
+            <!-- Interactive Cockpit Controls & Presets HUD -->
             <div class="cockpit-quick-hud">
+              <!-- Physical Action Bar -->
+              <div class="cockpit-actions-bar">
+                <button class="cockpit-action-btn btn-engine-start" id="cockpit-start-btn" data-cursor="START">
+                  <span class="action-icon">⚡</span>
+                  <span class="action-text">START ENGINE</span>
+                </button>
+                <button class="cockpit-action-btn btn-throttle" id="cockpit-accel-btn" data-cursor="HOLD TO REV">
+                  <span class="action-icon">🔥</span>
+                  <span class="action-text">ACCELERATE</span>
+                </button>
+                <button class="cockpit-action-btn btn-shift" id="cockpit-shift-btn" data-cursor="SHIFT">
+                  <span class="action-icon">⚙️</span>
+                  <span class="action-text">SHIFT GEAR</span>
+                </button>
+                <button class="cockpit-action-btn btn-lights" id="cockpit-lights-btn" data-cursor="HEADLIGHTS">
+                  <span class="action-icon">💡</span>
+                  <span class="action-text">HEADLIGHTS</span>
+                </button>
+                <button class="cockpit-action-btn btn-wipers" id="cockpit-wipers-btn" data-cursor="WIPERS">
+                  <span class="action-icon">🌧️</span>
+                  <span class="action-text">WIPERS</span>
+                </button>
+              </div>
+
+              <!-- Camera View Presets Deck -->
               <div class="cockpit-presets-group">
                 <span class="hud-label">PRESET VIEWS:</span>
-                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.06">FORWARD</button>
-                <button class="cockpit-preset-btn" data-yaw="0" data-pitch="-0.52">INSTRUMENTS</button>
+                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.06">FORWARD TRACK</button>
+                <button class="cockpit-preset-btn" data-yaw="0" data-pitch="-0.52">STEWART-WARNER GAUGES</button>
+                <button class="cockpit-preset-btn" data-yaw="1.65" data-pitch="0.08">REAR 427 V8</button>
+                <button class="cockpit-preset-btn" data-yaw="0.65" data-pitch="-0.48">SHIFTER & PEDALS</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.42" data-pitch="-0.32">KEN MILES LAP LOG</button>
                 <button class="cockpit-preset-btn" data-yaw="-0.45" data-pitch="0.45">GURNEY BUBBLE</button>
-                <button class="cockpit-preset-btn" data-yaw="0.95" data-pitch="-0.15">PASSENGER</button>
-                <button class="cockpit-preset-btn" data-yaw="1.65" data-pitch="0.08">REAR V8</button>
               </div>
 
               <div class="cockpit-actions-group">
@@ -1912,7 +2056,7 @@
     <script src="assets/js/vendor/tsparticles.slim.bundle.min.js"></script>
 
     <!-- Project Application Scripts -->
-    <script src="main.js"></script>
+    <script src="main.js?v=3.0"></script>
     <script type="module" src="assets/js/game.js?v=3.0"></script>
     <script type="module" src="assets/js/exploded-view.js?v=3.0"></script>
     <script type="module">
