@@ -167,7 +167,7 @@ function imageToCanvas( image, flipY ) {
 
 //
 
-const PRECISION = 7;
+const PRECISION = 4;
 
 function buildHeader() {
 
