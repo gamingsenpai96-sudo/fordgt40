@@ -233,17 +233,17 @@ body {
 .custom-cursor.hovering .cursor-ring {
   width: 52px;
   height: 52px;
-  border-color: #38bdf8;
-  background: rgba(56, 189, 248, 0.08);
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .custom-cursor.hovering-red .cursor-ring {
   width: 56px;
   height: 56px;
-  border-color: #ff3b20;
-  background: rgba(255, 59, 32, 0.12);
-  box-shadow: 0 0 24px rgba(255, 59, 32, 0.45);
+  border-color: #e02424;
+  background: rgba(224, 36, 36, 0.12);
+  box-shadow: 0 0 24px rgba(224, 36, 36, 0.45);
 }
 
 .cursor-label {
@@ -252,11 +252,11 @@ body {
   left: 0;
   transform: translateX(-50%);
   padding: 3px 10px;
-  background: rgba(8, 12, 18, 0.9);
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  background: rgba(8, 12, 18, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.45);
   border-radius: 999px;
-  color: #38bdf8;
-  font-family: 'Oswald', sans-serif;
+  color: #e5c158;
+  font-family: 'Space Mono', 'Oswald', sans-serif;
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.22em;
@@ -538,7 +538,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-left: 2px solid #38bdf8;
+  border-left: 2px solid #d4af37;
   border-radius: 8px;
   padding: 18px 24px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -550,8 +550,8 @@ body {
 }
 .specs-line {
   display: block; width: 24px; height: 1px;
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
+  background: #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
 }
 .specs-label {
   font-family: 'Oswald', sans-serif;
@@ -747,30 +747,34 @@ body {
 }
 .section-tag {
   display: inline-block;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 300;
-  font-size: .7rem;
-  letter-spacing: .4em;
-  color: rgba(255,255,255,.25);
+  font-family: 'Space Mono', 'Oswald', monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
+  color: #d4af37;
+  text-transform: uppercase;
   margin-bottom: 12px;
 }
 .section-title {
-  font-family: 'Bebas Neue', 'Oswald', sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
-  letter-spacing: .03em;
-  line-height: 1;
-  margin-bottom: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(160,160,160,.5) 100%);
+  font-family: 'Oswald', 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 4.6vw, 4.0rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin-bottom: 18px;
+  background: linear-gradient(180deg, #ffffff 20%, #d8e2ee 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-transform: uppercase;
 }
 .section-body {
   font-family: 'Rajdhani', sans-serif;
-  font-weight: 400;
-  font-size: clamp(.95rem, 1.4vw, 1.15rem);
-  line-height: 1.75;
-  color: rgba(255,255,255,.55);
+  font-weight: 500;
+  font-size: clamp(1.0rem, 1.25vw, 1.15rem);
+  line-height: 1.72;
+  color: #c4cedc;
+  letter-spacing: 0.02em;
 }
 
 /* ---------- Footer ---------- */
@@ -822,14 +826,14 @@ body {
 }
 
 .game-wrapper {
-  max-width: 1200px;
+  max-width: 1380px;
   width: 100%;
   margin: 0 auto;
 }
 
 .game-header {
   text-align: center;
-  max-width: 720px;
+  max-width: 780px;
   margin: 0 auto 36px;
 }
 
@@ -838,12 +842,12 @@ body {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: rgba(255, 60, 40, 0.12);
-  border: 1px solid rgba(255, 60, 40, 0.4);
+  background: rgba(224, 36, 36, 0.1);
+  border: 1px solid rgba(224, 36, 36, 0.35);
   border-radius: 999px;
   font-family: 'Oswald', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.25em;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
   color: #ff5533;
   margin-bottom: 14px;
 }
@@ -859,12 +863,12 @@ body {
 .game-container {
   position: relative;
   width: 100%;
-  height: 640px;
+  height: 680px;
   background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 60, 40, 0.12);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(224, 36, 36, 0.08);
 }
 
 #game-canvas {
@@ -1261,18 +1265,18 @@ body {
 }
 
 .exploded-system-btn:hover {
-  background: rgba(0, 210, 255, 0.15);
-  border-color: rgba(0, 210, 255, 0.5);
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.5);
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.25);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
 }
 
 .exploded-system-btn.active {
-  background: rgba(0, 210, 255, 0.22);
-  border-color: #00d2ff;
-  color: #00d2ff;
-  box-shadow: 0 0 20px rgba(0, 210, 255, 0.4), inset 0 0 12px rgba(0, 210, 255, 0.15);
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #d4af37;
+  color: #f5d77f;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 12px rgba(212, 175, 55, 0.15);
 }
 
 /* 3D Stage Container */
@@ -1283,15 +1287,39 @@ body {
   border-radius: 16px;
   overflow: hidden;
   background: #06080d;
-  border: 1px solid rgba(0, 210, 255, 0.25);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 210, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.06);
   cursor: grab;
 }
 .exploded-stage-container:active {
   cursor: grabbing;
 }
 
+/* Authentic Blurred 1966 Le Mans Pit-Lane Environment Background */
+.exploded-pitlane-bg {
+  position: absolute;
+  inset: -24px;
+  background-image: url('assets/images/history/lemans_pit_lane_dusk.jpg');
+  background-size: cover;
+  background-position: center 58%;
+  background-repeat: no-repeat;
+  filter: blur(14px) brightness(0.36) contrast(1.15) saturate(0.85);
+  transform: scale(1.05);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+.exploded-pitlane-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(6, 8, 13, 0.35) 0%, rgba(6, 8, 13, 0.8) 70%, rgba(4, 5, 8, 0.98) 100%),
+              linear-gradient(180deg, rgba(6, 8, 13, 0.85) 0%, transparent 22%, transparent 78%, rgba(6, 8, 13, 0.95) 100%);
+}
+
 #exploded-canvas {
+  position: relative;
+  z-index: 1;
   width: 100% !important;
   height: 100% !important;
   display: block;
@@ -1441,11 +1469,12 @@ body {
   max-height: calc(100% - 40px);
   overflow-y: auto;
   z-index: 15;
-  background: rgba(8, 13, 22, 0.82);
-  border: 1px solid rgba(0, 210, 255, 0.25);
+  background: rgba(10, 14, 22, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   backdrop-filter: blur(18px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 210, 255, 0.04);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   pointer-events: auto;
   transition: all 0.3s ease;
 }
@@ -1468,11 +1497,12 @@ body {
 }
 
 .telemetry-subsystem-tag {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Space Mono', 'Oswald', sans-serif;
   font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  color: #00d2ff;
+  letter-spacing: 0.18em;
+  color: #d4af37;
   text-transform: uppercase;
+  font-weight: 700;
 }
 
 .telemetry-status-tag {
@@ -3095,12 +3125,12 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 /* =================================================================
-   UPGRADE 1: FIRST-PERSON COCKPIT DRIVER SIMULATION
+   SECTION 04: AUTHENTIC 3D FIRST-PERSON COCKPIT VIEW
    ================================================================= */
 
 .cockpit-sim-section {
   position: relative;
-  padding: 80px 4% 100px;
+  padding: 90px 4% 110px;
 }
 
 .cockpit-sim-wrapper {
@@ -3109,7 +3139,7 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .cockpit-header {
-  margin-bottom: 35px;
+  margin-bottom: 32px;
 }
 
 .cockpit-header-top {
@@ -3124,437 +3154,196 @@ img[src*="ferrari-p3-beauty"] {
   align-items: center;
   gap: 8px;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: #00d2ff;
-  background: rgba(0, 210, 255, 0.08);
-  border: 1px solid rgba(0, 210, 255, 0.25);
-  padding: 4px 12px;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  padding: 4px 14px;
   border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Cockpit Enclosure Stage */
+/* Cockpit 3D Viewport Stage */
 .cockpit-stage {
   position: relative;
   width: 100%;
-  border-radius: 20px;
+  height: 680px;
+  border-radius: 16px;
   overflow: hidden;
   background: #06080d;
-  border: 1px solid rgba(0, 210, 255, 0.25);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 210, 255, 0.08);
-  display: flex;
-  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.06);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
 }
 
-/* Windscreen Viewport */
-.cockpit-windscreen-wrap {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  background: #080c14;
-  overflow: hidden;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+.cockpit-stage.is-dragging {
+  cursor: grabbing;
 }
 
-#cockpit-windscreen-canvas {
-  width: 100%;
-  height: 100%;
+#cockpit-canvas {
+  width: 100% !important;
+  height: 100% !important;
   display: block;
 }
 
-.windscreen-gurney-bubble-tint {
+/* CAD / Cockpit Viewport Telemetry Badge */
+.cockpit-viewport-badge {
   position: absolute;
-  top: 15px;
-  right: 18%;
-  padding: 6px 14px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  backdrop-filter: blur(4px);
-  pointer-events: none;
-}
-
-.bubble-callout {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.windscreen-speed-watermark {
-  position: absolute;
-  bottom: 20px;
-  right: 35px;
-  font-family: 'Oswald', sans-serif;
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1;
-  text-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
-  pointer-events: none;
+  top: 18px;
+  left: 20px;
+  z-index: 10;
   display: flex;
-  align-items: baseline;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
 }
 
-.windscreen-speed-watermark .unit {
-  font-size: 1.1rem;
-  color: #00d2ff;
-  letter-spacing: 0.15em;
-}
-
-/* Dashboard Console & Gauges */
-.cockpit-dash-console {
-  background: linear-gradient(180deg, #10141c 0%, #080a0e 100%);
-  padding: 30px 40px;
-  position: relative;
-}
-
-.cockpit-gauges-cluster {
+/* Drag to Look Around Prompt */
+.cockpit-drag-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  margin-bottom: 30px;
+  gap: 12px;
+  padding: 12px 22px;
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  pointer-events: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.15);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  animation: cockpitPulseHint 2.4s infinite ease-in-out;
+}
+
+.cockpit-drag-hint.hidden {
+  opacity: 0;
+  transform: translate(-50%, -40%);
+  pointer-events: none;
+}
+
+@keyframes cockpitPulseHint {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }
+  50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; border-color: rgba(212, 175, 55, 0.7); }
+}
+
+.cockpit-drag-hint .hint-icon {
+  font-size: 1.1rem;
+  color: #d4af37;
+}
+
+/* Minimal Bottom Quick HUD */
+.cockpit-quick-hud {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.cockpit-presets-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(10, 14, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   flex-wrap: wrap;
 }
 
-.gauge-card {
+.cockpit-presets-group .hud-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.45);
+  margin-right: 4px;
+}
+
+.cockpit-preset-btn {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  outline: none;
+}
+
+.cockpit-preset-btn:hover {
+  background: rgba(212, 175, 55, 0.18);
+  border-color: rgba(212, 175, 55, 0.6);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.cockpit-preset-btn.active {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #06080d;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
+  font-weight: 700;
+}
+
+.cockpit-actions-group {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 10px;
+  pointer-events: auto;
 }
 
-.gauge-dial {
-  position: relative;
-  border-radius: 50%;
-  background: radial-gradient(circle, #1a1e28 0%, #0a0d14 85%);
-  border: 3px solid #3a4150;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@media (max-width: 1024px) {
+  .cockpit-stage {
+    height: 600px;
+  }
+  .cockpit-quick-hud {
+    flex-direction: column;
+    align-items: stretch;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+  }
 }
 
-.gauge-main-tach .gauge-dial,
-.gauge-main-speed .gauge-dial {
-  width: 160px;
-  height: 160px;
-  border-width: 4px;
-}
-
-.gauge-mini .gauge-dial {
-  width: 100px;
-  height: 100px;
-}
-
-.tach-face, .speed-face {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tach-brand {
-  position: absolute;
-  top: 32px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.2em;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.tach-numbers span,
-.speed-numbers span {
-  position: absolute;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.tach-numbers .t-0 { bottom: 22px; left: 32px; }
-.tach-numbers .t-2 { top: 62px; left: 16px; }
-.tach-numbers .t-4 { top: 16px; left: 74px; }
-.tach-numbers .t-6 { top: 62px; right: 16px; }
-.tach-numbers .t-7 { bottom: 38px; right: 20px; color: #ff3b30 !important; }
-.tach-numbers .t-8 { bottom: 22px; right: 34px; color: #ff3b30 !important; }
-
-.speed-numbers .s-0 { bottom: 22px; left: 32px; }
-.speed-numbers .s-60 { top: 58px; left: 18px; }
-.speed-numbers .s-120 { top: 16px; left: 70px; }
-.speed-numbers .s-180 { top: 58px; right: 18px; }
-.speed-numbers .s-220 { bottom: 22px; right: 30px; color: #00d2ff; }
-
-.gauge-scale {
-  position: absolute;
-  width: 80%;
-  display: flex;
-  justify-content: space-between;
-  bottom: 22px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.gauge-needle {
-  position: absolute;
-  bottom: 50%;
-  left: 50%;
-  width: 3px;
-  height: 60px;
-  background: #ff4757;
-  transform-origin: bottom center;
-  transform: rotate(-135deg);
-  transition: transform 0.08s ease-out;
-  border-radius: 2px 2px 0 0;
-  box-shadow: 0 0 8px rgba(255, 71, 87, 0.7);
-  z-index: 5;
-}
-
-.gauge-mini .gauge-needle {
-  height: 36px;
-  width: 2px;
-  background: #00d2ff;
-  box-shadow: 0 0 6px rgba(0, 210, 255, 0.7);
-  transform: rotate(-40deg);
-}
-
-.gauge-cap {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background: #2a3140;
-  border: 2px solid #5a6478;
-  border-radius: 50%;
-  z-index: 6;
-}
-
-.gauge-telemetry-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.gauge-name {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 700;
-}
-
-.gauge-digital-val {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.95rem;
-  color: #00d2ff;
-}
-
-/* Controls Bar */
-.cockpit-controls-bar {
-  display: grid;
-  grid-template-columns: 1fr 1.6fr 1.2fr;
-  gap: 24px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  align-items: center;
-}
-
-.control-block {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.control-tag {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 700;
-}
-
-/* Engine Start Button */
-.cockpit-ignition-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 16px 24px;
-  background: radial-gradient(circle, #2a0808 0%, #150303 100%);
-  border: 2px solid #ff3b30;
-  border-radius: 12px;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 0 20px rgba(255, 59, 48, 0.3);
-  transition: all 0.25s ease;
-}
-
-.cockpit-ignition-btn .btn-lamp {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #ff3b30;
-  box-shadow: 0 0 10px #ff3b30;
-  margin-bottom: 2px;
-}
-
-.cockpit-ignition-btn .cockpit-btn-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.05rem;
-  letter-spacing: 0.16em;
-  font-weight: 700;
-}
-
-.cockpit-ignition-btn .btn-sub {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.64rem;
-  letter-spacing: 0.2em;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.cockpit-ignition-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(255, 59, 48, 0.6);
-}
-
-.cockpit-ignition-btn.running {
-  background: radial-gradient(circle, #082414 0%, #03140a 100%);
-  border-color: #34c759;
-  box-shadow: 0 0 20px rgba(52, 199, 89, 0.35);
-}
-
-.cockpit-ignition-btn.running .btn-lamp {
-  background: #34c759;
-  box-shadow: 0 0 12px #34c759;
-}
-
-.cockpit-ignition-btn.cranking {
-  animation: pulse-crank 0.2s infinite;
-}
-
-@keyframes pulse-crank {
-  0% { transform: scale(1.0); }
-  50% { transform: scale(0.97); }
-  100% { transform: scale(1.0); }
-}
-
-/* 4-Speed Gated Sill Shifter */
-.cockpit-gate-console {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 10px 18px;
-}
-
-.gate-grid {
-  display: flex;
-  gap: 8px;
-}
-
-.cockpit-gate-slot {
-  width: 42px;
-  height: 42px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.cockpit-gate-slot:hover {
-  background: rgba(0, 210, 255, 0.18);
-  border-color: #00d2ff;
-}
-
-.cockpit-gate-slot.active {
-  background: #00d2ff;
-  color: #000;
-  font-weight: 700;
-  box-shadow: 0 0 16px rgba(0, 210, 255, 0.6);
-}
-
-.active-gear-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-left: auto;
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
-  padding-left: 16px;
-}
-
-.active-gear-indicator span {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.active-gear-indicator strong {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.8rem;
-  color: #00d2ff;
-  line-height: 1;
-}
-
-/* Throttle Pedal */
-.cockpit-accel-pedal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 16px 20px;
-  background: linear-gradient(180deg, #1f2736 0%, #10151f 100%);
-  border: 1px solid rgba(0, 210, 255, 0.35);
-  border-radius: 12px;
-  color: #fff;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-.cockpit-accel-pedal:hover {
-  border-color: #00d2ff;
-  box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
-}
-
-.cockpit-accel-pedal.active,
-.cockpit-accel-pedal:active {
-  transform: translateY(4px);
-  background: linear-gradient(180deg, #00d2ff 0%, #0088cc 100%);
-  color: #000;
-  box-shadow: 0 0 28px rgba(0, 210, 255, 0.7);
-}
-
-.pedal-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.05rem;
-  letter-spacing: 0.16em;
-  font-weight: 700;
-}
-
-.pedal-hint {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  opacity: 0.7;
+@media (max-width: 640px) {
+  .cockpit-stage {
+    height: 480px;
+  }
+  .cockpit-presets-group .hud-label {
+    display: none;
+  }
+  .cockpit-preset-btn {
+    padding: 5px 8px;
+    font-size: 0.65rem;
+  }
 }
 
 /* =================================================================
@@ -3776,9 +3565,9 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .dossier-spec-item .spec-num {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Space Mono', 'Oswald', sans-serif;
   font-size: 1.15rem;
-  color: #00d2ff;
+  color: #d4af37;
   font-weight: 700;
 }
 
@@ -3902,10 +3691,10 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .clock-time-val {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
+  font-family: 'Space Mono', 'Oswald', sans-serif;
+  font-size: 1.15rem;
   letter-spacing: 0.14em;
-  color: #00d2ff;
+  color: #d4af37;
   font-weight: 700;
 }
 
@@ -3930,16 +3719,16 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .race-hour-marker:hover {
-  background: rgba(0, 210, 255, 0.15);
-  border-color: #00d2ff;
+  background: rgba(212, 175, 55, 0.15);
+  border-color: #d4af37;
   color: #fff;
 }
 
 .race-hour-marker.active {
-  background: #00d2ff;
+  background: #d4af37;
   color: #06080d;
   font-weight: 800;
-  box-shadow: 0 0 14px rgba(0, 210, 255, 0.5);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
 }
 
 /* Slider Track */
@@ -3967,16 +3756,16 @@ img[src*="ferrari-p3-beauty"] {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #00d2ff;
+  background: #d4af37;
   border: 3px solid #fff;
-  box-shadow: 0 0 16px rgba(0, 210, 255, 0.8);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.8);
   cursor: grab;
 }
 
 .race-slider-fill {
   position: absolute;
   top: 0; left: 0; height: 100%;
-  background: linear-gradient(90deg, #00d2ff, #d4af37);
+  background: linear-gradient(90deg, #d4af37, #f39c12);
   border-radius: 4px;
   pointer-events: none;
 }
@@ -4021,7 +3810,7 @@ img[src*="ferrari-p3-beauty"] {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
-  color: #00d2ff;
+  color: #d4af37;
   font-weight: 700;
 }
 
@@ -4058,7 +3847,7 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .team-ford .team-count {
-  color: #00d2ff;
+  color: #4aa8d8;
 }
 
 .team-ferrari .team-count {
@@ -4135,12 +3924,12 @@ img[src*="ferrari-p3-beauty"] {
 }
 
 .race-phase-quote {
-  border-left: 2px solid #00d2ff;
+  border-left: 2px solid #d4af37;
   padding-left: 16px;
   margin: 0;
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.86rem;
-  color: #00d2ff;
+  color: #d4af37;
   font-style: italic;
   line-height: 1.5;
 }

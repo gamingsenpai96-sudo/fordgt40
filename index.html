@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=Oswald:wght@200;300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -98,7 +98,7 @@
         <button class="wayfinder-node" data-target="#cockpit-sim-section" data-cursor="COCKPIT">
           <span class="node-pip"></span>
           <span class="node-tag">04</span>
-          <span class="node-label">COCKPIT SIM</span>
+          <span class="node-label">COCKPIT VIEW</span>
         </button>
         <button class="wayfinder-node" data-target="#circuit-section" data-cursor="CIRCUIT">
           <span class="node-pip"></span>
@@ -224,6 +224,15 @@
         >
         <a href="#exploded-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="ANATOMY 3D"
           ><span>ANATOMY<br />EXPLODED 3D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#cockpit-sim-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="COCKPIT"
+          ><span>COCKPIT<br />VIEW 3D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#circuit-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="CIRCUIT"
+          ><span>CIRCUIT<br />DE LA SARTHE</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#race-clock-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="24H RACE"
+          ><span>24-HOUR<br />CRUCIBLE</span><span class="arrow">&rarr;</span></a
         >
         <a href="#story" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="THE STORY"
           ><span>ENTER<br />THE STORY</span><span class="arrow">&rarr;</span></a
@@ -515,6 +524,7 @@
 
           <!-- 3D Interactive Stage -->
           <div class="exploded-stage-container" id="exploded-container">
+            <div class="exploded-pitlane-bg" aria-hidden="true"></div>
             <canvas id="exploded-canvas"></canvas>
 
             <!-- Paddock Viewport Telemetry Badge -->
@@ -662,7 +672,7 @@
         </div>
       </div>
 
-      <!-- ====== SECTION 04: FIRST-PERSON COCKPIT SIMULATION ====== -->
+      <!-- ====== SECTION 04: FIRST-PERSON COCKPIT VIEW ====== -->
       <section id="cockpit-sim-section" class="cockpit-sim-section content-section">
         <div class="cockpit-sim-wrapper">
           <div class="cockpit-header">
@@ -670,140 +680,58 @@
               <span class="section-tag">04 &bull; DRIVER PERSPECTIVE</span>
               <span class="cockpit-badge">
                 <span class="live-dot"></span>
-                SIT 40 INCHES OFF THE TARMAC
+                1966 FORD GT40 MK II &bull; CHASSIS P/1046
               </span>
             </div>
             <h2 class="section-title">Enter the Cockpit</h2>
             <p class="section-body">
-              Take the driver's seat of Bruce McLaren and Ken Miles. Fire up the 7.0-litre FE V8 with authentic starter crank, click through the 4-speed mechanical sill gate, and hammer the throttle down the Mulsanne Straight.
+              Step into the driver's seat of Bruce McLaren and Chris Amon. Standing just 40 inches off the tarmac, look around the authentic 1966 competition interior from a stationary first-person perspective — explore the right-hand drive layout, 3-spoke competition steering wheel, Stewart-Warner gauges, wraparound windscreen, and roof Gurney bubble.
             </p>
           </div>
 
-          <!-- Interactive Cockpit Enclosure -->
+          <!-- Interactive Cockpit Viewport Stage -->
           <div class="cockpit-stage" id="cockpit-sim-container">
-            <!-- Windscreen Canvas with High-Speed Perspective Streamlines -->
-            <div class="cockpit-windscreen-wrap">
-              <canvas id="cockpit-windscreen-canvas"></canvas>
-              <div class="windscreen-gurney-bubble-tint">
-                <span class="bubble-callout">ROOF GURNEY BUBBLE (+1.75")</span>
+            <canvas id="cockpit-canvas"></canvas>
+
+            <!-- Minimal Unobtrusive Telemetry HUD -->
+            <div class="cockpit-viewport-badge">
+              <div class="cad-indicator"><span class="pulse-dot"></span> FIRST-PERSON DRIVER PERSPECTIVE</div>
+              <div class="cad-coords" id="cockpit-look-indicator">LOOK: FORWARD &bull; YAW: 0&deg; &bull; PITCH: -3&deg;</div>
+            </div>
+
+            <!-- Drag Prompt Overlay (Disappears on first user interaction) -->
+            <div class="cockpit-drag-hint" id="cockpit-drag-hint">
+              <span class="hint-icon">✥</span>
+              <span class="hint-text">DRAG TO LOOK AROUND</span>
+            </div>
+
+            <!-- Minimal Bottom Controls HUD -->
+            <div class="cockpit-quick-hud">
+              <div class="cockpit-presets-group">
+                <span class="hud-label">PRESET VIEWS:</span>
+                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.06">FORWARD</button>
+                <button class="cockpit-preset-btn" data-yaw="0" data-pitch="-0.52">INSTRUMENTS</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.45" data-pitch="0.45">GURNEY BUBBLE</button>
+                <button class="cockpit-preset-btn" data-yaw="0.95" data-pitch="-0.15">PASSENGER</button>
+                <button class="cockpit-preset-btn" data-yaw="1.65" data-pitch="0.08">REAR V8</button>
               </div>
-              <div class="windscreen-speed-watermark">
-                <span id="cockpit-speed-val">0</span>
-                <span class="unit">MPH</span>
+
+              <div class="cockpit-actions-group">
+                <button class="hud-tool-btn" id="cockpit-reset-btn" title="Reset View Forward" data-cursor="RESET">
+                  <span class="icon">🎯</span>
+                  <span class="btn-text">RESET VIEW</span>
+                </button>
               </div>
             </div>
 
-            <!-- Authentic 1966 Dashboard & Stewart-Warner Instrument Panel -->
-            <div class="cockpit-dash-console">
-              <!-- Gauges Cluster -->
-              <div class="cockpit-gauges-cluster">
-                <!-- Water Temp Mini Dial -->
-                <div class="gauge-card gauge-mini">
-                  <div class="gauge-dial dial-water">
-                    <div class="gauge-scale"><span>100</span><span>180</span><span>240°F</span></div>
-                    <div class="gauge-needle" id="cockpit-water-needle"></div>
-                    <div class="gauge-cap"></div>
-                  </div>
-                  <span class="gauge-name">WATER TEMP</span>
-                </div>
-
-                <!-- Main Tachometer (Center Stage 8,000 RPM) -->
-                <div class="gauge-card gauge-main-tach">
-                  <div class="gauge-dial dial-tach">
-                    <div class="gauge-bezel"></div>
-                    <div class="tach-face">
-                      <span class="tach-brand">STEWART-WARNER</span>
-                      <span class="tach-redline-band"></span>
-                      <div class="tach-numbers">
-                        <span class="t-0">0</span>
-                        <span class="t-2">2</span>
-                        <span class="t-4">4</span>
-                        <span class="t-6">6</span>
-                        <span class="t-7 red">7</span>
-                        <span class="t-8 red">8</span>
-                      </div>
-                      <div class="gauge-needle tach-needle-animated" id="cockpit-tach-needle"></div>
-                      <div class="gauge-cap"></div>
-                    </div>
-                  </div>
-                  <div class="gauge-telemetry-row">
-                    <span class="gauge-name">ENGINE TACHOMETER</span>
-                    <span class="gauge-digital-val"><strong id="cockpit-tach-val">0</strong> RPM</span>
-                  </div>
-                </div>
-
-                <!-- Main Speedometer -->
-                <div class="gauge-card gauge-main-speed">
-                  <div class="gauge-dial dial-speed">
-                    <div class="gauge-bezel"></div>
-                    <div class="speed-face">
-                      <span class="tach-brand">MILES PER HOUR</span>
-                      <div class="tach-numbers speed-numbers">
-                        <span class="s-0">0</span>
-                        <span class="s-60">60</span>
-                        <span class="s-120">120</span>
-                        <span class="s-180">180</span>
-                        <span class="s-220">220</span>
-                      </div>
-                      <div class="gauge-needle speed-needle-animated" id="cockpit-speed-needle"></div>
-                      <div class="gauge-cap"></div>
-                    </div>
-                  </div>
-                  <div class="gauge-telemetry-row">
-                    <span class="gauge-name">LE MANS SPEED</span>
-                    <span class="gauge-digital-val">TOP: 212 MPH</span>
-                  </div>
-                </div>
-
-                <!-- Oil Temp Mini Dial -->
-                <div class="gauge-card gauge-mini">
-                  <div class="gauge-dial dial-oil">
-                    <div class="gauge-scale"><span>50</span><span>150</span><span>250°F</span></div>
-                    <div class="gauge-needle" id="cockpit-oil-needle"></div>
-                    <div class="gauge-cap"></div>
-                  </div>
-                  <span class="gauge-name">OIL TEMP</span>
-                </div>
+            <!-- Loading Overlay -->
+            <div id="cockpit-loader" class="exploded-loader-overlay">
+              <div class="exploded-loader-spinner"></div>
+              <div class="exploded-loader-title">INITIALIZING GT40 COCKPIT...</div>
+              <div class="exploded-loader-bar">
+                <div id="cockpit-loader-fill" class="exploded-loader-fill"></div>
               </div>
-
-              <!-- Interactive Controls Bar (Starter, H-Gate Shifter & Throttle) -->
-              <div class="cockpit-controls-bar">
-                <!-- Ignition / Starter Button -->
-                <div class="control-block starter-block">
-                  <button class="cockpit-ignition-btn" id="cockpit-btn-start" data-cursor="IGNITION">
-                    <span class="btn-lamp"></span>
-                    <span class="cockpit-btn-label">ENGINE START</span>
-                    <span class="btn-sub">FORD 427 V8</span>
-                  </button>
-                </div>
-
-                <!-- 4-Speed Gated Sill Shifter -->
-                <div class="control-block shifter-block">
-                  <span class="control-tag">KAR KRAFT T-44 GATE</span>
-                  <div class="cockpit-gate-console">
-                    <div class="gate-grid">
-                      <button class="cockpit-gate-slot active" data-gear="0"><span>N</span></button>
-                      <button class="cockpit-gate-slot" data-gear="1"><span>1</span></button>
-                      <button class="cockpit-gate-slot" data-gear="2"><span>2</span></button>
-                      <button class="cockpit-gate-slot" data-gear="3"><span>3</span></button>
-                      <button class="cockpit-gate-slot" data-gear="4"><span>4</span></button>
-                    </div>
-                    <div class="active-gear-indicator">
-                      <span>GEAR</span>
-                      <strong id="cockpit-gear-val">N</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Accelerator Pedal Action -->
-                <div class="control-block pedal-block">
-                  <button class="cockpit-accel-pedal" id="cockpit-btn-accel" data-cursor="FLOOR IT">
-                    <span class="pedal-ribs"></span>
-                    <span class="pedal-label">HAMMER THROTTLE</span>
-                    <span class="pedal-hint">CLICK & HOLD / SPACEBAR</span>
-                  </button>
-                </div>
-              </div>
+              <div id="cockpit-loader-sub" class="exploded-loader-sub">Positioning Driver Perspective (Right-Hand Drive)</div>
             </div>
           </div>
         </div>

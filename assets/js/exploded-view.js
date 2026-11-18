@@ -340,10 +340,10 @@ export class GT40ExplodedViewer {
   }
 
   initThree() {
-    // 1. Scene
+    // 1. Scene with transparent background to reveal cinematic blurred pit-lane environment
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0c0f16);
-    this.scene.fog = new THREE.FogExp2(0x0c0f16, 0.045);
+    this.scene.background = null;
+    this.scene.fog = null;
 
     // 2. Camera
     const width = this.canvas.clientWidth || (this.container ? this.container.clientWidth : 0) || window.innerWidth || 1440;
@@ -351,15 +351,16 @@ export class GT40ExplodedViewer {
     this.camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
     this.camera.position.copy(SYSTEM_CAMERAS.all.cam);
 
-    // 3. Renderer with high dynamic range tone mapping
+    // 3. Renderer with high dynamic range tone mapping and alpha transparency
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
-      alpha: false,
+      alpha: true,
       powerPreference: 'high-performance',
       preserveDrawingBuffer: true
     });
     this.renderer.setSize(width, height);
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05; // Natural, realistic paddock exposure
@@ -469,20 +470,35 @@ export class GT40ExplodedViewer {
   setupFloor() {
     const texLoader = new THREE.TextureLoader();
 
-    // 1. Authentic Asphalt Tarmac Ground Plane
+    // 1. Authentic Asphalt Tarmac Ground Plane with soft radial edge fade into pit lane background
     const asphaltTex = texLoader.load('assets/models/car/textures_web/floor_asphalt.png');
     asphaltTex.wrapS = THREE.RepeatWrapping;
     asphaltTex.wrapT = THREE.RepeatWrapping;
-    asphaltTex.repeat.set(10, 10);
+    asphaltTex.repeat.set(6, 6);
+
+    const alphaCanvas = document.createElement('canvas');
+    alphaCanvas.width = 512;
+    alphaCanvas.height = 512;
+    const actx = alphaCanvas.getContext('2d');
+    const aGrad = actx.createRadialGradient(256, 256, 60, 256, 256, 250);
+    aGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    aGrad.addColorStop(0.55, 'rgba(255, 255, 255, 0.85)');
+    aGrad.addColorStop(0.85, 'rgba(255, 255, 255, 0.25)');
+    aGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    actx.fillStyle = aGrad;
+    actx.fillRect(0, 0, 512, 512);
+    const alphaTex = new THREE.CanvasTexture(alphaCanvas);
 
     const floorMat = new THREE.MeshStandardMaterial({
       map: asphaltTex,
+      alphaMap: alphaTex,
+      transparent: true,
       roughness: 0.90,
       metalness: 0.08,
-      color: 0x30333a
+      color: 0x2e3138
     });
 
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(32, 32), floorMat);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.375;
     floor.receiveShadow = true;
