@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=2.9" />
+    <link rel="stylesheet" href="styles.css?v=3.0" />
     <script type="importmap">
     {
       "imports": {
@@ -462,6 +462,7 @@
 
       <!-- ====== SECTION: 3D EXPLODED TECHNICAL BREAKDOWN ====== -->
       <section id="exploded-section" class="exploded-section content-section">
+        <div class="exploded-section-cinematic-bg" aria-hidden="true"></div>
         <div class="exploded-wrapper">
           <!-- Section Header -->
           <div class="exploded-header">
@@ -788,7 +789,7 @@
                 <path id="circuit-track-line" class="circuit-track-racing-line" d="M 180 390 L 130 380 Q 90 340 100 270 L 130 180 Q 150 140 190 120 L 250 100 Q 290 90 330 110 L 370 140 Q 400 150 430 140 L 710 140 Q 750 140 760 170 L 760 210 Q 750 240 710 240 L 450 260 Q 420 270 400 300 L 370 360 Q 350 400 300 410 L 220 400 Z" filter="url(#track-glow)" />
 
                 <!-- Directional Arrow Overlays -->
-                <path class="track-flow-arrow" d="M 520 135 L 560 140 L 520 145 Z" fill="#00d2ff" />
+                <path class="track-flow-arrow" d="M 520 135 L 560 140 L 520 145 Z" fill="#d4af37" />
 
                 <!-- Hotspot Beacons -->
                 <!-- 01: Start / Finish -->
@@ -1912,12 +1913,12 @@
 
     <!-- Project Application Scripts -->
     <script src="main.js"></script>
-    <script type="module" src="assets/js/game.js?v=2.9"></script>
-    <script type="module" src="assets/js/exploded-view.js?v=2.9"></script>
+    <script type="module" src="assets/js/game.js?v=3.0"></script>
+    <script type="module" src="assets/js/exploded-view.js?v=3.0"></script>
     <script type="module">
-      import { GT40CockpitSimulator } from './assets/js/cockpit-sim.js?v=2.9';
-      import { LeMansTrackExperience } from './assets/js/lemans-track.js?v=2.9';
-      import { LeMansRaceClock } from './assets/js/race-clock.js?v=2.9';
+      import { GT40CockpitSimulator } from './assets/js/cockpit-sim.js?v=3.0';
+      import { LeMansTrackExperience } from './assets/js/lemans-track.js?v=3.0';
+      import { LeMansRaceClock } from './assets/js/race-clock.js?v=3.0';
 
       window.addEventListener('DOMContentLoaded', () => {
         window.gt40Cockpit = new GT40CockpitSimulator();
