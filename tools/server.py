@@ -37,7 +37,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         if self.path.startswith('/api/save-glb'):
-            target_path = os.path.join(DIRECTORY, 'assets/models/car/source/gt40_ar.glb')
+            target_path = os.path.join(DIRECTORY, 'assets/models/car/source/gt40.glb')
             os.makedirs(os.path.dirname(target_path), exist_ok=True)
             with open(target_path, 'wb') as f:
                 f.write(post_data)

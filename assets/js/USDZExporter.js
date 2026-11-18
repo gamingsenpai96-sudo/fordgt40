@@ -490,14 +490,14 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		{
 			uniform token info:id = "UsdPrimvarReader_float2"
 			float2 inputs:fallback = (0.0, 0.0)
-			token inputs:varname = "${ uv }"
+			string inputs:varname = "${ uv }"
 			float2 outputs:result
 		}
 
 		def Shader "Transform2d_${ mapType }"
 		{
 			uniform token info:id = "UsdTransform2d"
-			token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+			float2 inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
 			float inputs:rotation = ${ ( rotation * ( 180 / Math.PI ) ).toFixed( PRECISION ) }
 			float2 inputs:scale = ${ buildVector2( repeat ) }
 			float2 inputs:translation = ${ buildVector2( offset ) }
@@ -509,8 +509,8 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			uniform token info:id = "UsdUVTexture"
 			asset inputs:file = @textures/Texture_${ id }.png@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
-			token inputs:sourceColorSpace = "${ texture.colorSpace === NoColorSpace ? 'raw' : 'sRGB' }"
+			${ mapType === 'normal' ? 'float4 inputs:bias = (-1, -1, -1, 0)\n\t\t\tfloat4 inputs:scale = (2, 2, 2, 1)' : ( color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' ) }
+			token inputs:sourceColorSpace = "${ mapType === 'normal' ? 'raw' : ( texture.colorSpace === NoColorSpace ? 'raw' : 'sRGB' ) }"
 			token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
 			token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
 			float outputs:r
