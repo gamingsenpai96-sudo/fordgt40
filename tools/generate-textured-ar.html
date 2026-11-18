@@ -101,9 +101,10 @@
           } else if (name.includes('Wheels')) {
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Halibrand_Wheels',
+              color: new THREE.Color(0xd4af37),
               map: wheelsTex,
               normalMap: wheelsNormTex,
-              roughness: 0.38,
+              roughness: 0.35,
               metalness: 0.82
             });
           } else if (name.includes('Interior')) {
