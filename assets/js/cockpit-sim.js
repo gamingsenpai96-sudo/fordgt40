@@ -44,22 +44,22 @@ export class GT40CockpitSimulator {
     this.telemetryStatus = document.getElementById('cockpit-engine-status');
 
     // Stationary driver eye position inside Ford GT40 Mk II (Right-Hand Drive)
-    // Chassis P/1046: X = 0.28m (RHD driver seat center), Y = 0.38m (driver eye level), Z = 0.10m (driver head)
-    this.eyePosition = new THREE.Vector3(0.28, 0.38, 0.10);
+    // Chassis P/1046: X = 0.28m (RHD driver seat center), Y = 0.52m (realistic adult eye level), Z = 0.06m (driver head)
+    this.eyePosition = new THREE.Vector3(0.28, 0.52, 0.06);
     this.lookTarget = new THREE.Vector3();
 
     // Look-around rotation angles (radians)
     // Forward is +Z direction (yaw = 0)
     this.currentYaw = 0;
     this.targetYaw = 0;
-    this.currentPitch = -0.06; // natural subtle downward glance at instruments
-    this.targetPitch = -0.06;
+    this.currentPitch = -0.02; // natural forward eye level
+    this.targetPitch = -0.02;
 
-    // Strict rotational boundaries
-    this.yawMin = -1.92;   // -110 deg (right window, door sill, wing mirror)
-    this.yawMax = 2.18;    // +125 deg (center console, passenger seat, rear engine bay)
-    this.pitchMin = -0.78; // -45 deg (pedals, steering wheel, lower Stewart-Warner dials)
-    this.pitchMax = 0.61;  // +35 deg (windscreen top, roof, Gurney bubble, rearview mirror)
+    // Rotational boundaries - allow full look-around down to pedals/shifter and back to engine
+    this.yawMin = -3.14;   // -180 deg
+    this.yawMax = 3.14;    // +180 deg
+    this.pitchMin = -1.25; // -72 deg (allows looking down at floor pedals and gated shifter)
+    this.pitchMax = 0.85;  // +48 deg (allows looking up through Gurney bubble & roof)
 
     // Interaction state
     this.isDragging = false;
@@ -90,11 +90,19 @@ export class GT40CockpitSimulator {
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
-    // Web Audio Engine Synthesizer
+    // Authentic Recorded Audio Engine (Same as Game Simulator)
     this.audioCtx = null;
-    this.engineGain = null;
-    this.engineOsc = null;
-    this.engineNoise = null;
+    this.audioBuffers = {
+      startup: null,
+      idle: null,
+      downshift: null,
+      accel: null
+    };
+    this.idleSource = null;
+    this.idleGain = null;
+    this.accelSource = null;
+    this.accelGain = null;
+    this.masterGain = null;
 
     this.initThree();
     this.bindEvents();
@@ -102,23 +110,61 @@ export class GT40CockpitSimulator {
   }
 
   // =================================================================
-  //  Web Audio Procedural Sound Engine
+  //  Authentic GT40 Engine Audio (Startup, Idle, Downshift & Accel)
   // =================================================================
 
   initAudio() {
     if (this.audioCtx) return;
     try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      this.audioCtx = new AudioContextClass();
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+      this.audioCtx = new AudioCtxClass();
 
       // Master Cockpit Gain
       this.masterGain = this.audioCtx.createGain();
-      this.masterGain.gain.setValueAtTime(0.7, this.audioCtx.currentTime);
+      this.masterGain.gain.setValueAtTime(0.85, this.audioCtx.currentTime);
       this.masterGain.connect(this.audioCtx.destination);
+
+      // Dedicated Gain for Idle Loop
+      this.idleGain = this.audioCtx.createGain();
+      this.idleGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+      this.idleGain.connect(this.masterGain);
+
+      // Dedicated Gain for Full-Throttle Acceleration Sound
+      this.accelGain = this.audioCtx.createGain();
+      this.accelGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+      this.accelGain.connect(this.masterGain);
+
+      this.loadAudioFiles();
     } catch (e) {
       console.warn('Web Audio initialization fallback:', e);
     }
+  }
+
+  async loadAudioFiles() {
+    if (!this.audioCtx) return;
+    const loadBuf = async (url) => {
+      try {
+        const res = await fetch(url);
+        const arr = await res.arrayBuffer();
+        return await this.audioCtx.decodeAudioData(arr);
+      } catch (e) {
+        console.warn('Audio decode error for', url, e);
+        return null;
+      }
+    };
+
+    const [startup, idle, downshift, accel] = await Promise.all([
+      loadBuf('assets/audio/gt40-startup.mp3'),
+      loadBuf('assets/audio/gt40-idle.mp3'),
+      loadBuf('assets/audio/gt40-downshift.mp3'),
+      loadBuf('assets/audio/gt40-accel.mp3')
+    ]);
+
+    this.audioBuffers.startup = startup;
+    this.audioBuffers.idle = idle;
+    this.audioBuffers.downshift = downshift;
+    this.audioBuffers.accel = accel;
   }
 
   playClickSound() {
@@ -146,62 +192,33 @@ export class GT40CockpitSimulator {
     if (!this.audioCtx) this.initAudio();
     if (!this.audioCtx) return;
 
+    // Use authentic downshift audio (blip & mechanical clack from game section)
+    if (this.audioBuffers.downshift) {
+      try {
+        const src = this.audioCtx.createBufferSource();
+        src.buffer = this.audioBuffers.downshift;
+        const g = this.audioCtx.createGain();
+        g.gain.setValueAtTime(0.85, this.audioCtx.currentTime);
+        src.connect(g);
+        g.connect(this.masterGain);
+        src.start();
+        return;
+      } catch (e) {}
+    }
+
     try {
       const t = this.audioCtx.currentTime;
-      // Dual metallic gate impact (shifter hitting gate slot)
       const osc1 = this.audioCtx.createOscillator();
-      const osc2 = this.audioCtx.createOscillator();
       const gain = this.audioCtx.createGain();
-
       osc1.type = 'square';
       osc1.frequency.setValueAtTime(680, t);
       osc1.frequency.exponentialRampToValueAtTime(120, t + 0.07);
-
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(2200, t);
-      osc2.frequency.exponentialRampToValueAtTime(450, t + 0.05);
-
       gain.gain.setValueAtTime(0.45, t);
       gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
-
       osc1.connect(gain);
-      osc2.connect(gain);
       gain.connect(this.masterGain);
-
       osc1.start(t);
-      osc2.start(t);
       osc1.stop(t + 0.08);
-      osc2.stop(t + 0.08);
-    } catch (e) {}
-  }
-
-  playStarterCrankSound() {
-    if (!this.audioCtx) this.initAudio();
-    if (!this.audioCtx) return;
-
-    try {
-      const t = this.audioCtx.currentTime;
-      // Whining starter motor and compression pulses
-      const starterOsc = this.audioCtx.createOscillator();
-      const starterGain = this.audioCtx.createGain();
-
-      starterOsc.type = 'sawtooth';
-      starterOsc.frequency.setValueAtTime(120, t);
-      // Pulses for starter cranking
-      for (let p = 0; p < 6; p++) {
-        starterOsc.frequency.setValueAtTime(110, t + (p * 0.12));
-        starterOsc.frequency.linearRampToValueAtTime(145, t + (p * 0.12) + 0.06);
-      }
-
-      starterGain.gain.setValueAtTime(0.35, t);
-      starterGain.gain.linearRampToValueAtTime(0.4, t + 0.7);
-      starterGain.gain.exponentialRampToValueAtTime(0.01, t + 0.85);
-
-      starterOsc.connect(starterGain);
-      starterGain.connect(this.masterGain);
-
-      starterOsc.start(t);
-      starterOsc.stop(t + 0.85);
     } catch (e) {}
   }
 
@@ -209,73 +226,67 @@ export class GT40CockpitSimulator {
     if (!this.audioCtx) this.initAudio();
     if (!this.audioCtx) return;
 
-    if (this.engineOsc) return;
-
-    try {
-      // 7.0L FE V8 big-block rumble: Low fundamental + subharmonic lope
-      this.engineOsc = this.audioCtx.createOscillator();
-      this.engineOsc.type = 'sawtooth';
-      this.engineOsc.frequency.setValueAtTime(38, this.audioCtx.currentTime); // ~1140 RPM (38 Hz firing)
-
-      // V8 Sub-harmonic lope
-      this.subOsc = this.audioCtx.createOscillator();
-      this.subOsc.type = 'triangle';
-      this.subOsc.frequency.setValueAtTime(19, this.audioCtx.currentTime);
-
-      this.engineGain = this.audioCtx.createGain();
-      this.engineGain.gain.setValueAtTime(0.22, this.audioCtx.currentTime);
-
-      // Low pass filter for deep muffled cockpit acoustic insulation
-      this.engineFilter = this.audioCtx.createBiquadFilter();
-      this.engineFilter.type = 'lowpass';
-      this.engineFilter.frequency.setValueAtTime(280, this.audioCtx.currentTime);
-      this.engineFilter.Q.setValueAtTime(3.5, this.audioCtx.currentTime);
-
-      this.engineOsc.connect(this.engineFilter);
-      this.subOsc.connect(this.engineFilter);
-      this.engineFilter.connect(this.engineGain);
-      this.engineGain.connect(this.masterGain);
-
-      this.engineOsc.start();
-      this.subOsc.start();
-    } catch (e) {}
+    if (this.audioBuffers.idle && !this.idleSource) {
+      try {
+        this.idleSource = this.audioCtx.createBufferSource();
+        this.idleSource.buffer = this.audioBuffers.idle;
+        this.idleSource.loop = true;
+        this.idleSource.connect(this.idleGain);
+        this.idleSource.start();
+        this.idleGain.gain.setTargetAtTime(0.85, this.audioCtx.currentTime, 0.15);
+      } catch (e) {}
+    }
   }
 
   stopEngineAudioLoop() {
-    if (this.engineOsc) {
-      try {
-        this.engineOsc.stop();
-        this.engineOsc.disconnect();
-        this.engineOsc = null;
-      } catch (e) {}
+    if (this.idleGain && this.audioCtx) {
+      this.idleGain.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.08);
     }
-    if (this.subOsc) {
-      try {
-        this.subOsc.stop();
-        this.subOsc.disconnect();
-        this.subOsc = null;
-      } catch (e) {}
+    if (this.accelGain && this.audioCtx) {
+      this.accelGain.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.08);
     }
+    setTimeout(() => {
+      if (this.idleSource) {
+        try { this.idleSource.stop(); this.idleSource.disconnect(); } catch (e) {}
+        this.idleSource = null;
+      }
+      if (this.accelSource) {
+        try { this.accelSource.stop(); this.accelSource.disconnect(); } catch (e) {}
+        this.accelSource = null;
+      }
+    }, 150);
   }
 
   updateEngineAudio() {
-    if (!this.engineOsc || !this.audioCtx) return;
+    if (!this.audioCtx) return;
 
-    try {
-      const t = this.audioCtx.currentTime;
-      // Scale fundamental frequency from RPM: 1000 RPM ~ 33 Hz, 6000 RPM ~ 200 Hz
-      const hz = Math.max(20, (this.currentRPM / 60) * 2);
-      this.engineOsc.frequency.setTargetAtTime(hz, t, 0.05);
-      if (this.subOsc) this.subOsc.frequency.setTargetAtTime(hz / 2, t, 0.05);
+    const now = this.audioCtx.currentTime;
+    if (this.isAccelerating) {
+      // Throttle is active: bring down idle and bring up authentic accel roar
+      if (this.idleGain) this.idleGain.gain.setTargetAtTime(0.15, now, 0.1);
 
-      // Filter opens up as throttle opens
-      const filterFreq = 260 + (this.currentRPM / 6500) * 1200;
-      this.engineFilter.frequency.setTargetAtTime(filterFreq, t, 0.05);
+      if (!this.accelSource && this.audioBuffers.accel) {
+        try {
+          this.accelSource = this.audioCtx.createBufferSource();
+          this.accelSource.buffer = this.audioBuffers.accel;
+          this.accelSource.loop = true;
+          this.accelSource.connect(this.accelGain);
+          this.accelSource.start();
+        } catch (e) {}
+      }
 
-      // Gain increases with throttle
-      const gainVal = 0.20 + (this.currentRPM / 6500) * 0.40;
-      this.engineGain.gain.setTargetAtTime(gainVal, t, 0.05);
-    } catch (e) {}
+      if (this.accelGain) {
+        this.accelGain.gain.setTargetAtTime(0.90, now, 0.1);
+      }
+      if (this.accelSource) {
+        const rate = Math.max(0.75, Math.min(1.45, 0.82 + (this.currentRPM / 6200) * 0.42));
+        this.accelSource.playbackRate.setTargetAtTime(rate, now, 0.08);
+      }
+    } else {
+      // Throttle released: restore pure GT40 big-block idle rumble
+      if (this.accelGain) this.accelGain.gain.setTargetAtTime(0.0, now, 0.15);
+      if (this.idleGain) this.idleGain.gain.setTargetAtTime(0.85, now, 0.15);
+    }
   }
 
   // =================================================================
@@ -317,6 +328,26 @@ export class GT40CockpitSimulator {
 
     // 6. Photorealistic 1966 Le Mans Circuit de la Sarthe Pit Straight Exterior
     this.setupTrackEnvironment();
+
+    // 7. Viewport Visibility Observer (Resource Optimization)
+    this.setupVisibilityObserver();
+  }
+
+  setupVisibilityObserver() {
+    this.isVisible = true;
+    const target = this.container || this.canvas;
+    if (!target || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        this.isVisible = entry.isIntersecting;
+        if (this.isVisible && !this.animationFrameId) {
+          this.startLoop();
+        }
+      });
+    }, { threshold: 0.05 });
+
+    observer.observe(target);
   }
 
   setupEnvironment() {
@@ -1528,7 +1559,18 @@ export class GT40CockpitSimulator {
 
     if (this.isCranking) return;
     this.isCranking = true;
-    this.playStarterCrankSound();
+
+    // Play authentic GT40 startup sound (exact recording from game section)
+    if (this.audioCtx && this.audioBuffers.startup) {
+      try {
+        const src = this.audioCtx.createBufferSource();
+        src.buffer = this.audioBuffers.startup;
+        src.connect(this.masterGain);
+        src.start();
+      } catch (e) {}
+    } else {
+      this.playClickSound();
+    }
 
     if (this.telemetryStatus) {
       this.telemetryStatus.textContent = 'STARTER CRANKING...';
@@ -1552,7 +1594,7 @@ export class GT40CockpitSimulator {
         this.btnStart.classList.add('running');
         this.btnStart.innerHTML = '<span class="action-icon">🛑</span><span class="action-text">CUT IGNITION</span>';
       }
-    }, 850);
+    }, 1100);
   }
 
   accelerate(active) {
@@ -1569,6 +1611,7 @@ export class GT40CockpitSimulator {
       this.targetRPM = 1150; // Return to idle
       if (this.pedalThrottle) this.pedalThrottle.rotation.x = 0.0;
     }
+    this.updateEngineAudio();
   }
 
   shiftGear() {
@@ -1794,12 +1837,17 @@ export class GT40CockpitSimulator {
   }
 
   startLoop() {
+    if (this.animationFrameId) return;
     const animate = () => {
+      if (!this.isVisible) {
+        this.animationFrameId = null;
+        return;
+      }
       this.animationFrameId = requestAnimationFrame(animate);
       this.update();
       this.render();
     };
-    animate();
+    this.animationFrameId = requestAnimationFrame(animate);
   }
 
   update() {

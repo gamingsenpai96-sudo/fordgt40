@@ -807,82 +807,8 @@
   }
 
   // =================================================================
-  //  Interactive Deck Handlers: Ignition, Specs Unit & Showroom Drag
+  //  Interactive Deck Handlers: Specs Unit Toggle
   // =================================================================
-
-  function setupHeroIgnition() {
-    const btnMaster = document.getElementById('hero-btn-master');
-    const btnFuel = document.getElementById('hero-btn-fuel');
-    const btnStart = document.getElementById('hero-btn-start');
-    const btnThrottle = document.getElementById('hero-btn-throttle');
-
-    if (btnMaster) {
-      btnMaster.addEventListener('click', (e) => {
-        e.stopPropagation();
-        btnMaster.classList.toggle('active');
-        playClickSound();
-        const active = btnMaster.classList.contains('active');
-        setIndicator(active ? 'MASTER POWER: ENGAGED' : 'MASTER POWER: OFF', true);
-      });
-    }
-
-    if (btnFuel) {
-      btnFuel.addEventListener('click', (e) => {
-        e.stopPropagation();
-        btnFuel.classList.toggle('active');
-        playClickSound();
-        const active = btnFuel.classList.contains('active');
-        setIndicator(active ? 'TWIN HOLLEY FUEL PUMPS: PRESSURIZED' : 'FUEL PUMPS: OFF', true);
-      });
-    }
-
-    if (btnStart) {
-      btnStart.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playClickSound();
-
-        const masterActive = btnMaster && btnMaster.classList.contains('active');
-        const fuelActive = btnFuel && btnFuel.classList.contains('active');
-
-        if (!masterActive || !fuelActive) {
-          setIndicator('IGNITION ABORT: ENGAGE MASTER & FUEL PUMPS', true);
-          return;
-        }
-
-        if (!videoStarted) {
-          startHeroVideo();
-        } else {
-          playFordV8Rev();
-          setIndicator('FORD 7.0L V8 • 485 BHP IGNITION FIRED', true);
-        }
-      });
-    }
-
-    if (btnThrottle) {
-      let isThrottling = false;
-      const startThrottle = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (isThrottling) return;
-        isThrottling = true;
-        btnThrottle.classList.add('revving');
-        setIndicator('FORD 7.0L V8 • 7,000 RPM FULL THROTTLE', true);
-        playFordV8Rev();
-      };
-      const endThrottle = (e) => {
-        if (!isThrottling) return;
-        isThrottling = false;
-        btnThrottle.classList.remove('revving');
-        setIndicator('FORD 7.0L V8 • IDLE 850 RPM', true);
-      };
-
-      btnThrottle.addEventListener('mousedown', startThrottle);
-      btnThrottle.addEventListener('mouseup', endThrottle);
-      btnThrottle.addEventListener('mouseleave', endThrottle);
-      btnThrottle.addEventListener('touchstart', startThrottle, { passive: false });
-      btnThrottle.addEventListener('touchend', endThrottle, { passive: false });
-    }
-  }
 
   function setupSpecsUnitToggle() {
     const toggle = document.getElementById('specs-unit-toggle');
@@ -941,98 +867,6 @@
         animateSpecNumbers();
       });
     });
-  }
-
-  function setupShowroomDeck() {
-    const duelFord = document.getElementById('btn-duel-ford');
-    const duelFerrari = document.getElementById('btn-duel-ferrari');
-    const dragLaunch = document.getElementById('btn-drag-launch');
-    const dragFordBar = document.getElementById('drag-ford-bar');
-    const dragFerrariBar = document.getElementById('drag-ferrari-bar');
-    const dragFordStat = document.getElementById('drag-ford-stat');
-    const dragFerrariStat = document.getElementById('drag-ferrari-stat');
-
-    if (duelFord) {
-      duelFord.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playFordV8Rev();
-      });
-    }
-
-    if (duelFerrari) {
-      duelFerrari.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playFerrariV12Rev();
-      });
-    }
-
-    if (dragLaunch && dragFordBar && dragFerrariBar) {
-      let isRacing = false;
-
-      dragLaunch.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (isRacing) return;
-        isRacing = true;
-
-        dragLaunch.classList.add('racing');
-        dragLaunch.innerHTML = '<span class="launch-icon">⚡</span><span>SPRINTING AT LE MANS...</span>';
-
-        playFordV8Rev();
-
-        const fordDot = dragFordBar.querySelector('.drag-car-dot');
-        const ferrariDot = dragFerrariBar.querySelector('.drag-car-dot');
-
-        const raceDuration = 5500; // 5.5s simulation for high intensity
-        const startTime = performance.now();
-
-        function updateSprint(now) {
-          const elapsed = now - startTime;
-          const t = Math.min(1, elapsed / raceDuration);
-
-          const fordProg = Math.min(1, Math.pow(t, 1.25));
-          const ferrariProg = Math.min(1, Math.pow(t, 1.4) * 0.94);
-
-          const fordSpeed = Math.round(t * 205);
-          const ferrariSpeed = Math.round(t * 193);
-
-          if (fordDot) fordDot.style.left = `${fordProg * 100}%`;
-          if (ferrariDot) ferrariDot.style.left = `${ferrariProg * 100}%`;
-
-          const curSeconds = (t * 10.8).toFixed(1);
-
-          if (dragFordStat) {
-            dragFordStat.textContent = `${curSeconds}s • ${fordSpeed} MPH`;
-          }
-          if (dragFerrariStat) {
-            dragFerrariStat.textContent = `${curSeconds}s • ${ferrariSpeed} MPH`;
-          }
-
-          if (t < 1) {
-            requestAnimationFrame(updateSprint);
-          } else {
-            if (fordDot) fordDot.style.left = '100%';
-            if (ferrariDot) ferrariDot.style.left = '92%';
-
-            if (dragFordStat) {
-              dragFordStat.innerHTML = '<strong style="color: #4ade80;">10.8s • 205 MPH 🏆 1ST</strong>';
-            }
-            if (dragFerrariStat) {
-              dragFerrariStat.innerHTML = '<span style="color: #f87171;">11.4s • 193 MPH (+0.6s)</span>';
-            }
-
-            triggerVictoryConfetti();
-
-            setTimeout(() => {
-              dragLaunch.classList.remove('racing');
-              dragLaunch.innerHTML = '<span class="launch-icon">🏁</span><span>RE-RUN DRAG SPRINT</span>';
-              isRacing = false;
-            }, 1800);
-          }
-        }
-
-        requestAnimationFrame(updateSprint);
-      });
-    }
   }
 
   // =================================================================
@@ -1412,10 +1246,8 @@
     initParticles();
 
     setupStartInterceptors();
-    setupHeroIgnition();
     setupSpecsUnitToggle();
     setupShowroomSplit();
-    setupShowroomDeck();
     setupExperienceModals();
 
     window.addEventListener('scroll', onScroll, { passive: true });

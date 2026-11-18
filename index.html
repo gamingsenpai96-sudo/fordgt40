@@ -179,39 +179,13 @@
         </button>
       </header>
 
-      <!-- Hero text & Interactive Pre-Flight Ignition Console -->
+      <!-- Hero text -->
       <div class="hero">
         <p class="hero-sub animate-in" data-delay="0">FORD GT40 MK II &bull; LE MANS 1966</p>
         <h1 class="hero-title animate-in" data-delay="150">GO LIKE HELL</h1>
         <p class="hero-tagline animate-in" data-delay="300">
           THE 24-HOUR BATTLE FOR MOTORSPORT SUPREMACY
         </p>
-
-        <!-- Interactive Ignition Protocol Deck -->
-        <div class="hero-ignition-deck animate-in" data-delay="380">
-          <div class="ignition-deck-header">
-            <span class="pulse-dot"></span>
-            <span>427 FE V8 PRE-FLIGHT IGNITION PROTOCOL</span>
-          </div>
-          <div class="ignition-switches-row">
-            <button class="ignition-toggle-btn active" id="hero-btn-master" data-cursor="BATTERY">
-              <span class="toggle-led"></span>
-              <span class="toggle-name">MASTER</span>
-            </button>
-            <button class="ignition-toggle-btn active" id="hero-btn-fuel" data-cursor="FUEL PUMPS">
-              <span class="toggle-led"></span>
-              <span class="toggle-name">FUEL PUMPS</span>
-            </button>
-            <button class="ignition-fire-btn" id="hero-btn-start" data-cursor="IGNITE V8">
-              <span class="fire-btn-glow"></span>
-              <span class="fire-btn-cap">START 7.0L V8</span>
-            </button>
-            <button class="hero-throttle-btn" id="hero-btn-throttle" data-cursor="HOLD TO REV">
-              <span class="throttle-icon">🔥</span>
-              <span class="throttle-text">HOLD TO REV 7,000 RPM</span>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- Specs panel with 3D Tilt, Rolling Odometer Values & Unit Toggle -->
@@ -368,60 +342,6 @@
                 class="showroom-car-cutout"
                 loading="eager"
               />
-            </div>
-          </div>
-        </div>
-
-        <!-- Floating Interactive Showroom Command Deck -->
-        <div class="showroom-interactive-deck">
-          <!-- Rev Duel Buttons -->
-          <div class="showroom-rev-duel">
-            <button class="duel-rev-btn ford-duel-btn" id="btn-duel-ford" data-cursor="REV FORD">
-              <span class="btn-flag">🇺🇸</span>
-              <span class="btn-info">
-                <strong>REV FORD 7.0L V8</strong>
-                <small>485 BHP &bull; 475 LB-FT @ 6,200 RPM</small>
-              </span>
-              <span class="rev-wave-icon">🔊</span>
-            </button>
-
-            <div class="duel-vs-badge">VS</div>
-
-            <button class="duel-rev-btn ferrari-duel-btn" id="btn-duel-ferrari" data-cursor="REV FERRARI">
-              <span class="btn-flag">🇮🇹</span>
-              <span class="btn-info">
-                <strong>REV FERRARI 4.0L V12</strong>
-                <small>420 BHP &bull; 290 LB-FT @ 8,200 RPM</small>
-              </span>
-              <span class="rev-wave-icon">🔊</span>
-            </button>
-          </div>
-
-          <!-- Drag Strip Sprint Simulator -->
-          <div class="showroom-drag-sim">
-            <div class="drag-header">
-              <span class="drag-title">MULSANNE STRAIGHT 0–200 MPH ACCELERATION SIMULATOR</span>
-              <button class="drag-launch-btn" id="btn-drag-launch" data-cursor="LAUNCH">
-                <span class="launch-icon">🚦</span>
-                <span>LAUNCH DRAG SPRINT</span>
-              </button>
-            </div>
-
-            <div class="drag-strip-track" id="drag-track">
-              <div class="drag-lane ford-lane">
-                <span class="lane-tag">FORD GT40 MK II</span>
-                <div class="drag-car-progress" id="drag-ford-bar">
-                  <div class="drag-car-dot"></div>
-                </div>
-                <span class="lane-stat" id="drag-ford-stat">0.0s &bull; 0 MPH</span>
-              </div>
-              <div class="drag-lane ferrari-lane">
-                <span class="lane-tag">FERRARI 330 P3</span>
-                <div class="drag-car-progress" id="drag-ferrari-bar">
-                  <div class="drag-car-dot"></div>
-                </div>
-                <span class="lane-stat" id="drag-ferrari-stat">0.0s &bull; 0 MPH</span>
-              </div>
             </div>
           </div>
         </div>
@@ -853,12 +773,12 @@
               <!-- Camera View Presets Deck -->
               <div class="cockpit-presets-group">
                 <span class="hud-label">PRESET VIEWS:</span>
-                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.06">FORWARD TRACK</button>
-                <button class="cockpit-preset-btn" data-yaw="0" data-pitch="-0.52">STEWART-WARNER GAUGES</button>
-                <button class="cockpit-preset-btn" data-yaw="1.65" data-pitch="0.08">REAR 427 V8</button>
-                <button class="cockpit-preset-btn" data-yaw="0.65" data-pitch="-0.48">SHIFTER & PEDALS</button>
-                <button class="cockpit-preset-btn" data-yaw="-0.42" data-pitch="-0.32">KEN MILES LAP LOG</button>
-                <button class="cockpit-preset-btn" data-yaw="-0.45" data-pitch="0.45">GURNEY BUBBLE</button>
+                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.02">FORWARD TRACK</button>
+                <button class="cockpit-preset-btn" data-yaw="0.07" data-pitch="-0.35">STEWART-WARNER GAUGES</button>
+                <button class="cockpit-preset-btn" data-yaw="1.02" data-pitch="-0.85">GATED SHIFTER</button>
+                <button class="cockpit-preset-btn" data-yaw="0.00" data-pitch="-0.75">ALUMINUM PEDALS</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.92" data-pitch="-0.46">KEN MILES LAP LOG</button>
+                <button class="cockpit-preset-btn" data-yaw="2.85" data-pitch="-0.02">REAR 427 V8</button>
               </div>
 
               <div class="cockpit-actions-group">

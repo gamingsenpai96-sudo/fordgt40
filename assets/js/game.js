@@ -922,10 +922,15 @@ export class LeMansGame {
 
   setupEvents() {
     this.isVisible = false;
+    this.isLooping = false;
     if (this.container && 'IntersectionObserver' in window) {
       this.observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
+          const wasVisible = this.isVisible;
           this.isVisible = entry.isIntersecting;
+          if (this.isVisible && !wasVisible && !this.isLooping) {
+            this.animate();
+          }
         });
       }, { threshold: 0.01, rootMargin: '150px' });
       this.observer.observe(this.container);
@@ -1352,9 +1357,12 @@ export class LeMansGame {
   // =================================================================
 
   animate() {
+    if (!this.isVisible) {
+      this.isLooping = false;
+      return;
+    }
+    this.isLooping = true;
     requestAnimationFrame(() => this.animate());
-
-    if (!this.isVisible) return;
 
     const delta = Math.min(this.clock.getDelta(), 0.1);
 

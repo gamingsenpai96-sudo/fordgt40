@@ -430,42 +430,47 @@ export class GT40ExplodedViewer {
   }
 
   setupLighting() {
-    // 1. Natural daylight overcast ambient base
-    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+    // 1. Natural daylight overcast ambient base (boosted for rich clarity)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.85);
     this.scene.add(ambient);
 
-    // 2. Realistic sky/ground hemisphere light (cool sky, dark tarmac bounce)
-    const hemiLight = new THREE.HemisphereLight(0xdbe6f2, 0x1a1d24, 0.80);
+    // 2. Realistic sky/ground hemisphere light (cool sky, warm ground bounce)
+    const hemiLight = new THREE.HemisphereLight(0xe4efff, 0x1e222b, 0.95);
     this.scene.add(hemiLight);
 
-    // 3. Primary Key Sunlight (Directional with realistic soft PCF shadows)
-    const keyLight = new THREE.DirectionalLight(0xfffaee, 1.30);
-    keyLight.position.set(5.5, 9, 4.5);
+    // 3. Primary Key Studio Light (High-intensity warm sun with crisp soft shadows)
+    const keyLight = new THREE.DirectionalLight(0xfff8ee, 2.10);
+    keyLight.position.set(5.0, 9.0, 5.0);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
     keyLight.shadow.camera.near = 0.5;
     keyLight.shadow.camera.far = 25;
-    keyLight.shadow.camera.left = -3.5;
-    keyLight.shadow.camera.right = 3.5;
-    keyLight.shadow.camera.top = 3.5;
-    keyLight.shadow.camera.bottom = -3.5;
-    keyLight.shadow.bias = -0.0002;
-    keyLight.shadow.radius = 2.5; // Soft shadow edges
+    keyLight.shadow.camera.left = -4.0;
+    keyLight.shadow.camera.right = 4.0;
+    keyLight.shadow.camera.top = 4.0;
+    keyLight.shadow.camera.bottom = -4.0;
+    keyLight.shadow.bias = -0.0001;
+    keyLight.shadow.radius = 2.0;
     this.scene.add(keyLight);
 
-    // 4. Rear/Rim Fill Light (Diffused cool paddock daylight)
-    const rimLight = new THREE.DirectionalLight(0xd4e2f2, 0.65);
-    rimLight.position.set(-6, 5, -5);
+    // 4. Frontal Nose & Cockpit Fill Light (Eliminates dark front shadows)
+    const frontFill = new THREE.DirectionalLight(0xffffff, 1.25);
+    frontFill.position.set(0, 3.5, 6.5);
+    this.scene.add(frontFill);
+
+    // 5. Rear-Left Crisp Rim / Contour Light (Carves beautiful body contours & velocity stacks)
+    const rimLight = new THREE.DirectionalLight(0xcde2ff, 1.45);
+    rimLight.position.set(-5.5, 5.5, -4.0);
     this.scene.add(rimLight);
 
-    // 5. Warm Paddock Garage Bounce
-    const fillLight = new THREE.DirectionalLight(0xffeed8, 0.45);
-    fillLight.position.set(4, 3, -4);
-    this.scene.add(fillLight);
+    // 6. Underbody Chassis Uplight (Illuminates suspension, brakes & transaxle from below)
+    const underLight = new THREE.PointLight(0xfff0dd, 1.2, 5.0);
+    underLight.position.set(0, -0.25, 0);
+    this.scene.add(underLight);
 
-    // 6. Engine Bay Inspection Warm Work Light
-    this.engineCoreLight = new THREE.PointLight(0xffaa44, 1.8, 3.2);
+    // 7. Engine Bay Inspection Warm Work Light
+    this.engineCoreLight = new THREE.PointLight(0xffaa44, 2.2, 3.5);
     this.engineCoreLight.position.set(0, 0.45, -0.45);
     this.scene.add(this.engineCoreLight);
   }
@@ -633,110 +638,177 @@ export class GT40ExplodedViewer {
   buildPitStopPaddock() {
     const texLoader = new THREE.TextureLoader();
 
-    // 1. Procedural 1966 Le Mans Pit Garage Rear Brick Wall Canvas
-    const wallCanvas = document.createElement('canvas');
-    wallCanvas.width = 1024;
-    wallCanvas.height = 512;
-    const wCtx = wallCanvas.getContext('2d');
+    // 1. Procedural Weathered 1966 Le Mans Brick Wall Texture (Tiled Realistically)
+    const brickCanvas = document.createElement('canvas');
+    brickCanvas.width = 512;
+    brickCanvas.height = 512;
+    const bCtx = brickCanvas.getContext('2d');
 
-    // Weathered red-brown brick base
-    wCtx.fillStyle = '#3a2b25';
-    wCtx.fillRect(0, 0, 1024, 512);
+    // Weathered mortar base
+    bCtx.fillStyle = '#261e1b';
+    bCtx.fillRect(0, 0, 512, 512);
 
     // Brick pattern
-    const bW = 32, bH = 14;
-    wCtx.strokeStyle = '#271c18';
-    wCtx.lineWidth = 2;
+    const bW = 64, bH = 28;
     for (let y = 0; y < 512; y += bH) {
       const offset = (Math.floor(y / bH) % 2) * (bW / 2);
-      for (let x = -bW; x < 1024 + bW; x += bW) {
-        // Subtle brick color variation
-        const shade = Math.floor(Math.sin(x * 12.3 + y * 4.5) * 12);
-        wCtx.fillStyle = `rgb(${58 + shade}, ${43 + shade / 2}, ${37 + shade / 3})`;
-        wCtx.fillRect(x + offset, y, bW - 2, bH - 2);
+      for (let x = -bW; x < 512 + bW; x += bW) {
+        const shade = Math.floor(Math.sin(x * 17.3 + y * 9.1) * 16);
+        bCtx.fillStyle = `rgb(${72 + shade}, ${46 + Math.floor(shade / 2)}, ${38 + Math.floor(shade / 3)})`;
+        bCtx.fillRect(x + offset + 2, y + 2, bW - 4, bH - 4);
       }
     }
 
-    // Weathering stains and damp concrete header
-    wCtx.fillStyle = '#4a4e58';
-    wCtx.fillRect(0, 0, 1024, 60);
+    const brickTex = new THREE.CanvasTexture(brickCanvas);
+    brickTex.colorSpace = THREE.SRGBColorSpace;
+    brickTex.wrapS = THREE.RepeatWrapping;
+    brickTex.wrapT = THREE.RepeatWrapping;
+    brickTex.repeat.set(6, 3); // Realistic brick scale across the 16m x 6.5m wall
 
-    // Stencil Header on Wall
-    wCtx.fillStyle = '#f1f5f9';
-    wCtx.font = 'bold 36px Oswald, sans-serif';
-    wCtx.textAlign = 'center';
-    wCtx.fillText('SHELBY AMERICAN INC.  //  FORD RACING DIVISION', 512, 110);
-
-    wCtx.fillStyle = '#d4af37';
-    wCtx.font = 'bold 24px Oswald, sans-serif';
-    wCtx.fillText('24 HEURES DU MANS 1966  •  OFFICIAL PADDOCK PIT STALL #02', 512, 145);
-
-    // Hand-painted vintage sponsor signs
-    // Champion Spark Plugs
-    wCtx.fillStyle = '#dc2626';
-    wCtx.fillRect(120, 200, 210, 85);
-    wCtx.strokeStyle = '#ffffff';
-    wCtx.lineWidth = 4;
-    wCtx.strokeRect(124, 204, 202, 77);
-    wCtx.fillStyle = '#ffffff';
-    wCtx.font = '900 28px Oswald, sans-serif';
-    wCtx.fillText('CHAMPION', 225, 245);
-    wCtx.font = '14px Space Mono, monospace';
-    wCtx.fillText('SPARK PLUGS', 225, 268);
-
-    // Castrol Motor Oil
-    wCtx.fillStyle = '#15803d';
-    wCtx.beginPath();
-    wCtx.arc(512, 245, 50, 0, Math.PI * 2);
-    wCtx.fill();
-    wCtx.fillStyle = '#ffffff';
-    wCtx.fillRect(452, 235, 120, 22);
-    wCtx.fillStyle = '#dc2626';
-    wCtx.font = 'bold 20px Oswald, sans-serif';
-    wCtx.fillText('CASTROL', 512, 252);
-
-    // Ferodo Brake Linings
-    wCtx.fillStyle = '#991b1b';
-    wCtx.fillRect(700, 200, 210, 85);
-    wCtx.strokeStyle = '#ffffff';
-    wCtx.lineWidth = 4;
-    wCtx.strokeRect(704, 204, 202, 77);
-    wCtx.fillStyle = '#ffffff';
-    wCtx.font = '900 28px Oswald, sans-serif';
-    wCtx.fillText('FERODO', 805, 245);
-    wCtx.font = '14px Space Mono, monospace';
-    wCtx.fillText('BRAKE LININGS', 805, 268);
-
-    // Chalkboard Pit Timing Board on the wall
-    wCtx.fillStyle = '#111827';
-    wCtx.fillRect(160, 320, 704, 150);
-    wCtx.strokeStyle = '#854d0e';
-    wCtx.lineWidth = 6;
-    wCtx.strokeRect(160, 320, 704, 150);
-
-    wCtx.fillStyle = '#fef08a';
-    wCtx.font = 'bold 22px Space Mono, monospace';
-    wCtx.textAlign = 'left';
-    wCtx.fillText('CIRCUIT DE LA SARTHE // 18-19 JUIN 1966', 185, 355);
-    wCtx.fillStyle = '#ffffff';
-    wCtx.font = '18px Space Mono, monospace';
-    wCtx.fillText('CAR #02 : B. McLAREN / C. AMON  [CHASSIS P/1046]', 185, 390);
-    wCtx.fillText('TARGET LAP : 3:30.0   |   MULSANNE TRAP : 212 MPH (341 KM/H)', 185, 420);
-    wCtx.fillStyle = '#4ade80';
-    wCtx.fillText('STATUS: P1 LEADER // TRANSMISSION: T-44 OK // TIRES: GOODYEAR OK', 185, 450);
-
-    const wallTex = new THREE.CanvasTexture(wallCanvas);
-    wallTex.colorSpace = THREE.SRGBColorSpace;
     const wallMat = new THREE.MeshStandardMaterial({
-      map: wallTex,
-      roughness: 0.88,
-      metalness: 0.12
+      map: brickTex,
+      roughness: 0.92,
+      metalness: 0.08
     });
 
     const rearWall = new THREE.Mesh(new THREE.BoxGeometry(16.0, 6.5, 0.4), wallMat);
     rearWall.position.set(0, 2.875, -4.3);
     rearWall.receiveShadow = true;
     this.pitStopGroup.add(rearWall);
+
+    // 2. Beautifully Scaled Wall-Mounted Shelby American Workshop Sign Plaque
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 2048;
+    signCanvas.height = 512;
+    const sCtx = signCanvas.getContext('2d');
+
+    // Dark heritage navy enamel background with gold border
+    sCtx.fillStyle = '#0a101d';
+    sCtx.fillRect(0, 0, 2048, 512);
+    sCtx.strokeStyle = '#d4af37';
+    sCtx.lineWidth = 14;
+    sCtx.strokeRect(16, 16, 2016, 480);
+    sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    sCtx.lineWidth = 4;
+    sCtx.strokeRect(34, 34, 1980, 444);
+
+    // Typography
+    sCtx.fillStyle = '#ffffff';
+    sCtx.font = '900 84px Oswald, sans-serif';
+    sCtx.textAlign = 'center';
+    sCtx.letterSpacing = '6px';
+    sCtx.fillText('SHELBY AMERICAN INC.  //  FORD RACING DIVISION', 1024, 210);
+
+    sCtx.fillStyle = '#d4af37';
+    sCtx.font = '700 48px Oswald, sans-serif';
+    sCtx.letterSpacing = '4px';
+    sCtx.fillText('24 HEURES DU MANS 1966  •  OFFICIAL PADDOCK PIT STALL #02', 1024, 330);
+
+    const signTex = new THREE.CanvasTexture(signCanvas);
+    signTex.colorSpace = THREE.SRGBColorSpace;
+    const signMat = new THREE.MeshStandardMaterial({
+      map: signTex,
+      roughness: 0.35,
+      metalness: 0.65
+    });
+
+    const shelbySign = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 1.1), signMat);
+    shelbySign.position.set(0, 3.65, -4.08);
+    this.pitStopGroup.add(shelbySign);
+
+    // 3. Vintage Sponsor Enamel Signs (Champion & Ferodo)
+    // Champion Spark Plugs
+    const champCanvas = document.createElement('canvas');
+    champCanvas.width = 512;
+    champCanvas.height = 256;
+    const cCtx = champCanvas.getContext('2d');
+    cCtx.fillStyle = '#dc2626';
+    cCtx.fillRect(0, 0, 512, 256);
+    cCtx.strokeStyle = '#ffffff';
+    cCtx.lineWidth = 10;
+    cCtx.strokeRect(12, 12, 488, 232);
+    cCtx.fillStyle = '#ffffff';
+    cCtx.font = '900 68px Oswald, sans-serif';
+    cCtx.textAlign = 'center';
+    cCtx.fillText('CHAMPION', 256, 120);
+    cCtx.font = '700 32px Space Mono, monospace';
+    cCtx.fillText('SPARK PLUGS', 256, 185);
+
+    const champTex = new THREE.CanvasTexture(champCanvas);
+    champTex.colorSpace = THREE.SRGBColorSpace;
+    const champMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.2, 0.6),
+      new THREE.MeshStandardMaterial({ map: champTex, roughness: 0.4, metalness: 0.5 })
+    );
+    champMesh.position.set(-3.2, 2.3, -4.08);
+    this.pitStopGroup.add(champMesh);
+
+    // Ferodo Brake Linings
+    const ferodoCanvas = document.createElement('canvas');
+    ferodoCanvas.width = 512;
+    ferodoCanvas.height = 256;
+    const fCtx = ferodoCanvas.getContext('2d');
+    fCtx.fillStyle = '#991b1b';
+    fCtx.fillRect(0, 0, 512, 256);
+    fCtx.strokeStyle = '#ffffff';
+    fCtx.lineWidth = 10;
+    fCtx.strokeRect(12, 12, 488, 232);
+    fCtx.fillStyle = '#ffffff';
+    fCtx.font = '900 68px Oswald, sans-serif';
+    fCtx.textAlign = 'center';
+    fCtx.fillText('FERODO', 256, 120);
+    fCtx.font = '700 28px Space Mono, monospace';
+    fCtx.fillText('BRAKE LININGS', 256, 185);
+
+    const ferodoTex = new THREE.CanvasTexture(ferodoCanvas);
+    ferodoTex.colorSpace = THREE.SRGBColorSpace;
+    const ferodoMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.2, 0.6),
+      new THREE.MeshStandardMaterial({ map: ferodoTex, roughness: 0.4, metalness: 0.5 })
+    );
+    ferodoMesh.position.set(3.2, 2.3, -4.08);
+    this.pitStopGroup.add(ferodoMesh);
+
+    // 4. Authentic Wall-Mounted Pit Timing Chalkboard
+    const boardCanvas = document.createElement('canvas');
+    boardCanvas.width = 1024;
+    boardCanvas.height = 512;
+    const kCtx = boardCanvas.getContext('2d');
+
+    // Slate blackboard with oak wood frame
+    kCtx.fillStyle = '#111827';
+    kCtx.fillRect(0, 0, 1024, 512);
+    kCtx.strokeStyle = '#78350f';
+    kCtx.lineWidth = 16;
+    kCtx.strokeRect(8, 8, 1008, 496);
+
+    // Chalkboard telemetry
+    kCtx.fillStyle = '#fef08a';
+    kCtx.font = 'bold 36px Space Mono, monospace';
+    kCtx.textAlign = 'left';
+    kCtx.fillText('CIRCUIT DE LA SARTHE  //  18-19 JUIN 1966', 45, 80);
+
+    kCtx.fillStyle = '#e2e8f0';
+    kCtx.font = '30px Space Mono, monospace';
+    kCtx.fillText('CAR #02 : B. McLAREN / C. AMON  [CHASSIS P/1046]', 45, 160);
+    kCtx.fillText('TARGET LAP : 3:30.0   |   TRAP SPEED : 212 MPH (341 KM/H)', 45, 235);
+    kCtx.fillText('ENGINE: 427 FE V8    |   TRANSMISSION: T-44 TRANSAXLE', 45, 310);
+
+    kCtx.fillStyle = '#4ade80';
+    kCtx.font = 'bold 32px Space Mono, monospace';
+    kCtx.fillText('STATUS: P1 LEADER    |   TIRES: GOODYEAR BLUE STREAK OK', 45, 410);
+
+    const boardTex = new THREE.CanvasTexture(boardCanvas);
+    boardTex.colorSpace = THREE.SRGBColorSpace;
+    const boardMat = new THREE.MeshStandardMaterial({
+      map: boardTex,
+      roughness: 0.95,
+      metalness: 0.05
+    });
+
+    const chalkBoard = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.3), boardMat);
+    chalkBoard.position.set(0, 2.1, -4.08);
+    this.pitStopGroup.add(chalkBoard);
 
     // 2. Industrial Steel Overhead Trusses & Ceiling Beams ($Y = 3.8m$)
     const steelMat = new THREE.MeshStandardMaterial({ color: 0x222630, roughness: 0.65, metalness: 0.75 });
@@ -1100,10 +1172,10 @@ export class GT40ExplodedViewer {
     });
 
     if (mode === 'podium') {
-      this.renderer.toneMappingExposure = 1.25;
-      if (this.podiumLight) this.podiumLight.intensity = 2.2;
+      this.renderer.toneMappingExposure = 1.35;
+      if (this.podiumLight) this.podiumLight.intensity = 2.4;
     } else {
-      this.renderer.toneMappingExposure = 1.05;
+      this.renderer.toneMappingExposure = 1.22;
       if (this.podiumLight) this.podiumLight.intensity = 0.0;
     }
   }
@@ -2954,13 +3026,15 @@ export class GT40ExplodedViewer {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const wasVisible = this.isVisible;
           this.isVisible = entry.isIntersecting;
-          if (this.isVisible) {
+          if (this.isVisible && !wasVisible) {
             this.onResize();
+            this.render();
           }
         });
       },
-      { threshold: 0.01, rootMargin: '200px' }
+      { threshold: 0.01, rootMargin: '100px' }
     );
 
     if (this.container) {
@@ -2969,9 +3043,8 @@ export class GT40ExplodedViewer {
   }
 
   render() {
-    requestAnimationFrame(() => this.render());
-
     if (!this.isInitialized || !this.isVisible) return;
+    requestAnimationFrame(() => this.render());
 
     if (Math.abs(this.explodeFactor - this.targetExplodeFactor) > 0.001) {
       const nextFactor = THREE.MathUtils.lerp(this.explodeFactor, this.targetExplodeFactor, 0.08);
