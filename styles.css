@@ -3240,7 +3240,7 @@ img[src*="ferrari-p3-beauty"] {
 .cockpit-stage {
   position: relative;
   width: 100%;
-  height: 680px;
+  height: 740px;
   border-radius: 16px;
   overflow: hidden;
   background: #06080d;
@@ -3276,14 +3276,14 @@ img[src*="ferrari-p3-beauty"] {
 /* Drag to Look Around Prompt */
 .cockpit-drag-hint {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 22px;
+  padding: 10px 20px;
   background: rgba(10, 14, 22, 0.85);
   border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: 999px;
@@ -3291,20 +3291,20 @@ img[src*="ferrari-p3-beauty"] {
   -webkit-backdrop-filter: blur(12px);
   color: #fff;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   pointer-events: none;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.15);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
   animation: cockpitPulseHint 2.4s infinite ease-in-out;
 }
 
 .cockpit-drag-hint.hidden,
 .cockpit-drag-hint.faded {
-  opacity: 0;
-  transform: translate(-50%, -40%);
-  pointer-events: none;
+  opacity: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 @keyframes cockpitPulseHint {
@@ -4678,34 +4678,35 @@ model-viewer#gt40-ar-viewer {
   text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
-/* Cockpit Quick HUD Flex Adjustments */
+/* Cockpit Quick HUD Flex Adjustments - Slim Single-Row Floating Dock */
 .cockpit-quick-hud {
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   left: 20px;
   right: 20px;
   z-index: 10;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 16px;
   pointer-events: none;
 }
 
 .cockpit-actions-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
-  background: rgba(10, 14, 22, 0.88);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 12px;
-  padding: 8px 14px;
+  background: rgba(10, 14, 22, 0.82);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+  padding: 6px 12px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
   pointer-events: auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .cockpit-action-btn {

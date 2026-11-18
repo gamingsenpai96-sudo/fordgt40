@@ -786,12 +786,12 @@
               <div class="cockpit-presets-group">
                 <span class="hud-label">PRESET VIEWS:</span>
                 <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.02" data-preset="FORWARD TRACK">FORWARD TRACK</button>
-                <button class="cockpit-preset-btn" data-yaw="0.02" data-pitch="-0.28" data-preset="STEWART-WARNER GAUGES">GAUGES CLUSTER</button>
-                <button class="cockpit-preset-btn" data-yaw="1.05" data-pitch="-0.78" data-preset="GATED SHIFTER & SILL">SILL SHIFTER & HATCH</button>
-                <button class="cockpit-preset-btn" data-yaw="0.00" data-pitch="-0.82" data-preset="ALUMINUM PEDALS">PEDAL BOX</button>
-                <button class="cockpit-preset-btn" data-yaw="-0.52" data-pitch="-0.65" data-preset="CENTER AIR TUNNEL">CENTER AIR TUNNEL</button>
-                <button class="cockpit-preset-btn" data-yaw="-0.88" data-pitch="-0.34" data-preset="PASSENGER & BREAKERS">CIRCUIT BREAKERS</button>
-                <button class="cockpit-preset-btn" data-yaw="3.08" data-pitch="-0.05" data-preset="REAR 427 V8">REAR 427 V8</button>
+                <button class="cockpit-preset-btn" data-yaw="0" data-pitch="-0.42" data-preset="STEWART-WARNER GAUGES">GAUGES CLUSTER</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.92" data-pitch="-0.85" data-preset="GATED SHIFTER & SILL">SILL SHIFTER & HATCH</button>
+                <button class="cockpit-preset-btn" data-yaw="0.00" data-pitch="-0.75" data-preset="ALUMINUM PEDALS">PEDAL BOX</button>
+                <button class="cockpit-preset-btn" data-yaw="1.15" data-pitch="-0.85" data-preset="CENTER AIR TUNNEL">CENTER AIR TUNNEL</button>
+                <button class="cockpit-preset-btn" data-yaw="1.45" data-pitch="-0.45" data-preset="PASSENGER & BREAKERS">CIRCUIT BREAKERS</button>
+                <button class="cockpit-preset-btn" data-yaw="3.14" data-pitch="-0.05" data-preset="REAR 427 V8">REAR 427 V8</button>
               </div>
 
               <div class="cockpit-actions-group">
@@ -861,10 +861,12 @@
                 <model-viewer
                   id="gt40-ar-viewer"
                   src="assets/models/car/source/gt40.glb"
+                  ios-src="assets/models/car/source/gt40.usdz"
                   alt="1966 Ford GT40 Mk II 3D / AR Model - Chassis P/1046"
                   ar
+                  ar-placement="floor"
+                  ar-scale="fixed"
                   ar-modes="webxr scene-viewer quick-look"
-                  ar-scale="auto"
                   camera-controls
                   auto-rotate
                   rotation-per-second="18deg"

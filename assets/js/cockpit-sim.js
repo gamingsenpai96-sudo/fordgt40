@@ -44,8 +44,8 @@ export class GT40CockpitSimulator {
     this.telemetryStatus = document.getElementById('cockpit-engine-status');
 
     // Stationary driver eye position inside Ford GT40 Mk II (Right-Hand Drive)
-    // Chassis P/1046: X = 0.28m (RHD driver seat center), Y = 0.52m (realistic adult eye level), Z = 0.06m (driver head)
-    this.eyePosition = new THREE.Vector3(0.28, 0.52, 0.06);
+    // Chassis P/1046: X = -0.28m (RHD driver seat center), Y = 0.52m (realistic adult eye level), Z = 0.06m (driver head)
+    this.eyePosition = new THREE.Vector3(-0.28, 0.52, 0.06);
     this.lookTarget = new THREE.Vector3();
 
     // Look-around rotation angles (radians)
@@ -793,7 +793,8 @@ export class GT40CockpitSimulator {
       if (name.includes('body')) {
         child.material = bodyMat;
       } else if (name.includes('interior')) {
-        child.material = interiorMat;
+        // Hide stock low-poly interior so our authentic 1966 GT40 RHD cockpit is cleanly showcased
+        child.visible = false;
       } else if (name.includes('glass')) {
         child.material = glassMat;
       } else if (name.includes('engine')) {
@@ -912,12 +913,12 @@ export class GT40CockpitSimulator {
     // Flat wide top sill tub plate
     const sillPlateGeo = new THREE.BoxGeometry(0.20, 0.02, 0.90);
     const sillPlate = new THREE.Mesh(sillPlateGeo, tubBlackMat);
-    sillPlate.position.set(0.56, -0.11, 0.12);
+    sillPlate.position.set(-0.56, -0.11, 0.22);
     sillGroup.add(sillPlate);
 
     // 2A. Raised Stamped Aluminum Shifter Pedestal Bracket
     const pedestalGroup = new THREE.Group();
-    pedestalGroup.position.set(0.52, -0.01, 0.22);
+    pedestalGroup.position.set(-0.52, 0.03, 0.14);
 
     // Elevated horizontal mounting plate
     const pedPlate = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.008, 0.13), brushedAlumMat);
@@ -994,17 +995,17 @@ export class GT40CockpitSimulator {
     const linkageRodGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.52, 16);
     const linkageRod = new THREE.Mesh(linkageRodGeo, brushedAlumMat);
     linkageRod.rotation.x = Math.PI / 2;
-    linkageRod.position.set(0.52, -0.06, -0.06);
+    linkageRod.position.set(-0.52, -0.06, -0.06);
     sillGroup.add(linkageRod);
 
     // Linkage guide support pillow block
     const pillowBlock = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.035, 0.024), darkAlumMat);
-    pillowBlock.position.set(0.52, -0.07, -0.16);
+    pillowBlock.position.set(-0.52, -0.07, -0.16);
     sillGroup.add(pillowBlock);
 
     // 2B. Stamped Aluminum Horizontal Oval Inspection Plate with Hex Perimeter Bolts
     const hatchGroup = new THREE.Group();
-    hatchGroup.position.set(0.55, -0.098, 0.01);
+    hatchGroup.position.set(-0.55, -0.095, 0.22);
 
     // Oval plate: cylinder scaled non-uniformly in Z
     const ovalGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.006, 32);
@@ -1031,7 +1032,7 @@ export class GT40CockpitSimulator {
     // 3-spoke design with drilled holes and "FORD G.T." circular medallion
     // ----------------------------------------------------
     const wheelGroup = new THREE.Group();
-    wheelGroup.position.set(0.28, 0.25, 0.44);
+    wheelGroup.position.set(-0.28, 0.25, 0.44);
     wheelGroup.rotation.x = -0.32;
 
     // Steering Column
@@ -1117,9 +1118,15 @@ export class GT40CockpitSimulator {
     emblemTex.colorSpace = THREE.SRGBColorSpace;
     const emblemMesh = new THREE.Mesh(
       new THREE.CircleGeometry(0.042, 32),
-      new THREE.MeshStandardMaterial({ map: emblemTex, roughness: 0.25, metalness: 0.45 })
+      new THREE.MeshStandardMaterial({
+        map: emblemTex,
+        roughness: 0.25,
+        metalness: 0.45,
+        side: THREE.DoubleSide
+      })
     );
-    emblemMesh.position.z = 0.014;
+    emblemMesh.rotation.y = Math.PI;
+    emblemMesh.position.z = -0.018;
     wheelGroup.add(emblemMesh);
 
     // 4 hub allen screws
@@ -1166,9 +1173,10 @@ export class GT40CockpitSimulator {
     const dashGroup = new THREE.Group();
     dashGroup.position.set(0, 0.28, 0.62);
 
-    // Main curved cowl with anti-glare flocked finish
-    const cowlGeo = new THREE.BoxGeometry(1.24, 0.18, 0.24);
+    // Main curved cowl with anti-glare flocked finish (upper visor shelf)
+    const cowlGeo = new THREE.BoxGeometry(1.24, 0.035, 0.22);
     const dashCowl = new THREE.Mesh(cowlGeo, flockedDashMat);
+    dashCowl.position.set(0, 0.14, -0.04);
     dashCowl.rotation.x = 0.18;
     dashGroup.add(dashCowl);
 
@@ -1177,16 +1185,16 @@ export class GT40CockpitSimulator {
     [-0.34, 0.34].forEach((lx) => {
       for (let l = 0; l < 4; l++) {
         const louver = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.005, 0.015), louverMat);
-        louver.position.set(lx, 0.082, 0.04 + (l * 0.025));
+        louver.position.set(lx, 0.142, 0.04 + (l * 0.025));
         louver.rotation.x = 0.18;
         dashGroup.add(louver);
       }
     });
 
     // Stamped aluminum driver instrument plate directly behind steering wheel
-    const alumPlateGeo = new THREE.BoxGeometry(0.56, 0.14, 0.015);
+    const alumPlateGeo = new THREE.BoxGeometry(0.56, 0.18, 0.015);
     const alumPlate = new THREE.Mesh(alumPlateGeo, darkAlumMat);
-    alumPlate.position.set(0.28, 0.01, 0.10);
+    alumPlate.position.set(-0.28, 0.05, 0.06);
     alumPlate.rotation.x = 0.18;
     dashGroup.add(alumPlate);
 
@@ -1199,12 +1207,12 @@ export class GT40CockpitSimulator {
     });
     this.shiftLight = new THREE.Mesh(shiftLightGeo, this.shiftLightMat);
     this.shiftLight.rotation.x = 0.18;
-    this.shiftLight.position.set(0.28, 0.09, 0.09);
+    this.shiftLight.position.set(-0.28, 0.09, 0.09);
     dashGroup.add(this.shiftLight);
 
     // Red Emergency Pull Knob (to left of steering column)
     const pullKnobGroup = new THREE.Group();
-    pullKnobGroup.position.set(0.12, -0.075, 0.12);
+    pullKnobGroup.position.set(-0.14, -0.075, 0.12);
     pullKnobGroup.rotation.x = 0.18;
 
     const pullBezel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.006, 24), chromeMat);
@@ -1252,7 +1260,7 @@ export class GT40CockpitSimulator {
       new THREE.PlaneGeometry(0.24, 0.06),
       new THREE.MeshStandardMaterial({ map: plaqueTex, roughness: 0.4, metalness: 0.7 })
     );
-    plaqueMesh.position.set(-0.25, 0.02, 0.105);
+    plaqueMesh.position.set(0.25, 0.02, 0.105);
     plaqueMesh.rotation.x = 0.18;
     dashGroup.add(plaqueMesh);
 
@@ -1261,7 +1269,7 @@ export class GT40CockpitSimulator {
     // ----------------------------------------------------
     // 1. Large Circular Master Battery Disconnect Switch
     const masterSwGroup = new THREE.Group();
-    masterSwGroup.position.set(-0.36, 0.02, 0.105);
+    masterSwGroup.position.set(0.36, 0.02, 0.105);
     masterSwGroup.rotation.x = 0.18;
 
     const masterCanvas = document.createElement('canvas');
@@ -1305,7 +1313,7 @@ export class GT40CockpitSimulator {
 
     // 2. Two-Tier Matrix of Push-Button Circuit Breakers
     const cbPanelGroup = new THREE.Group();
-    cbPanelGroup.position.set(-0.48, -0.045, 0.105);
+    cbPanelGroup.position.set(0.48, -0.045, 0.105);
     cbPanelGroup.rotation.x = 0.18;
 
     // Outer silver frame
@@ -1425,7 +1433,7 @@ export class GT40CockpitSimulator {
       const dialTex = new THREE.CanvasTexture(c);
       dialTex.colorSpace = THREE.SRGBColorSpace;
 
-      const depth = 0.035;
+      const depth = 0.025;
       const bezelGeo = new THREE.CylinderGeometry(size, size * 1.04, depth, 32);
       const bezelMesh = new THREE.Mesh(bezelGeo, chromeMat);
       bezelMesh.rotation.x = Math.PI / 2;
@@ -1435,18 +1443,21 @@ export class GT40CockpitSimulator {
       const faceMat = new THREE.MeshStandardMaterial({
         map: dialTex,
         roughness: 0.65,
-        emissive: new THREE.Color(0x222630),
-        emissiveIntensity: 0.35
+        emissive: new THREE.Color(0x333845),
+        emissiveIntensity: 0.5,
+        side: THREE.DoubleSide
       });
       const faceMesh = new THREE.Mesh(faceGeo, faceMat);
-      faceMesh.position.z = depth * 0.48;
+      faceMesh.position.z = -depth * 0.45;
+      faceMesh.rotation.y = Math.PI;
       gGroup.add(faceMesh);
 
       // 3D Needle
       const needleT = Math.min(1, Math.max(0, (needleVal - min) / (max - min)));
       const needleAngle = startAngle + needleT * sweep;
       const needleGroup = new THREE.Group();
-      needleGroup.position.z = depth * 0.52;
+      needleGroup.position.z = -depth * 0.48;
+      needleGroup.rotation.y = Math.PI;
 
       const needleBlade = new THREE.Mesh(
         new THREE.BoxGeometry(size * 0.82, 0.003, 0.0015),
@@ -1466,7 +1477,8 @@ export class GT40CockpitSimulator {
       gGroup.add(needleGroup);
 
       const glassMesh = new THREE.Mesh(new THREE.CircleGeometry(size * 0.96, 32), gaugeGlassMat);
-      glassMesh.position.z = depth * 0.54;
+      glassMesh.position.z = -depth * 0.52;
+      glassMesh.rotation.y = Math.PI;
       gGroup.add(glassMesh);
 
       // Save needle reference and metadata for dynamic physics animation
@@ -1485,37 +1497,37 @@ export class GT40CockpitSimulator {
 
     // 1. Tachometer (Large Central Dial directly behind wheel - 0-8000 RPM, redline 6200)
     const tach = createGauge('tach', 'RPM', 'x1000', 0, 8000, 6200, 0, 0.055);
-    tach.position.set(0.28, 0.02, 0.12);
+    tach.position.set(-0.28, 0.06, 0.03);
     tach.rotation.x = 0.18;
     dashGroup.add(tach);
 
-    // 2. Speedometer (Right of Tachometer - 0-220 MPH)
-    const speedo = createGauge('speedo', 'SPEED', 'MPH', 0, 220, null, 0, 0.048);
-    speedo.position.set(0.40, 0.02, 0.12);
+    // 2. Speedometer (Left of Tachometer towards center dash - 0-220 MPH)
+    const speedo = createGauge('speedo', 'SPEED', 'MPH', 0, 220, null, 0, 0.046);
+    speedo.position.set(-0.06, 0.06, 0.03);
     speedo.rotation.x = 0.18;
     dashGroup.add(speedo);
 
-    // 3. Oil Pressure (Left of Tachometer - 0-100 PSI)
+    // 3. Oil Pressure (Left Inner - 0-100 PSI)
     const oilPress = createGauge('oilp', 'OIL P', 'PSI', 0, 100, 20, 0, 0.033);
-    oilPress.position.set(0.06, 0.02, 0.12);
+    oilPress.position.set(-0.15, 0.06, 0.03);
     oilPress.rotation.x = 0.18;
     dashGroup.add(oilPress);
 
-    // 4. Water Temp (Left Upper - 100-240 °F)
+    // 4. Water Temp (Left Mid - 100-240 °F)
     const waterTemp = createGauge('watert', 'WATER', '°F', 100, 240, 220, 110, 0.032);
-    waterTemp.position.set(0.16, 0.03, 0.12);
+    waterTemp.position.set(-0.21, 0.06, 0.03);
     waterTemp.rotation.x = 0.18;
     dashGroup.add(waterTemp);
 
-    // 5. Oil Temp (Left Lower - 100-300 °F)
+    // 5. Oil Temp (Right Inner - 100-300 °F)
     const oilTemp = createGauge('oilt', 'OIL T', '°F', 100, 300, 260, 120, 0.030);
-    oilTemp.position.set(0.16, -0.04, 0.12);
+    oilTemp.position.set(-0.35, 0.06, 0.03);
     oilTemp.rotation.x = 0.18;
     dashGroup.add(oilTemp);
 
     // 6. Fuel Gauge (Right Outer - 0-100%)
     const fuelG = createGauge('fuel', 'FUEL', '%', 0, 100, 15, 85, 0.030);
-    fuelG.position.set(0.50, 0.02, 0.12);
+    fuelG.position.set(-0.42, 0.06, 0.03);
     fuelG.rotation.x = 0.18;
     dashGroup.add(fuelG);
 
@@ -1523,7 +1535,7 @@ export class GT40CockpitSimulator {
     // 6. INTERACTIVE AVIATION TOGGLE SWITCHES & STARTER
     // ----------------------------------------------------
     const switchRow = new THREE.Group();
-    switchRow.position.set(0.28, -0.065, 0.12);
+    switchRow.position.set(-0.28, -0.045, 0.035);
     switchRow.rotation.x = 0.18;
 
     this.toggleMeshes = [];
@@ -1568,7 +1580,7 @@ export class GT40CockpitSimulator {
     );
     this.starterBtnMesh.name = 'starter_button';
     this.starterBtnMesh.rotation.x = 0.18;
-    this.starterBtnMesh.position.set(0.03, -0.06, 0.12);
+    this.starterBtnMesh.position.set(-0.06, -0.045, 0.035);
     this.interactiveObjects.push(this.starterBtnMesh);
     dashGroup.add(this.starterBtnMesh);
 
@@ -1577,7 +1589,7 @@ export class GT40CockpitSimulator {
       chromeMat
     );
     startBezel.rotation.x = 0.18;
-    startBezel.position.set(0.03, -0.06, 0.115);
+    startBezel.position.set(-0.06, -0.045, 0.035);
     dashGroup.add(startBezel);
 
     cockpitGroup.add(dashGroup);
@@ -1670,8 +1682,8 @@ export class GT40CockpitSimulator {
       return sGroup;
     };
 
-    cockpitGroup.add(createGT40Seat(0.28, true));   // Driver Seat (Right)
-    cockpitGroup.add(createGT40Seat(-0.28, false)); // Passenger Seat (Left)
+    cockpitGroup.add(createGT40Seat(-0.28, true));  // Driver Seat (Right Side of Car)
+    cockpitGroup.add(createGT40Seat(0.28, false));  // Passenger Seat (Left Side of Car)
 
     // ----------------------------------------------------
     // 8. WINDSCREEN SCRUTINEERING DECALS & MIRROR
@@ -1705,7 +1717,7 @@ export class GT40CockpitSimulator {
       new THREE.PlaneGeometry(0.12, 0.075),
       new THREE.MeshBasicMaterial({ map: decal1Tex, transparent: true, opacity: 0.92, side: THREE.DoubleSide })
     );
-    decal1Mesh.position.set(-0.12, 0.62, 0.64);
+    decal1Mesh.position.set(-0.15, 0.62, 0.64);
     decal1Mesh.rotation.x = -0.42;
     cockpitGroup.add(decal1Mesh);
 
@@ -1738,18 +1750,18 @@ export class GT40CockpitSimulator {
       new THREE.PlaneGeometry(0.085, 0.085),
       new THREE.MeshBasicMaterial({ map: decal2Tex, transparent: true, opacity: 0.92, side: THREE.DoubleSide })
     );
-    decal2Mesh.position.set(-0.10, 0.53, 0.61);
+    decal2Mesh.position.set(-0.13, 0.53, 0.61);
     decal2Mesh.rotation.x = -0.42;
     cockpitGroup.add(decal2Mesh);
 
     // Windshield Mirror
     const mirrorStem = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.08, 12), chromeMat);
-    mirrorStem.position.set(-0.28, 0.60, 0.58);
+    mirrorStem.position.set(0.12, 0.60, 0.58);
     mirrorStem.rotation.x = 0.35;
     cockpitGroup.add(mirrorStem);
 
     const mirrorBody = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.045, 0.02), chromeMat);
-    mirrorBody.position.set(-0.28, 0.62, 0.56);
+    mirrorBody.position.set(0.12, 0.62, 0.56);
     mirrorBody.rotation.y = 0.18;
     cockpitGroup.add(mirrorBody);
 
@@ -1757,7 +1769,7 @@ export class GT40CockpitSimulator {
       new THREE.PlaneGeometry(0.11, 0.038),
       new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.98, roughness: 0.02 })
     );
-    mirrorGlass.position.set(-0.28, 0.62, 0.55);
+    mirrorGlass.position.set(0.12, 0.62, 0.55);
     mirrorGlass.rotation.y = 0.18;
     cockpitGroup.add(mirrorGlass);
 
@@ -1765,7 +1777,7 @@ export class GT40CockpitSimulator {
     // 9. DRILLED ALUMINUM ENDURANCE PEDALS
     // ----------------------------------------------------
     const pedalGroup = new THREE.Group();
-    pedalGroup.position.set(0.28, -0.16, 0.82);
+    pedalGroup.position.set(-0.28, -0.16, 0.82);
 
     const makePedal = (xOffset, width, height, name) => {
       const p = new THREE.Group();
@@ -1786,9 +1798,9 @@ export class GT40CockpitSimulator {
       return p;
     };
 
-    this.pedalClutch = makePedal(-0.065, 0.038, 0.065, 'pedal_clutch');
+    this.pedalClutch = makePedal(0.065, 0.038, 0.065, 'pedal_clutch');
     this.pedalBrake = makePedal(0.000, 0.042, 0.070, 'pedal_brake');
-    this.pedalThrottle = makePedal(0.075, 0.032, 0.110, 'pedal_throttle');
+    this.pedalThrottle = makePedal(-0.075, 0.032, 0.110, 'pedal_throttle');
 
     pedalGroup.add(this.pedalClutch);
     pedalGroup.add(this.pedalBrake);
@@ -1827,7 +1839,7 @@ export class GT40CockpitSimulator {
       new THREE.PlaneGeometry(0.26, 0.32),
       new THREE.MeshStandardMaterial({ map: clipTex, roughness: 0.7 })
     );
-    clipboard.position.set(-0.28, 0.02, 0.32);
+    clipboard.position.set(0.28, 0.02, 0.32);
     clipboard.rotation.x = -0.42;
     clipboard.rotation.y = 0.22;
     cockpitGroup.add(clipboard);
@@ -1845,7 +1857,7 @@ export class GT40CockpitSimulator {
 
     this.ventScoopR = new THREE.Group();
     this.ventScoopR.name = 'vent_scoop_rhd';
-    this.ventScoopR.position.set(0.60, 0.36, 0.18);
+    this.ventScoopR.position.set(-0.60, 0.36, 0.18);
     const ventOuter = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 12, 24), chromeMat);
     this.ventScoopR.add(ventOuter);
     const scoopFlap = new THREE.Mesh(new THREE.CircleGeometry(0.042, 16), ventMat);
@@ -1895,7 +1907,7 @@ export class GT40CockpitSimulator {
 
     // Right door sill longitudinal roll cage tube
     const sillTube = new THREE.Mesh(new THREE.CylinderGeometry(tubeR, tubeR, 0.85, 16), cageMat);
-    sillTube.position.set(0.56, -0.06, 0.15);
+    sillTube.position.set(-0.56, -0.06, 0.15);
     sillTube.rotation.x = Math.PI / 2;
     rollCageGroup.add(sillTube);
 
@@ -2218,8 +2230,9 @@ export class GT40CockpitSimulator {
     this.targetYaw = Math.max(this.yawMin, Math.min(this.yawMax, yaw));
     this.targetPitch = Math.max(this.pitchMin, Math.min(this.pitchMax, pitch));
 
-    if (this.dragHint && !this.hasInteracted) {
+    if (this.dragHint) {
       this.dragHint.classList.add('faded');
+      this.dragHint.style.display = 'none';
       this.hasInteracted = true;
     }
 
@@ -2328,8 +2341,8 @@ export class GT40CockpitSimulator {
       const degPitch = Math.round(THREE.MathUtils.radToDeg(this.currentPitch));
 
       let dirName = 'FORWARD TRACK';
-      if (degYaw > 35 && degYaw < 120) dirName = 'GATED SHIFTER & SILL';
-      else if (degYaw < -35 && degYaw > -120) dirName = 'PASSENGER & BREAKER MATRIX';
+      if (degYaw < -35 && degYaw > -120) dirName = 'GATED SHIFTER & SILL';
+      else if (degYaw > 35 && degYaw < 120) dirName = 'PASSENGER & BREAKER MATRIX';
       else if (Math.abs(degYaw) >= 120) dirName = 'REAR 427 V8 BULKHEAD';
       else if (degPitch < -22) dirName = 'STEWART-WARNER GAUGES';
       else if (degPitch > 18) dirName = 'GURNEY BUBBLE & ROOF';

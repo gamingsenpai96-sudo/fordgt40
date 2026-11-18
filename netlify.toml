@@ -1,6 +1,10 @@
 [build]
   publish = "."
 
+[build.environment]
+  GIT_LFS_ENABLED = "true"
+  GIT_LFS_FETCH_INCLUDE = "*.usdz,*.glb"
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -15,9 +19,23 @@
     Accept-Ranges = "bytes"
 
 [[headers]]
+  for = "*.usdz"
+  [headers.values]
+    Content-Type = "model/vnd.usdz+zip"
+    Cache-Control = "public, max-age=31536000, immutable"
+    Accept-Ranges = "bytes"
+
+[[headers]]
   for = "*.wav"
   [headers.values]
     Content-Type = "audio/wav"
+    Cache-Control = "public, max-age=31536000, immutable"
+    Accept-Ranges = "bytes"
+
+[[headers]]
+  for = "*.mp3"
+  [headers.values]
+    Content-Type = "audio/mpeg"
     Cache-Control = "public, max-age=31536000, immutable"
     Accept-Ranges = "bytes"
 
