@@ -1225,6 +1225,70 @@
     }
   }
 
+  function setupAugmentedReality() {
+    const qrContainer = document.getElementById('ar-qr-code');
+    const urlText = document.getElementById('ar-url-text');
+    const directTrigger = document.getElementById('ar-direct-trigger');
+    const modelViewer = document.getElementById('gt40-ar-viewer');
+    const mobileInstructions = document.getElementById('ar-mobile-instructions');
+    const desktopInstructions = document.getElementById('ar-desktop-instructions');
+
+    // Dynamic target URL pointing directly to AR section
+    const targetUrl = `${window.location.origin}${window.location.pathname}?ar=true#ar-section`;
+
+    if (urlText) {
+      urlText.textContent = targetUrl;
+    }
+
+    // Dynamic High-Contrast Monochrome QR Code Generation
+    if (qrContainer && typeof QRCode !== 'undefined') {
+      try {
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+          text: targetUrl,
+          width: 170,
+          height: 170,
+          colorDark: '#0a0d14',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      } catch (e) {
+        console.warn('QR Code generation notice:', e);
+      }
+    }
+
+    // Mobile / Touch Device Detection
+    const isMobileDevice = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+
+    if (isMobileDevice) {
+      if (desktopInstructions) desktopInstructions.style.display = 'none';
+      if (mobileInstructions) mobileInstructions.style.display = 'flex';
+    }
+
+    // Direct Mobile AR Trigger Button Hook
+    if (directTrigger && modelViewer) {
+      directTrigger.addEventListener('click', () => {
+        if (typeof modelViewer.activateAR === 'function') {
+          modelViewer.activateAR();
+        } else {
+          const slotBtn = modelViewer.querySelector('button[slot="ar-button"]');
+          if (slotBtn) slotBtn.click();
+        }
+      });
+    }
+
+    // Auto-launch AR when visiting via QR scan on a mobile device
+    if (window.location.search.includes('ar=true') && isMobileDevice && modelViewer) {
+      setTimeout(() => {
+        if (typeof modelViewer.activateAR === 'function') {
+          modelViewer.activateAR();
+        }
+      }, 900);
+    }
+  }
+
   function init() {
     // Spacer height keeps story cleanly below the 100vh viewport
     function updateSpacer() {
@@ -1249,6 +1313,7 @@
     setupSpecsUnitToggle();
     setupShowroomSplit();
     setupExperienceModals();
+    setupAugmentedReality();
 
     window.addEventListener('scroll', onScroll, { passive: true });
     observeSections();

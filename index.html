@@ -19,6 +19,10 @@
       }
     }
     </script>
+    <!-- Google Model Viewer for Native AR (WebXR / iOS Quick Look / Android Scene Viewer) -->
+    <script type="module" src="assets/js/model-viewer.min.js"></script>
+    <!-- High-Performance Dynamic QR Code Generator -->
+    <script src="assets/js/qrcode.min.js"></script>
   </head>
   <body>
     <!-- Preloader -->
@@ -100,19 +104,24 @@
           <span class="node-tag">04</span>
           <span class="node-label">COCKPIT VIEW</span>
         </button>
-        <button class="wayfinder-node" data-target="#circuit-section" data-cursor="CIRCUIT">
+        <button class="wayfinder-node" data-target="#ar-section" data-cursor="AR 3D">
           <span class="node-pip"></span>
           <span class="node-tag">05</span>
+          <span class="node-label">AR EXPERIENCE</span>
+        </button>
+        <button class="wayfinder-node" data-target="#circuit-section" data-cursor="CIRCUIT">
+          <span class="node-pip"></span>
+          <span class="node-tag">06</span>
           <span class="node-label">LE MANS TRACK</span>
         </button>
         <button class="wayfinder-node" data-target="#race-clock-section" data-cursor="24H RACE">
           <span class="node-pip"></span>
-          <span class="node-tag">06</span>
+          <span class="node-tag">07</span>
           <span class="node-label">24H CRUCIBLE</span>
         </button>
         <button class="wayfinder-node" data-target="#story" data-cursor="CHRONICLES">
           <span class="node-pip"></span>
-          <span class="node-tag">07</span>
+          <span class="node-tag">08</span>
           <span class="node-label">CHRONICLES</span>
         </button>
       </div>
@@ -232,6 +241,9 @@
         >
         <a href="#cockpit-sim-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="COCKPIT"
           ><span>COCKPIT<br />VIEW 3D</span><span class="arrow">&rarr;</span></a
+        >
+        <a href="#ar-section" class="nav-card highlight-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="AR 3D"
+          ><span>AUGMENTED<br />REALITY 3D</span><span class="arrow">&rarr;</span></a
         >
         <a href="#circuit-section" class="nav-card" data-tilt data-tilt-max="12" data-tilt-scale="1.04" data-cursor="CIRCUIT"
           ><span>CIRCUIT<br />DE LA SARTHE</span><span class="arrow">&rarr;</span></a
@@ -773,12 +785,13 @@
               <!-- Camera View Presets Deck -->
               <div class="cockpit-presets-group">
                 <span class="hud-label">PRESET VIEWS:</span>
-                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.02">FORWARD TRACK</button>
-                <button class="cockpit-preset-btn" data-yaw="0.07" data-pitch="-0.35">STEWART-WARNER GAUGES</button>
-                <button class="cockpit-preset-btn" data-yaw="1.02" data-pitch="-0.85">GATED SHIFTER</button>
-                <button class="cockpit-preset-btn" data-yaw="0.00" data-pitch="-0.75">ALUMINUM PEDALS</button>
-                <button class="cockpit-preset-btn" data-yaw="-0.92" data-pitch="-0.46">KEN MILES LAP LOG</button>
-                <button class="cockpit-preset-btn" data-yaw="2.85" data-pitch="-0.02">REAR 427 V8</button>
+                <button class="cockpit-preset-btn active" data-yaw="0" data-pitch="-0.02" data-preset="FORWARD TRACK">FORWARD TRACK</button>
+                <button class="cockpit-preset-btn" data-yaw="0.02" data-pitch="-0.28" data-preset="STEWART-WARNER GAUGES">GAUGES CLUSTER</button>
+                <button class="cockpit-preset-btn" data-yaw="1.05" data-pitch="-0.78" data-preset="GATED SHIFTER & SILL">SILL SHIFTER & HATCH</button>
+                <button class="cockpit-preset-btn" data-yaw="0.00" data-pitch="-0.82" data-preset="ALUMINUM PEDALS">PEDAL BOX</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.52" data-pitch="-0.65" data-preset="CENTER AIR TUNNEL">CENTER AIR TUNNEL</button>
+                <button class="cockpit-preset-btn" data-yaw="-0.88" data-pitch="-0.34" data-preset="PASSENGER & BREAKERS">CIRCUIT BREAKERS</button>
+                <button class="cockpit-preset-btn" data-yaw="3.08" data-pitch="-0.05" data-preset="REAR 427 V8">REAR 427 V8</button>
               </div>
 
               <div class="cockpit-actions-group">
@@ -802,24 +815,188 @@
         </div>
       </section>
 
-      <!-- Flow Bridge 05: Cockpit to Circuit Map -->
-      <div class="velocity-bridge bridge-cockpit-circuit">
+      <!-- Flow Bridge: Cockpit to Augmented Reality -->
+      <div class="velocity-bridge bridge-cockpit-ar">
         <div class="bridge-streamlines">
           <span class="streamline line-left"></span>
           <div class="bridge-telemetry-badge">
             <span class="badge-dot"></span>
-            <span>STAGE 05 // 13.461 KM ARENA &bull; 1966 CIRCUIT DE LA SARTHE</span>
+            <span>EXPERIENCE 05 // AUGMENTED REALITY &bull; 1:1 PHYSICAL SCALE</span>
           </div>
           <span class="streamline line-right"></span>
         </div>
       </div>
 
-      <!-- ====== SECTION 05: INTERACTIVE LE MANS CIRCUIT MAP ====== -->
+      <!-- ====== SECTION 05: AUGMENTED REALITY EXPERIENCE ====== -->
+      <section id="ar-section" class="ar-section content-section">
+        <div class="ar-wrapper">
+          <div class="ar-header">
+            <div class="ar-header-top">
+              <span class="section-tag">05 &bull; AUGMENTED REALITY</span>
+              <span class="ar-badge">
+                <span class="live-dot"></span>
+                WEBXR &bull; APPLE QUICK LOOK &bull; GOOGLE SCENE VIEWER
+              </span>
+            </div>
+            <h2 class="section-title">EXPERIENCE THE GT40 IN YOUR WORLD</h2>
+            <p class="section-body">
+              Bring the 1966 Le Mans winner into your driveway, living room, or desk at authentic 1:1 physical scale. Powered by native WebXR and AR Quick Look, inspect every aerodynamic curve, NACA intake duct, and 427 V8 detail directly in your environment with zero app installations.
+            </p>
+          </div>
+
+          <div class="ar-experience-grid">
+            <!-- 3D Interactive Model Viewer / Desktop Preview -->
+            <div class="ar-viewer-card">
+              <div class="ar-viewer-header">
+                <div class="ar-viewer-tag">
+                  <span class="pulse-dot"></span>
+                  <span class="cad-mono">CHASSIS P/1046 // 1:1 SCALE AR DIGITAL TWIN</span>
+                </div>
+                <div class="ar-viewer-specs">
+                  <span>SCALE: 1:1</span> &bull; <span>40.0" ROOF</span> &bull; <span>7.0L 427 V8</span>
+                </div>
+              </div>
+
+              <div class="ar-stage-container">
+                <model-viewer
+                  id="gt40-ar-viewer"
+                  src="assets/models/car/source/gt40.glb"
+                  alt="1966 Ford GT40 Mk II 3D / AR Model - Chassis P/1046"
+                  ar
+                  ar-modes="webxr scene-viewer quick-look"
+                  ar-scale="auto"
+                  camera-controls
+                  auto-rotate
+                  rotation-per-second="18deg"
+                  shadow-intensity="1.6"
+                  shadow-softness="0.75"
+                  exposure="1.05"
+                  loading="lazy"
+                  interaction-prompt="none"
+                >
+                  <!-- Native Mobile AR Launch Button (prominent on mobile) -->
+                  <button slot="ar-button" class="ar-mobile-launch-btn" id="ar-launch-button" data-cursor="VIEW IN AR">
+                    <span class="ar-btn-pulse"></span>
+                    <span class="ar-btn-icon">⚡</span>
+                    <span class="ar-btn-text">VIEW GT40 IN YOUR SPACE (1:1 SCALE AR)</span>
+                  </button>
+                </model-viewer>
+
+                <!-- Viewer Gesture HUD overlay -->
+                <div class="ar-stage-hud">
+                  <span class="ar-hud-pill">DRAG TO ROTATE &bull; PINCH TO ZOOM &bull; ORBIT IN REAL-TIME 3D</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AR Access & Smartphone Scanning Deck -->
+            <div class="ar-control-deck">
+              <!-- Desktop QR Code Scanning Card -->
+              <div class="ar-deck-card ar-desktop-card" id="ar-desktop-instructions">
+                <div class="ar-card-header">
+                  <span class="ar-card-label">INSTANT SMARTPHONE ACCESS</span>
+                  <span class="ar-platform-pills">
+                    <span class="p-pill">iOS QUICK LOOK</span>
+                    <span class="p-pill">ANDROID SCENE VIEWER</span>
+                  </span>
+                </div>
+                <h3 class="ar-card-title">SCAN TO LAUNCH AR</h3>
+                <p class="ar-card-desc">
+                  Point your smartphone camera at the dynamic QR code below. Your mobile browser will launch the AR camera immediately, allowing you to walk around the life-size 1966 Ford GT40 Mk II.
+                </p>
+
+                <!-- Dynamic High-Contrast QR Code Frame -->
+                <div class="ar-qr-outer-frame">
+                  <div class="ar-qr-frame">
+                    <div id="ar-qr-code" class="ar-qr-container">
+                      <!-- Rendered dynamically by QRCode library -->
+                    </div>
+                    <div class="ar-qr-target-corners">
+                      <span class="c-tl"></span><span class="c-tr"></span>
+                      <span class="c-bl"></span><span class="c-br"></span>
+                    </div>
+                  </div>
+                  <div class="ar-qr-status">
+                    <span class="live-dot"></span>
+                    <span id="ar-qr-status-text">DYNAMIC AR TARGET READY</span>
+                  </div>
+                </div>
+
+                <div class="ar-qr-url-pill">
+                  <span class="qr-url-icon">🔗</span>
+                  <span class="qr-url-text" id="ar-url-text">Loading live link...</span>
+                </div>
+
+                <!-- 3-Step Guided AR Workflow -->
+                <div class="ar-steps-list">
+                  <div class="ar-step-item">
+                    <div class="step-num-badge">01</div>
+                    <div class="step-info">
+                      <h4 class="step-title">Scan QR with Phone</h4>
+                      <p class="step-desc">Open your native iOS or Android camera app and point at the QR code above.</p>
+                    </div>
+                  </div>
+                  <div class="ar-step-item">
+                    <div class="step-num-badge">02</div>
+                    <div class="step-info">
+                      <h4 class="step-title">Tap Notification Link</h4>
+                      <p class="step-desc">Tap the browser banner to open the dedicated mobile AR view with zero app installs.</p>
+                    </div>
+                  </div>
+                  <div class="ar-step-item">
+                    <div class="step-num-badge">03</div>
+                    <div class="step-info">
+                      <h4 class="step-title">Place at 1:1 Scale</h4>
+                      <p class="step-desc">Point at your floor, driveway, or pavement to position the 40-inch champion.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mobile Launch Card (Visible on mobile screens) -->
+              <div class="ar-deck-card ar-mobile-card" id="ar-mobile-instructions">
+                <div class="ar-card-header">
+                  <span class="ar-card-label">MOBILE AR ENGINE DETECTED</span>
+                </div>
+                <h3 class="ar-card-title">PROJECT GT40 INTO YOUR SPACE</h3>
+                <p class="ar-card-desc">
+                  Your mobile browser supports native WebXR / AR Quick Look. Tap the button below to turn on your camera and place Bruce McLaren's #2 GT40 Mk II directly on your floor.
+                </p>
+                <button class="ar-direct-trigger-btn" id="ar-direct-trigger" data-cursor="LAUNCH AR">
+                  <span class="btn-glow"></span>
+                  <span class="btn-icon">⚡</span>
+                  <span class="btn-text">LAUNCH 1:1 AUGMENTED REALITY</span>
+                </button>
+                <div class="ar-specs-mini">
+                  <div class="mini-spec"><span class="ms-lbl">CAR</span><span class="ms-val">CHASSIS P/1046</span></div>
+                  <div class="mini-spec"><span class="ms-lbl">ROOF HEIGHT</span><span class="ms-val">40.0 INCHES</span></div>
+                  <div class="mini-spec"><span class="ms-lbl">ENGINE</span><span class="ms-val">427 CI (7.0L) V8</span></div>
+                  <div class="mini-spec"><span class="ms-lbl">TRANSMISSION</span><span class="ms-val">KAR KRAFT T-44</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flow Bridge: AR to Circuit Map -->
+      <div class="velocity-bridge bridge-ar-circuit">
+        <div class="bridge-streamlines">
+          <span class="streamline line-left"></span>
+          <div class="bridge-telemetry-badge">
+            <span class="badge-dot"></span>
+            <span>STAGE 06 // 13.461 KM ARENA &bull; 1966 CIRCUIT DE LA SARTHE</span>
+          </div>
+          <span class="streamline line-right"></span>
+        </div>
+      </div>
+
+      <!-- ====== SECTION 06: INTERACTIVE LE MANS CIRCUIT MAP ====== -->
       <section id="circuit-section" class="circuit-section content-section">
         <div class="circuit-wrapper">
           <div class="circuit-header">
             <div class="circuit-header-top">
-              <span class="section-tag">05 &bull; THE BATTLEFIELD</span>
+              <span class="section-tag">06 &bull; THE BATTLEFIELD</span>
               <span class="circuit-badge">
                 <span class="live-dot"></span>
                 13.461 KM HISTORIC CONFIGURATION
