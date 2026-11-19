@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Authoritative GT40 AR Exporter</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "../assets/js/three.module.js",
+      "three/addons/": "../assets/js/"
+    }
+  }
+  </script>
+</head>
+<body style="background:#090a0f; color:#f0f4f8; font-family:monospace; padding:30px;">
+  <h2 style="color:#e11d48;">1966 Ford GT40 Mk II — Authoritative AR Exporter</h2>
+  <div id="status" style="font-size:18px; color:#38bdf8; margin-bottom:15px;">Initializing WebGL & Exporters...</div>
+  <pre id="log" style="background:#11151c; border:1px solid #222b38; padding:15px; border-radius:6px; max-height:500px; overflow-y:auto;"></pre>
+
+  <script type="module">
+    import * as THREE from '../assets/js/three.module.js';
+    import { GLTFLoader } from '../assets/js/GLTFLoader.js';
+    import { GLTFExporter } from '../assets/js/GLTFExporter.js';
+    import { USDZExporter } from '../assets/js/USDZExporter.js';
+    import { addMechanicalAssemblies } from './mechanical-assemblies.js';
+
+    const statusEl = document.getElementById('status');
+    const logEl = document.getElementById('log');
+
+    function log(msg) {
+      logEl.textContent += msg + '\n';
+      statusEl.textContent = msg;
+      console.log(msg);
+    }
+
+    async function uploadBlob(url, blob, filename) {
+      const resp = await fetch(url + (filename ? '?name=' + encodeURIComponent(filename) : ''), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: blob
+      });
+      return await resp.text();
+    }
+
+    async function run() {
+      try {
+        log('1. Initializing WebGL Renderer for texture baking & assembly...');
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+        renderer.setSize(2048, 2048);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        const texLoader = new THREE.TextureLoader();
+        const loadTex = (file, isSRGB = true, flip = false) => {
+          return new Promise((resolve, reject) => {
+            texLoader.load(`../assets/models/car/textures_web/${file}`, (t) => {
+              t.flipY = flip;
+              if (isSRGB) t.colorSpace = THREE.SRGBColorSpace;
+              resolve(t);
+            }, undefined, reject);
+          });
+        };
+
+        log('2. Loading base textures...');
+        const [
+          bodyBaseTex,
+          wheelsBaseTex,
+          wheelsNormalTex,
+          engineBaseTex,
+          interiorBaseTex,
+          interiorNormalTex,
+          lightsBaseTex
+        ] = await Promise.all([
+          loadTex('Body_Livery_BlackWhite.png', true, false),
+          loadTex('Wheels_BaseColor.png', true, false),
+          loadTex('Wheels_Normal.png', false, false),
+          loadTex('Engine_BaseColor.png', true, true),
+          loadTex('Interior_BaseColor.1001.png', true, false),
+          loadTex('Interior_Normal.1001.png', false, false),
+          loadTex('LIGHTS_BaseColor.png', true, false)
+        ]);
+        log('Base textures loaded.');
+
+        log('3. Loading optimized CAD base geometry (assets/models/car/source/gt40_mobile_base.glb)...');
+        const gltfLoader = new GLTFLoader();
+        const gltf = await new Promise((resolve, reject) => {
+          gltfLoader.load('../assets/models/car/source/gt40_mobile_base.glb', resolve, undefined, reject);
+        });
+
+        const root = gltf.scene;
+        log(`Base CAD Model loaded. Root child nodes: ${root.children.length}`);
+
+        // Find primary meshes
+        let bodyMesh = null;
+        let wheelsMesh = null;
+        let diskMesh = null;
+        let interiorMesh = null;
+        let engineMesh = null;
+        let glassMesh = null;
+        let lightsMesh = null;
+        let redlightMesh = null;
+        let lightsNoOpacMesh = null;
+
+        root.traverse((child) => {
+          if (!child.isMesh) return;
+          const name = (child.name || '').toLowerCase();
+          if (name.includes('body')) bodyMesh = child;
+          else if (name.includes('wheel')) wheelsMesh = child;
+          else if (name.includes('disk')) diskMesh = child;
+          else if (name.includes('interior')) interiorMesh = child;
+          else if (name.includes('engine')) engineMesh = child;
+          else if (name.includes('glass')) glassMesh = child;
+          else if (name.includes('redlight')) redlightMesh = child;
+          else if (name.includes('lights-noopacity') || name.includes('noopacity')) lightsNoOpacMesh = child;
+          else if (name.includes('light')) lightsMesh = child;
+        });
+
+        if (!bodyMesh) throw new Error('Body mesh not found in gt40.glb!');
+        log(`Found Body: ${bodyMesh.name}, Wheels: ${wheelsMesh?.name}, Disk: ${diskMesh?.name}`);
+
+        // 4. BAKE BODY TEXTURE VIA WEBGL UNWRAP RENDER
+        log('4. Baking authentic 1966 Le Mans #2 livery into 2048x2048 Body texture...');
+        const bakeScene = new THREE.Scene();
+        const orthoCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 10);
+        orthoCam.position.z = 5;
+
+        // Custom UV unwrap shader matching assets/js/exploded-view.js 100%
+        const bodyBakeMat = new THREE.ShaderMaterial({
+          uniforms: {
+            baseMap: { value: bodyBaseTex }
+          },
+          vertexShader: `
+            attribute vec2 uv;
+            attribute vec3 position;
+            attribute vec3 normal;
+            varying vec3 vBodyPos;
+            varying vec3 vBodyNorm;
+            varying vec2 vUv;
+
+            void main() {
+              vBodyPos = position;
+              vBodyNorm = normal;
+              vUv = uv;
+              // Map UV (0..1) to clip space (-1..1), flip Y to match WebGL render target convention
+              gl_Position = vec4(uv.x * 2.0 - 1.0, (1.0 - uv.y) * 2.0 - 1.0, 0.0, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform sampler2D baseMap;
+            varying vec3 vBodyPos;
+            varying vec3 vBodyNorm;
+            varying vec2 vUv;
+
+            void main() {
+              vec4 baseTex = texture2D(baseMap, vUv);
+              float ax = abs(vBodyPos.x);
+
+              // Exterior upper panels (nose, hood, roof, rear deck, rear spoiler)
+              bool isExteriorTop = (vBodyPos.y > 0.16) && (vBodyNorm.y > -0.05) && !(vBodyPos.z > 0.95 && vBodyPos.y < 0.26 && vBodyNorm.y < 0.4);
+
+              bool isStripe = false;
+              if (isExteriorTop) {
+                // Main twin Le Mans white stripes
+                if (ax >= 0.012 && ax <= 0.068) {
+                  isStripe = true;
+                }
+                // Outer accent pinstripe
+                if (ax >= 0.076 && ax <= 0.082) {
+                  isStripe = true;
+                }
+                // Front bonnet competition roundel (passenger side)
+                if (length(vec2(vBodyPos.x - 0.24, vBodyPos.z - 1.16)) < 0.16 && vBodyPos.y > 0.20 && vBodyNorm.y > 0.35) {
+                  isStripe = true;
+                }
+              }
+
+              // Door rocker sill white stripes
+              bool isRocker = (vBodyPos.y >= -0.02 && vBodyPos.y <= 0.065) && (abs(vBodyNorm.x) > 0.6) && (vBodyPos.z > -0.75 && vBodyPos.z < 0.85);
+              if (isRocker && (vBodyPos.y >= 0.012 && vBodyPos.y <= 0.038)) {
+                isStripe = true;
+              }
+
+              vec3 col;
+              if (isStripe) {
+                col = vec3(0.96, 0.96, 0.98);
+              } else {
+                // Deep satin black lacquer paint
+                col = baseTex.rgb * vec3(0.14, 0.14, 0.16) + vec3(0.045, 0.045, 0.05);
+              }
+
+              gl_FragColor = vec4(col, 1.0);
+            }
+          `,
+          side: THREE.DoubleSide
+        });
+
+        const unwrapMesh = new THREE.Mesh(bodyMesh.geometry, bodyBakeMat);
+        bakeScene.add(unwrapMesh);
+
+        const renderTarget = new THREE.WebGLRenderTarget(2048, 2048, {
+          format: THREE.RGBAFormat,
+          type: THREE.UnsignedByteType,
+          colorSpace: THREE.SRGBColorSpace
+        });
+
+        renderer.setRenderTarget(renderTarget);
+        // Clear with dark lacquer base color so any non-UV gaps are rich black
+        renderer.setClearColor(new THREE.Color(0x0e1014), 1.0);
+        renderer.clear();
+        renderer.render(bakeScene, orthoCam);
+        renderer.setRenderTarget(null);
+
+        // Read pixels to canvas
+        const bodyCanvas = document.createElement('canvas');
+        bodyCanvas.width = 2048;
+        bodyCanvas.height = 2048;
+        const bodyCtx = bodyCanvas.getContext('2d');
+        const imgData = bodyCtx.createImageData(2048, 2048);
+
+        renderer.readRenderTargetPixels(renderTarget, 0, 0, 2048, 2048, imgData.data);
+        // Flip vertical because WebGL readPixels is bottom-to-top
+        const flippedCanvas = document.createElement('canvas');
+        flippedCanvas.width = 2048;
+        flippedCanvas.height = 2048;
+        const fCtx = flippedCanvas.getContext('2d');
+        bodyCtx.putImageData(imgData, 0, 0);
+
+        fCtx.translate(0, 2048);
+        fCtx.scale(1, -1);
+        fCtx.drawImage(bodyCanvas, 0, 0);
+
+        log('Body texture baked successfully. Converting to blob...');
+        const bodyBlob = await new Promise(res => flippedCanvas.toBlob(res, 'image/png'));
+        await uploadBlob('/api/save-texture', bodyBlob, 'Body_Livery_Baked.png');
+        log('Uploaded baked body texture to /assets/models/car/textures_web/Body_Livery_Baked.png');
+
+        const bakedBodyTex = new THREE.CanvasTexture(flippedCanvas);
+        bakedBodyTex.colorSpace = THREE.SRGBColorSpace;
+        bakedBodyTex.flipY = false;
+
+        // 5. BAKE HALIBRAND GOLD RIMS & CHROME KNOCKOFF SPINNER
+        log('5. Baking Halibrand Gold Rim & Chrome Knockoff texture...');
+        let bakedRimsTex = wheelsBaseTex;
+        if (diskMesh) {
+          const diskBakeScene = new THREE.Scene();
+          const diskBakeMat = new THREE.ShaderMaterial({
+            uniforms: {
+              baseMap: { value: wheelsBaseTex }
+            },
+            vertexShader: `
+              attribute vec2 uv;
+              attribute vec3 position;
+              varying vec3 vRimPos;
+              varying vec2 vUv;
+              void main() {
+                vRimPos = position;
+                vUv = uv;
+                gl_Position = vec4(uv.x * 2.0 - 1.0, (1.0 - uv.y) * 2.0 - 1.0, 0.0, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform sampler2D baseMap;
+              varying vec3 vRimPos;
+              varying vec2 vUv;
+              void main() {
+                vec4 baseTex = texture2D(baseMap, vUv);
+                float cz = vRimPos.z > 0.0 ? 1.23 : -1.11;
+                float cy = vRimPos.z > 0.0 ? 0.02 : -0.03;
+                float r = length(vec2(vRimPos.y - cy, vRimPos.z - cz));
+                vec3 col;
+                if (r < 0.052) {
+                  col = vec3(0.95, 0.95, 0.97); // Chrome Center Knockoff
+                } else {
+                  // Halibrand Vintage Racing Gold (0xd4af37)
+                  col = baseTex.rgb * vec3(0.83, 0.68, 0.21);
+                }
+                gl_FragColor = vec4(col, 1.0);
+              }
+            `,
+            side: THREE.DoubleSide
+          });
+
+          const unwrapDisk = new THREE.Mesh(diskMesh.geometry, diskBakeMat);
+          diskBakeScene.add(unwrapDisk);
+
+          const rimTarget = new THREE.WebGLRenderTarget(2048, 2048, {
+            format: THREE.RGBAFormat,
+            type: THREE.UnsignedByteType,
+            colorSpace: THREE.SRGBColorSpace
+          });
+
+          renderer.setRenderTarget(rimTarget);
+          renderer.setClearColor(new THREE.Color(0xd4af37), 1.0);
+          renderer.clear();
+          renderer.render(diskBakeScene, orthoCam);
+          renderer.setRenderTarget(null);
+
+          const rimCanvas = document.createElement('canvas');
+          rimCanvas.width = 2048;
+          rimCanvas.height = 2048;
+          const rimCtx = rimCanvas.getContext('2d');
+          const rimImgData = rimCtx.createImageData(2048, 2048);
+          renderer.readRenderTargetPixels(rimTarget, 0, 0, 2048, 2048, rimImgData.data);
+
+          const flippedRim = document.createElement('canvas');
+          flippedRim.width = 2048;
+          flippedRim.height = 2048;
+          const frCtx = flippedRim.getContext('2d');
+          rimCtx.putImageData(rimImgData, 0, 0);
+          frCtx.translate(0, 2048);
+          frCtx.scale(1, -1);
+          frCtx.drawImage(rimCanvas, 0, 0);
+
+          bakedRimsTex = new THREE.CanvasTexture(flippedRim);
+          bakedRimsTex.colorSpace = THREE.SRGBColorSpace;
+          bakedRimsTex.flipY = false;
+
+          const rimBlob = await new Promise(res => flippedRim.toBlob(res, 'image/png'));
+          await uploadBlob('/api/save-texture', rimBlob, 'Rims_BaseColor_Baked.png');
+          log('Halibrand Rim texture baked and saved.');
+        }
+
+        // 6. BAKE SOLID GOODYEAR TIRE RUBBER TEXTURE
+        log('6. Baking solid charcoal Goodyear Blue Streak tire texture (0x222428)...');
+        const tireCanvas = document.createElement('canvas');
+        tireCanvas.width = 2048;
+        tireCanvas.height = 2048;
+        const tireCtx = tireCanvas.getContext('2d');
+        // Fill rich charcoal rubber base
+        tireCtx.fillStyle = '#222428';
+        tireCtx.fillRect(0, 0, 2048, 2048);
+        tireCtx.globalCompositeOperation = 'multiply';
+        tireCtx.drawImage(wheelsBaseTex.image, 0, 0, 2048, 2048);
+        tireCtx.globalCompositeOperation = 'source-over';
+
+        const bakedTiresTex = new THREE.CanvasTexture(tireCanvas);
+        bakedTiresTex.colorSpace = THREE.SRGBColorSpace;
+        bakedTiresTex.flipY = false;
+
+        const tireBlob = await new Promise(res => tireCanvas.toBlob(res, 'image/png'));
+        await uploadBlob('/api/save-texture', tireBlob, 'Tires_BaseColor_Baked.png');
+        log('Goodyear Tire texture baked and saved.');
+
+        // 7. ASSIGN AUTHORITATIVE PBR MATERIALS TO GT40 MESHES
+        log('7. Binding authoritative standard PBR materials to GT40 assembly...');
+
+        // Body: 100% Opaque, Authentic Single-Stage Race Lacquer Black
+        bodyMesh.material = new THREE.MeshStandardMaterial({
+          name: 'GT40_Body_Livery',
+          color: new THREE.Color(0xffffff),
+          map: bakedBodyTex,
+          roughness: 0.32,
+          metalness: 0.12,
+          transparent: false,
+          opacity: 1.0,
+          depthWrite: true,
+          side: THREE.DoubleSide
+        });
+
+        // Tires: 100% Solid Opaque Goodyear Racing Rubber
+        if (wheelsMesh) {
+          wheelsMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Solid_Tires',
+            color: new THREE.Color(0xffffff),
+            map: bakedTiresTex,
+            normalMap: wheelsNormalTex,
+            roughness: 0.88,
+            metalness: 0.05,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
+            side: THREE.DoubleSide
+          });
+        }
+
+        // Rims: 100% Opaque Halibrand Vintage Racing Gold & Chrome Center Knockoff
+        if (diskMesh) {
+          diskMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Halibrand_Rims',
+            color: new THREE.Color(0xffffff),
+            map: bakedRimsTex,
+            normalMap: wheelsNormalTex,
+            roughness: 0.36,
+            metalness: 0.78,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
+            side: THREE.DoubleSide
+          });
+        }
+
+        // Interior Cockpit Tub
+        if (interiorMesh) {
+          interiorMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Cockpit_Tub',
+            map: interiorBaseTex,
+            normalMap: interiorNormalTex,
+            roughness: 0.75,
+            metalness: 0.15,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
+            side: THREE.DoubleSide
+          });
+        }
+
+        // Engine Block
+        if (engineMesh) {
+          engineMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Engine_Powertrain',
+            map: engineBaseTex,
+            roughness: 0.38,
+            metalness: 0.75,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
+            side: THREE.DoubleSide
+          });
+        }
+
+        // Competition Glass: Translucent with pristine index of refraction
+        if (glassMesh) {
+          glassMesh.material = new THREE.MeshPhysicalMaterial({
+            name: 'GT40_Competition_Glass',
+            color: new THREE.Color(0xeef4f8),
+            roughness: 0.06,
+            metalness: 0.08,
+            transmission: 0.90,
+            thickness: 0.20,
+            ior: 1.5,
+            transparent: true,
+            opacity: 0.35,
+            depthWrite: false,
+            side: THREE.DoubleSide
+          });
+        }
+
+        // Red Tail Lights
+        if (redlightMesh) {
+          redlightMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Tail_Lights',
+            color: new THREE.Color(0xee2222),
+            emissive: new THREE.Color(0xaa1100),
+            emissiveIntensity: 1.2,
+            roughness: 0.25,
+            transparent: false,
+            opacity: 1.0
+          });
+        }
+
+        // Headlights
+        if (lightsMesh) {
+          lightsMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Headlights',
+            map: lightsBaseTex,
+            roughness: 0.12,
+            metalness: 0.85,
+            transparent: false,
+            opacity: 1.0
+          });
+        }
+
+        if (lightsNoOpacMesh) {
+          lightsNoOpacMesh.material = new THREE.MeshStandardMaterial({
+            name: 'GT40_Headlight_Lenses',
+            color: new THREE.Color(0xffffff),
+            transparent: true,
+            opacity: 0.65,
+            roughness: 0.10,
+            metalness: 0.30
+          });
+        }
+
+        // 8. ADD AUTHENTIC MECHANICAL ASSEMBLIES MATCHING EXPLODED-VIEW.JS
+        log('8. Adding authentic mechanical assemblies (bundle-of-snakes exhaust, Koni coilovers, carbs, transaxle, RHD cockpit)...');
+        addMechanicalAssemblies(root, THREE);
+        log('Mechanical assemblies attached to root.');
+
+        // Clean up any unnamed or empty meshes that might cause issues
+        root.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (!child.name) child.name = 'GT40_Part';
+          }
+        });
+
+        // 9. EXPORT GLB USING GLTFExporter
+        log('9. Exporting full PBR scene to GLB (assets/models/car/source/gt40.glb)...');
+        const gltfExporter = new GLTFExporter();
+        const glbBuffer = await new Promise((resolve, reject) => {
+          gltfExporter.parse(
+            root,
+            (buffer) => resolve(buffer),
+            (err) => reject(err),
+            { binary: true }
+          );
+        });
+
+        log(`GLB generated. Size: ${(glbBuffer.byteLength / (1024 * 1024)).toFixed(2)} MB`);
+        const glbBlob = new Blob([glbBuffer], { type: 'model/gltf-binary' });
+        const glbUploadRes = await uploadBlob('/api/save-glb', glbBlob);
+        log(`Server response: ${glbUploadRes}`);
+
+        // 10. EXPORT USDZ FOR APPLE QUICK LOOK
+        log('10. Exporting full PBR scene to USDZ (assets/models/car/source/gt40.usdz)...');
+        const usdzExporter = new USDZExporter();
+        const usdzData = await usdzExporter.parse(root, {
+          quickLookCompatible: true,
+          ar: {
+            anchoring: { type: 'plane' },
+            planeAnchoring: { alignment: 'horizontal' }
+          }
+        });
+
+        log(`USDZ generated. Size: ${(usdzData.byteLength / (1024 * 1024)).toFixed(2)} MB`);
+        const usdzBlob = new Blob([usdzData], { type: 'model/vnd.usdz+zip' });
+        const usdzUploadRes = await uploadBlob('/api/save-usdz', usdzBlob);
+        log(`Server response: ${usdzUploadRes}`);
+
+        statusEl.textContent = 'EXPORT COMPLETE! Both GLB and USDZ deployed successfully.';
+        statusEl.style.color = '#4ade80';
+        window.__EXPORT_SUCCESS__ = true;
+        log('=== ALL OPERATIONS COMPLETED SUCCESSFULLY ===');
+      } catch (err) {
+        log(`ERROR: ${err.message}\n${err.stack}`);
+        statusEl.textContent = 'EXPORT FAILED: ' + err.message;
+        statusEl.style.color = '#ef4444';
+        window.__EXPORT_FAILED__ = true;
+      }
+    }
+
+    run();
+  </script>
+</body>
+</html>
