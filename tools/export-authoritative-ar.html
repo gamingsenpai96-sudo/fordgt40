@@ -134,27 +134,28 @@
         if (!bodyMesh) throw new Error('Body mesh not found in gt40_base_cad.glb!');
         log(`Found Body: ${bodyMesh.name}, Wheels: ${wheelsMesh?.name}, Disk: ${diskMesh?.name}`);
 
-        // 4. APPLY AUTHENTIC LE MANS #2 LIVERY MATERIAL
+        // 4. APPLY AUTHENTIC LE MANS #2 LIVERY MATERIAL (Pure dielectric lacquer - zero metalness)
         bodyMesh.material = new THREE.MeshStandardMaterial({
           name: 'GT40_Body_Livery',
+          color: new THREE.Color(0xffffff),
           map: bodyLiveryTex,
-          roughnessMap: bodyRoughTex,
-          metalnessMap: bodyMetalTex,
-          roughness: 0.32,
-          metalness: 0.15,
+          roughness: 0.38,
+          metalness: 0.0,
           side: THREE.DoubleSide
         });
 
-        // 5. SOLID GOODYEAR BLUE STREAK RACING TIRES
+        // 5. SOLID GOODYEAR BLUE STREAK RACING TIRES (Solid rubber - zero metalness)
         if (wheelsMesh) {
           wheelsMesh.material = new THREE.MeshStandardMaterial({
             name: 'GT40_Solid_Tires',
-            color: new THREE.Color(0x222428),
+            color: new THREE.Color(0xffffff),
             map: tiresTex,
-            roughnessMap: wheelsRoughTex,
             normalMap: wheelsNormTex,
-            roughness: 0.88,
-            metalness: 0.05,
+            roughness: 0.90,
+            metalness: 0.0,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
             side: THREE.DoubleSide
           });
         }
@@ -163,13 +164,14 @@
         if (diskMesh) {
           diskMesh.material = new THREE.MeshStandardMaterial({
             name: 'GT40_Halibrand_Rims',
-            color: new THREE.Color(0xd4af37),
+            color: new THREE.Color(0xffffff),
             map: rimsTex,
-            roughnessMap: wheelsRoughTex,
-            metalnessMap: wheelsMetalTex,
             normalMap: wheelsNormTex,
-            roughness: 0.36,
-            metalness: 0.78,
+            roughness: 0.35,
+            metalness: 0.85,
+            transparent: false,
+            opacity: 1.0,
+            depthWrite: true,
             side: THREE.DoubleSide
           });
         }

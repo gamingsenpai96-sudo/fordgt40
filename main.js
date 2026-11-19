@@ -1287,6 +1287,23 @@
         }
       }, 900);
     }
+
+    if (modelViewer) {
+      modelViewer.addEventListener('load', async () => {
+        modelViewer.exposure = 0.55;
+        if (modelViewer.model?.materials) {
+          for (const m of modelViewer.model.materials) {
+            try {
+              if (typeof m.ensureLoaded === 'function') await m.ensureLoaded();
+            } catch (e) {}
+          }
+          const bodyMat = modelViewer.model.materials.find(m => m.name === 'GT40_Body_Livery');
+          if (bodyMat && bodyMat.pbrMetallicRoughness) {
+            bodyMat.pbrMetallicRoughness.setRoughnessFactor(0.18);
+          }
+        }
+      });
+    }
   }
 
   function init() {
