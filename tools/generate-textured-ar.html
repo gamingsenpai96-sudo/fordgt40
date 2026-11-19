@@ -58,7 +58,8 @@
           interiorNormTex,
           engineTex,
           lightsTex,
-          redlightTex
+          redlightTex,
+          glassTex
         ] = await Promise.all([
           loadTex('../assets/models/car/textures_web/Body_Livery_Baked.png', true),
           loadTex('../assets/models/car/textures_web/Body_Roughness_AR.png', false),
@@ -69,7 +70,8 @@
           loadTex('../assets/models/car/textures_web/Interior_Normal.1001.png', false),
           loadTex('../assets/models/car/textures_web/Engine_BaseColor_AR.png', true),
           loadTex('../assets/models/car/textures_web/LIGHTS_BaseColor_AR.png', true),
-          loadTex('../assets/models/car/textures_web/REDLIGHT_BaseColor_AR.png', true)
+          loadTex('../assets/models/car/textures_web/REDLIGHT_BaseColor_AR.png', true),
+          loadTex('../assets/models/car/textures_web/Glass_BaseColor.png', true)
         ]);
 
         log('All PBR texture maps loaded successfully.');
@@ -94,39 +96,37 @@
               name: 'GT40_Body_Livery',
               color: new THREE.Color(0xffffff),
               map: bodyTex,
-              roughnessMap: bodyRoughTex,
-              metalnessMap: bodyMetalTex,
-              roughness: 0.28,
-              metalness: 0.10,
+              roughness: 0.18,
+              metalness: 0.0,
               side: THREE.DoubleSide
             });
           } else if (name.includes('Wheels')) {
             // Authentic Solid Goodyear Blue Streak Racing Tires
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Solid_Tires',
-              color: new THREE.Color(0x181a1d),
+              color: new THREE.Color(0xffffff),
               map: wheelsTex,
               normalMap: wheelsNormTex,
-              roughness: 0.88,
-              metalness: 0.05,
+              roughness: 0.90,
+              metalness: 0.02,
               side: THREE.DoubleSide
             });
           } else if (name.includes('Disk')) {
             // Halibrand Magnesium 15" Vintage Le Mans Gold Rims & Chrome Knockoff Spinner
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Halibrand_Rims',
-              color: new THREE.Color(0xd4af37),
+              color: new THREE.Color(0xffffff),
               map: wheelsTex,
               normalMap: wheelsNormTex,
-              roughness: 0.32,
-              metalness: 0.65,
+              roughness: 0.28,
+              metalness: 0.75,
               side: THREE.DoubleSide
             });
           } else if (name.includes('Interior')) {
             // Cockpit Interior Upholstery and Panels
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Cockpit_Interior',
-              color: 0xffffff,
+              color: new THREE.Color(0xffffff),
               map: interiorTex,
               normalMap: interiorNormTex,
               roughness: 0.85,
@@ -137,7 +137,7 @@
             // 427 FE Big-Block V8 Engine & Crossover Exhaust
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_427_V8_Engine',
-              color: 0xffffff,
+              color: new THREE.Color(0xffffff),
               map: engineTex,
               roughness: 0.35,
               metalness: 0.75,
@@ -146,10 +146,9 @@
           } else if (name.includes('Glass')) {
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Competition_Glass',
-              color: 0x99bbdd,
+              map: glassTex,
               transparent: true,
-              opacity: 0.35,
-              roughness: 0.05,
+              roughness: 0.1,
               metalness: 0.1,
               side: THREE.DoubleSide
             });
@@ -180,8 +179,8 @@
           }
         });
 
-        // 4. Add Solid Wheel Backing Drums (eliminates hollow tire appearance permanently)
-        log('4. Adding solid inner wheel well drums to permanently eliminate hollow tires...');
+        // 4. Add Solid Wheel Backing Drums (eliminates hollow tire appearance without covering Halibrand rims)
+        log('4. Adding solid inner wheel well drums and inner bead closures...');
         const drumMat = new THREE.MeshStandardMaterial({
           name: 'GT40_Solid_Wheel_Drums',
           color: 0x111215,
@@ -190,18 +189,41 @@
           side: THREE.DoubleSide
         });
 
-        const wheelDrums = [
-          { x: 0.552, y: 0.019, z: 1.230, r: 0.316, depth: 0.08 },
-          { x: -0.552, y: 0.019, z: 1.230, r: 0.316, depth: 0.08 },
-          { x: 0.548, y: -0.027, z: -1.107, r: 0.344, depth: 0.10 },
-          { x: -0.548, y: -0.027, z: -1.107, r: 0.344, depth: 0.10 }
+        const tireCoreMat = new THREE.MeshStandardMaterial({
+          name: 'GT40_Solid_Tire_Core',
+          color: 0x141518,
+          roughness: 0.92,
+          metalness: 0.04,
+          side: THREE.DoubleSide
+        });
+
+        const wheelConfigs = [
+          { name: 'Front-Left',  y:  0.019, z:  1.230, rTire: 0.316, rHub: 0.180, drumX: -0.551, sideSign: -1 },
+          { name: 'Front-Right', y:  0.019, z:  1.230, rTire: 0.316, rHub: 0.180, drumX:  0.551, sideSign:  1 },
+          { name: 'Rear-Left',   y: -0.027, z: -1.107, rTire: 0.344, rHub: 0.190, drumX: -0.547, sideSign: -1 },
+          { name: 'Rear-Right',  y: -0.027, z: -1.107, rTire: 0.344, rHub: 0.190, drumX:  0.547, sideSign:  1 }
         ];
 
-        wheelDrums.forEach(wd => {
-          const drum = new THREE.Mesh(new THREE.CylinderGeometry(wd.r, wd.r, wd.depth, 32, 1, false), drumMat);
+        wheelConfigs.forEach(wc => {
+          // Inner backing drum (covers open back of wheel well completely)
+          const drum = new THREE.Mesh(new THREE.CylinderGeometry(wc.rTire, wc.rTire, 0.06, 32, 1, false), drumMat);
           drum.rotation.z = Math.PI / 2;
-          drum.position.set(wd.x, wd.y, wd.z);
+          drum.position.set(wc.drumX, wc.y, wc.z);
           root.add(drum);
+
+          // Inner rim barrel (cylinder placed behind the outer rim face, closing tire interior from drum to rim back)
+          const barrelDepth = 0.10;
+          const barrelX = wc.drumX + (wc.sideSign * (barrelDepth / 2));
+          const barrel = new THREE.Mesh(new THREE.CylinderGeometry(wc.rHub, wc.rHub, barrelDepth, 32, 1, false), drumMat);
+          barrel.rotation.z = Math.PI / 2;
+          barrel.position.set(barrelX, wc.y, wc.z);
+          root.add(barrel);
+
+          // Inner tire sidewall ring (closes inner tire bead between rim barrel and tire tread)
+          const innerSidewall = new THREE.Mesh(new THREE.RingGeometry(wc.rHub * 0.90, wc.rTire, 32), tireCoreMat);
+          innerSidewall.rotation.y = Math.PI / 2;
+          innerSidewall.position.set(wc.drumX, wc.y, wc.z);
+          root.add(innerSidewall);
         });
 
         // 5. Add high-detail RHD cockpit interior components
