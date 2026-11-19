@@ -74,10 +74,10 @@
 
         log('All PBR texture maps loaded successfully.');
 
-        log('3. Loading pristine GT40 CAD geometry (assets/models/car/source/gt40_pristine_base.glb)...');
+        log('3. Loading optimized GT40 CAD geometry (assets/models/car/source/gt40_mobile_base.glb)...');
         const gltfLoader = new GLTFLoader();
         const gltf = await new Promise((resolve, reject) => {
-          gltfLoader.load('../assets/models/car/source/gt40_pristine_base.glb', resolve, undefined, reject);
+          gltfLoader.load('../assets/models/car/source/gt40_mobile_base.glb', resolve, undefined, reject);
         });
 
         const root = gltf.scene;
