@@ -2,3 +2,4 @@
 .netlify
 node_modules
 *.log
+assets/models/car/source/gt40_base_cad.glb

@@ -47,21 +47,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(f'Saved GLB ({len(post_data)} bytes) to {target_path}'.encode('utf-8'))
             return
 
-        if self.path.startswith('/api/save-texture'):
-            import urllib.parse
-            query = urllib.parse.urlparse(self.path).query
-            params = urllib.parse.parse_qs(query)
-            filename = params.get('name', ['texture.png'])[0]
-            target_path = os.path.join(DIRECTORY, 'assets/models/car/textures_web', os.path.basename(filename))
-            os.makedirs(os.path.dirname(target_path), exist_ok=True)
-            with open(target_path, 'wb') as f:
-                f.write(post_data)
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(f'Saved texture ({len(post_data)} bytes) to {target_path}'.encode('utf-8'))
-            return
-
         self.send_response(404)
         self.end_headers()
 

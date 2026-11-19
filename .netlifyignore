@@ -5,3 +5,4 @@ tools
 .DS_Store
 *.zip
 *.tar.gz
+assets/models/car/source/gt40_base_cad.glb
