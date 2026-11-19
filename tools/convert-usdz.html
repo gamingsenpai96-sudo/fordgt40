@@ -31,9 +31,10 @@
     }
 
     const loader = new GLTFLoader();
-    logMsg('Loading assets/models/car/source/gt40.glb...');
+    const modelUrl = '../assets/models/car/source/gt40.glb?t=' + Date.now();
+    logMsg('Loading ' + modelUrl + '...');
 
-    loader.load('../assets/models/car/source/gt40.glb', async (gltf) => {
+    loader.load(modelUrl, async (gltf) => {
       logMsg('GLTF loaded successfully. Nodes: ' + gltf.scene.children.length);
       try {
         const exporter = new USDZExporter();
