@@ -74,14 +74,14 @@
 
         log('All PBR texture maps loaded successfully.');
 
-        log('3. Loading simplified GT40 geometry (assets/models/car/source/gt40_mobile_base.glb)...');
+        log('3. Loading pristine GT40 CAD geometry (assets/models/car/source/gt40_pristine_base.glb)...');
         const gltfLoader = new GLTFLoader();
         const gltf = await new Promise((resolve, reject) => {
-          gltfLoader.load('../assets/models/car/source/gt40_mobile_base.glb', resolve, undefined, reject);
+          gltfLoader.load('../assets/models/car/source/gt40_pristine_base.glb', resolve, undefined, reject);
         });
 
         const root = gltf.scene;
-        log('Base mesh loaded. Processing meshes and binding authentic PBR materials...');
+        log('Pristine base CAD mesh loaded. Processing meshes and binding authentic PBR materials...');
 
         root.traverse((child) => {
           if (!child.isMesh) return;
@@ -89,27 +89,44 @@
           log(`Configuring material for mesh: ${name}`);
 
           if (name.includes('Body')) {
+            // Authentic 1966 Le Mans #2 Gloss Black with Twin White Center Racing Stripes
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Body_Livery',
+              color: new THREE.Color(0xffffff),
               map: bodyTex,
               roughnessMap: bodyRoughTex,
               metalnessMap: bodyMetalTex,
-              roughness: 0.32,
-              metalness: 0.25,
+              roughness: 0.28,
+              metalness: 0.10,
               side: THREE.DoubleSide
             });
           } else if (name.includes('Wheels')) {
+            // Authentic Solid Goodyear Blue Streak Racing Tires
             child.material = new THREE.MeshStandardMaterial({
-              name: 'GT40_Halibrand_Wheels',
+              name: 'GT40_Solid_Tires',
+              color: new THREE.Color(0x181a1d),
+              map: wheelsTex,
+              normalMap: wheelsNormTex,
+              roughness: 0.88,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('Disk')) {
+            // Halibrand Magnesium 15" Vintage Le Mans Gold Rims & Chrome Knockoff Spinner
+            child.material = new THREE.MeshStandardMaterial({
+              name: 'GT40_Halibrand_Rims',
               color: new THREE.Color(0xd4af37),
               map: wheelsTex,
               normalMap: wheelsNormTex,
-              roughness: 0.35,
-              metalness: 0.82
+              roughness: 0.32,
+              metalness: 0.65,
+              side: THREE.DoubleSide
             });
           } else if (name.includes('Interior')) {
+            // Cockpit Interior Upholstery and Panels
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_Cockpit_Interior',
+              color: 0xffffff,
               map: interiorTex,
               normalMap: interiorNormTex,
               roughness: 0.85,
@@ -117,11 +134,14 @@
               side: THREE.DoubleSide
             });
           } else if (name.includes('Engine')) {
+            // 427 FE Big-Block V8 Engine & Crossover Exhaust
             child.material = new THREE.MeshStandardMaterial({
               name: 'GT40_427_V8_Engine',
+              color: 0xffffff,
               map: engineTex,
-              roughness: 0.28,
-              metalness: 0.88
+              roughness: 0.35,
+              metalness: 0.75,
+              side: THREE.DoubleSide
             });
           } else if (name.includes('Glass')) {
             child.material = new THREE.MeshStandardMaterial({
@@ -157,18 +177,35 @@
               roughness: 0.12,
               metalness: 0.85
             });
-          } else if (name.includes('Disk')) {
-            child.material = new THREE.MeshStandardMaterial({
-              name: 'GT40_Brake_Disks',
-              color: 0x484848,
-              roughness: 0.35,
-              metalness: 0.92
-            });
           }
         });
 
-        // 4. Add high-detail RHD cockpit interior components
-        log('4. Adding authentic RHD cockpit interior details (Stewart-Warner cluster, Moto-Lita wheel, gated shifter)...');
+        // 4. Add Solid Wheel Backing Drums (eliminates hollow tire appearance permanently)
+        log('4. Adding solid inner wheel well drums to permanently eliminate hollow tires...');
+        const drumMat = new THREE.MeshStandardMaterial({
+          name: 'GT40_Solid_Wheel_Drums',
+          color: 0x111215,
+          roughness: 0.95,
+          metalness: 0.10,
+          side: THREE.DoubleSide
+        });
+
+        const wheelDrums = [
+          { x: 0.552, y: 0.019, z: 1.230, r: 0.316, depth: 0.08 },
+          { x: -0.552, y: 0.019, z: 1.230, r: 0.316, depth: 0.08 },
+          { x: 0.548, y: -0.027, z: -1.107, r: 0.344, depth: 0.10 },
+          { x: -0.548, y: -0.027, z: -1.107, r: 0.344, depth: 0.10 }
+        ];
+
+        wheelDrums.forEach(wd => {
+          const drum = new THREE.Mesh(new THREE.CylinderGeometry(wd.r, wd.r, wd.depth, 32, 1, false), drumMat);
+          drum.rotation.z = Math.PI / 2;
+          drum.position.set(wd.x, wd.y, wd.z);
+          root.add(drum);
+        });
+
+        // 5. Add high-detail RHD cockpit interior components
+        log('5. Adding authentic RHD cockpit interior details (Stewart-Warner cluster, Moto-Lita wheel, gated shifter)...');
         const cockpitGroup = new THREE.Group();
         cockpitGroup.name = 'Authentic_Cockpit_Details';
 
@@ -208,7 +245,7 @@
         centerCap.rotation.x = Math.PI / 2;
         wheelGroup.add(centerCap);
 
-        // Ford GT Horn Emblem
+        // Ford GT Horn Emblem (using MeshStandardMaterial for universal USDZ/GLTF export)
         const emblemCanvas = document.createElement('canvas');
         emblemCanvas.width = 128;
         emblemCanvas.height = 128;
@@ -225,16 +262,17 @@
         eCtx.textBaseline = 'middle';
         eCtx.fillText('FORD G.T.', 64, 64);
         const emblemTex = new THREE.CanvasTexture(emblemCanvas);
+        emblemTex.colorSpace = THREE.SRGBColorSpace;
         const emblemMesh = new THREE.Mesh(
           new THREE.CircleGeometry(0.028, 24),
-          new THREE.MeshBasicMaterial({ map: emblemTex })
+          new THREE.MeshStandardMaterial({ map: emblemTex, roughness: 0.35, metalness: 0.25 })
         );
         emblemMesh.position.set(0, 0, 0.008);
         wheelGroup.add(emblemMesh);
 
         cockpitGroup.add(wheelGroup);
 
-        // Stewart-Warner Gauges Dashboard Cluster facing driver
+        // Stewart-Warner Gauges Dashboard Cluster facing driver on Right Side (X = -0.28m)
         const dashCluster = new THREE.Group();
         dashCluster.position.set(-0.28, 0.28, 0.62);
 
@@ -260,9 +298,11 @@
         tCtx.lineTo(195, 75);
         tCtx.stroke();
 
+        const tachTex = new THREE.CanvasTexture(tachCanvas);
+        tachTex.colorSpace = THREE.SRGBColorSpace;
         const tachMesh = new THREE.Mesh(
           new THREE.CircleGeometry(0.055, 24),
-          new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(tachCanvas) })
+          new THREE.MeshStandardMaterial({ map: tachTex, roughness: 0.4, metalness: 0.1 })
         );
         tachMesh.position.set(0, 0, 0);
         dashCluster.add(tachMesh);
@@ -270,11 +310,11 @@
         const bezel = new THREE.Mesh(new THREE.TorusGeometry(0.056, 0.005, 12, 24), chromeMat);
         dashCluster.add(bezel);
 
-        // Secondary gauges
+        // Secondary gauges (oil pressure, water temperature, fuel level)
         [-0.11, 0.11, 0.20].forEach((gx) => {
           const smallGauge = new THREE.Mesh(
             new THREE.CircleGeometry(0.028, 20),
-            new THREE.MeshBasicMaterial({ color: 0x111317 })
+            new THREE.MeshStandardMaterial({ color: 0x111317, roughness: 0.5, metalness: 0.1 })
           );
           smallGauge.position.set(gx, 0, 0);
           dashCluster.add(smallGauge);
@@ -285,7 +325,7 @@
 
         cockpitGroup.add(dashCluster);
 
-        // Kar-Kraft Gated Shifter on Right Sill
+        // Kar-Kraft Gated Shifter on Right Door Sill (X = -0.52m)
         const shifterGroup = new THREE.Group();
         shifterGroup.position.set(-0.52, 0.03, 0.14);
         const shiftGate = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.012, 0.12), brushedAlum);
@@ -299,16 +339,16 @@
         shifterGroup.add(shiftKnob);
         cockpitGroup.add(shifterGroup);
 
-        // 12-bolt oval inspection hatch on right sill
+        // 12-bolt oval inspection hatch on right sill (X = -0.54m)
         const hatchMesh = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.006, 0.16), brushedAlum);
         hatchMesh.position.set(-0.54, -0.095, 0.22);
         cockpitGroup.add(hatchMesh);
 
         root.add(cockpitGroup);
-        log('Cockpit interior integrated with car root.');
+        log('RHD cockpit interior integrated with car root.');
 
-        // 5. Exporting GLTF Binary (GLB) with embedded textures for WebAR / Android Scene Viewer
-        log('5. Exporting fully-textured GLB for Android & WebAR...');
+        // 6. Exporting GLTF Binary (GLB) with embedded textures for WebAR / Android Scene Viewer
+        log('6. Exporting fully-textured GLB for Android & WebAR...');
         const glbExporter = new GLTFExporter();
         const glbData = await new Promise((resolve, reject) => {
           glbExporter.parse(root, resolve, reject, {
@@ -327,8 +367,8 @@
         });
         log(`Server GLB response: ${await glbResp.text()}`);
 
-        // 6. Exporting USDZ for Apple AR Quick Look
-        log('6. Exporting fully-textured USDZ for iOS Quick Look...');
+        // 7. Exporting USDZ for Apple AR Quick Look
+        log('7. Exporting fully-textured USDZ for iOS Quick Look...');
         const usdzExporter = new USDZExporter();
         const usdzData = await usdzExporter.parse(root, {
           quickLookCompatible: true,

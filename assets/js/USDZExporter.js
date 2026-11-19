@@ -1,6 +1,7 @@
 import {
   NoColorSpace,
   DoubleSide,
+  MeshStandardMaterial,
 } from './three.module.js';
 
 import {
@@ -38,9 +39,20 @@ class USDZExporter {
 			if ( object.isMesh ) {
 
 				const geometry = object.geometry;
-				const material = object.material;
+				let material = object.material;
 
-				if ( material.isMeshStandardMaterial ) {
+				if ( material ) {
+
+					if ( ! material.isMeshStandardMaterial ) {
+
+						material = new MeshStandardMaterial({
+							color: material.color || 0xffffff,
+							map: material.map || null,
+							roughness: 0.8,
+							metalness: 0.1
+						});
+
+					}
 
 					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
@@ -58,10 +70,6 @@ class USDZExporter {
 					}
 
 					output += buildXform( object, geometry, material );
-
-				} else {
-
-					console.warn( 'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)', object );
 
 				}
 
@@ -292,6 +300,7 @@ function buildMesh( geometry ) {
 	return `
 	def Mesh "${ name }"
 	{
+		uniform bool doubleSided = 1
 		int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
 		int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
 		normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
@@ -516,7 +525,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			float outputs:r
 			float outputs:g
 			float outputs:b
-			float3 outputs:rgb
+			${ mapType === 'normal' ? 'normal3f outputs:rgb' : 'color3f outputs:rgb' }
 			${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
 		}`;
 
